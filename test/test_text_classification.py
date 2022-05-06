@@ -1,6 +1,3 @@
-import torch
-from cogktr import *
-
 """
 tagger=XXXTagger()
 linker=XXXLinker()
@@ -12,7 +9,6 @@ reader=XXXReader()
 train_data=reader.read_train_data()
 valid_data=reader.read_valid_data()
 test_data=reader.read_test_data()
-
 train_data=enhancer.enhance_data(train_data)
 valid_data=enhancer.enhance_data(valid_data)
 test_data=enhancer.enhance_data(test_data)
@@ -37,6 +33,11 @@ evaluator=evaluator.evaluate()
 predictor=Predictor()
 predictor=predictor.predicte()
 """
+import torch
+from cogktr import *
+
+
+
 
 
 
