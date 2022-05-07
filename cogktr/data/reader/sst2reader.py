@@ -1,6 +1,7 @@
 import os
 from cogktr.data.reader.basereader import BaseReader
 from cogktr.data.datable import DataTable
+from cogktr.utils.vocab_utils import Vocabulary
 
 
 class SST2Reader(BaseReader):
@@ -13,8 +14,9 @@ class SST2Reader(BaseReader):
         self.train_path = os.path.join(raw_data_path, self.train_file)
         self.dev_path = os.path.join(raw_data_path, self.dev_file)
         self.test_path = os.path.join(raw_data_path, self.test_file)
+        self.label_vocab=Vocabulary()
 
-    def _read(self, path):
+    def _read_train(self, path):
         datable = DataTable()
         with open(path) as file:
             lines = file.readlines()
@@ -24,12 +26,41 @@ class SST2Reader(BaseReader):
             sentence,label=line.strip().split("\t")
             datable("sentence",sentence)
             datable("label", label)
+            self.label_vocab.add(label)
+        return datable
+    def _read_dev(self, path):
+        datable = DataTable()
+        with open(path) as file:
+            lines = file.readlines()
+        header=lines[0]
+        contents=lines[1:]
+        for line in contents:
+            sentence,label=line.strip().split("\t")
+            datable("sentence",sentence)
+            datable("label", label)
+            self.label_vocab.add(label)
+        return datable
+    def _read_test(self, path):
+        datable = DataTable()
+        with open(path) as file:
+            lines = file.readlines()
+        header=lines[0]
+        contents=lines[1:]
+        for line in contents:
+            index,sentence=line.strip().split("\t")
+            datable("sentence",sentence)
         return datable
 
+
     def read_all(self):
-        return self._read(self.train_path), self._read(self.dev_path), self._read(self.test_path)
+        return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
+
+    def read_vocab(self):
+        self.label_vocab.create()
+        return {"label_vocab":self.label_vocab}
 
 if __name__=="__main__":
     reader=SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data,dev_data,test_data=reader.read_all()
+    vocab=reader.read_vocab()
     print("end")
