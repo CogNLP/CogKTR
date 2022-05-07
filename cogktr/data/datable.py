@@ -2,7 +2,6 @@ from cogktr.utils.io_utils import save_json, load_json
 import prettytable as pt
 
 
-
 class DataTable:
     def __init__(self, headers=None):
         self.datas = {}

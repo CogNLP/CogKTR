@@ -10,7 +10,7 @@ class Vocabulary():
     def add(self, label):
         self.label_set.add(label)
 
-    def add_sequence(self,labels):
+    def add_sequence(self, labels):
         for label in labels:
             self.add(label)
 
@@ -36,13 +36,13 @@ class Vocabulary():
         return self.id2label_dict
 
 
-if __name__=="__main__":
-    vocab=Vocabulary()
+if __name__ == "__main__":
+    vocab = Vocabulary()
     vocab.add("C")
     vocab.add("A")
     vocab.add("B")
     vocab.add("A")
-    vocab.add_sequence(["C","B","D"])
+    vocab.add_sequence(["C", "B", "D"])
     vocab.create()
     print(vocab.label2id("A"))
     print(vocab.id2label(0))
@@ -50,4 +50,3 @@ if __name__=="__main__":
     print(vocab.get_id2label_dict())
     print(len(vocab))
     print("end")
-

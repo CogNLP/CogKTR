@@ -1,16 +1,17 @@
 from .loss import *
 from .metric import *
 from .trainer import *
-__all__ = [
-    #loss
 
-    #metric
+__all__ = [
+    # loss
+
+    # metric
     "BaseMetric",
     "BaseTextClassificationMetric",
 
-    #evaluator
+    # evaluator
 
-    #predictor
+    # predictor
 
     # trainer
     "Trainer",

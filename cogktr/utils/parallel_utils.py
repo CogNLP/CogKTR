@@ -1,6 +1,7 @@
 import torch
 import sys
 
+
 def module2parallel(module, device_ids):
     if len(device_ids) == 0:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

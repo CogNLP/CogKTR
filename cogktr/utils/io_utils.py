@@ -11,6 +11,7 @@ def load_json(file_path):
         data = json.load(f)
     return data
 
+
 def save_json(data, file_path):
     if not isinstance(file_path, Path):
         file_path = Path(file_path)
@@ -26,8 +27,9 @@ def load_model(model, model_path):
     if isinstance(model, nn.DataParallel):
         model.module.load_state_dict(states)
     else:
-        model.load_state_dict(states,strict=False)
+        model.load_state_dict(states, strict=False)
     return model
+
 
 def save_model(model, model_path):
     if isinstance(model_path, Path):
@@ -38,4 +40,3 @@ def save_model(model, model_path):
     for key in state_dict:
         state_dict[key] = state_dict[key].cpu()
     torch.save(state_dict, model_path)
-

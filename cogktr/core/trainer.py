@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn.utils as utils
 from torch.utils.data import DataLoader
@@ -9,6 +8,7 @@ import logging
 from cogktr.utils.io_utils import save_model, load_model
 from cogktr.utils.parallel_utils import module2parallel
 from torch.utils.tensorboard import SummaryWriter
+
 
 class Trainer:
     def __init__(
@@ -101,14 +101,14 @@ class Trainer:
         self.metrics = metrics
         self.scheduler = scheduler
         self.batch_size = batch_size
-        self.dev_batch_size=dev_batch_size if dev_batch_size is not None else batch_size
+        self.dev_batch_size = dev_batch_size if dev_batch_size is not None else batch_size
         self.use_tqdm = use_tqdm
         self.callbacks = callbacks
         self.train_sampler = train_sampler
         self.dev_sampler = dev_sampler
         self.num_workers = num_workers
         self.collate_fn = collate_fn
-        self.dev_collate_fn=dev_collate_fn if dev_collate_fn is not None else collate_fn
+        self.dev_collate_fn = dev_collate_fn if dev_collate_fn is not None else collate_fn
         self.drop_last = drop_last
         self.device_ids = device_ids
         self.writer_path = writer_path
@@ -128,7 +128,7 @@ class Trainer:
             self.model, self.optimizer = amp.initialize(model, optimizer, opt_level=self.fp16_opt_level)
 
         self.train_dataloader = DataLoader(dataset=self.train_data, batch_size=self.batch_size,
-                                           sampler=self.train_sampler,drop_last=self.drop_last,
+                                           sampler=self.train_sampler, drop_last=self.drop_last,
                                            collate_fn=self.collate_fn)
 
         self.batch_count = len(self.train_dataloader)
@@ -296,7 +296,7 @@ class Trainer:
                         self.logger.debug("Saving scheduler states to %s", output_dir)
                         torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
 
-                #验证模型
+                # 验证模型
                 if self.dev_data and isinstance(self.validate_steps, int) and global_step % self.validate_steps == 0:
                     self.logger.info("Evaluate step = %d", global_step)
                     self.model.eval()
