@@ -17,5 +17,5 @@ __all__ = [
     #datableset
     "DataTableSet",
 
-    #enhancer
+    #enhancers
 ]
