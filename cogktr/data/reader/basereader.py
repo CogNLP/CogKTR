@@ -5,6 +5,9 @@ class BaseReader:
     def _read(self,path):
         pass
 
+    def read_all(self):
+        pass
+
     def read_train(self):
         pass
 
@@ -12,7 +15,4 @@ class BaseReader:
         pass
 
     def read_test(self):
-        pass
-
-    def read_all(self):
         pass

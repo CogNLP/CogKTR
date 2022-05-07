@@ -21,23 +21,13 @@ class SST2Reader(BaseReader):
         header=lines[0]
         contents=lines[1:]
         for line in contents:
-            text,label=line.strip().split("\t")
-            datable("text", text)
+            sentence,label=line.strip().split("\t")
+            datable("sentence",sentence)
             datable("label", label)
         return datable
 
-
-    def read_train(self):
-        return self._read(self.train_path)
-
-    def read_dev(self):
-        return self._read(self.dev_path)
-
-    def read_test(self):
-        return self._read(self.test_path)
-
     def read_all(self):
-        return self.read_train(), self.read_dev(), self.read_test()
+        return self._read(self.train_path), self._read(self.dev_path), self._read(self.test_path)
 
 if __name__=="__main__":
     reader=SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")

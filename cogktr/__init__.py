@@ -8,7 +8,12 @@ __all__ = [
     #core
 
     #data
+    "BaseProcessor",
+    "SST2Processor",
     "BaseReader",
+    "SST2Reader",
+    "DataTable",
+    "DataTableSet",
 
     #models
 

@@ -36,6 +36,13 @@ predictor=predictor.predicte()
 import torch
 from cogktr import *
 
+reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+train_data, dev_data, test_data = reader.read_all()
+processor = SST2Processor(plm="bert-base-cased", max_token_len=128)
+train_dataset = processor.process(train_data)
+dev_dataset = processor.process(dev_data)
+test_dataset = processor.process(test_data)
+print("end")
 
 
 
