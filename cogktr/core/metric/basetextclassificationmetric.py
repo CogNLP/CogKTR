@@ -18,9 +18,9 @@ class BaseTextClassificationMetric(BaseMetric):
         micro_P = precision_score(self.pre_list, self.label_list, average="micro")
         micro_R = recall_score(self.pre_list, self.label_list, average="micro")
         micro_F1 = f1_score(self.pre_list, self.label_list, average="micro")
-        macro_P = precision_score(self.pre_list, self.label_list, average="micro")
-        macro_R = recall_score(self.pre_list, self.label_list, average="micro")
-        macro_F1 = f1_score(self.pre_list, self.label_list, average="micro")
+        macro_P = precision_score(self.pre_list, self.label_list, average="macro")
+        macro_R = recall_score(self.pre_list, self.label_list, average="macro")
+        macro_F1 = f1_score(self.pre_list, self.label_list, average="macro")
         evaluate_result = {"micro_P": micro_P,
                            "micro_R": micro_R,
                            "micro_F1": micro_F1,
