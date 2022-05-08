@@ -1,5 +1,5 @@
 from .baseprocessor import *
-from .sst2processor import *
+from cogktr.data.processor.sst2processors.sst2processor import *
 
 __all__ = [
     # baseprocessor
