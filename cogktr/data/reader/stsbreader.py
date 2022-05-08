@@ -14,28 +14,6 @@ class STSBReader(BaseReader):
         self.dev_path = os.path.join(raw_data_path, self.dev_file)
         self.test_path = os.path.join(raw_data_path, self.test_file)
 
-    def _read_data(self, path):
-        datable = DataTable()
-        with open(path) as file:
-            lines = file.readlines()
-        header = lines[1]
-        contents = lines[1:]
-        for line in contents:
-            index, genre, filename, year, old_index, source1, source2, sentence1, sentence2, score = line.strip().split(
-                "\t")
-            datable("index", index)
-            datable("genre", genre)
-            datable("filename", filename)
-            datable("year", year)
-            datable("old_index", old_index)
-            datable("source1", source1)
-            datable("source2", source2)
-            datable("sentence1", sentence1)
-            datable("sentence2", sentence2)
-            datable("score", score)
-
-        return datable
-
     def _read_train(self, path):
         datable = DataTable()
         with open(path) as file:
