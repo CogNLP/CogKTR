@@ -16,22 +16,6 @@ class QNLIReader(BaseReader):
         self.test_path = os.path.join(raw_data_path, self.test_file)
         self.label_vocab = Vocabulary()
 
-    def _read_data(self, path):
-        datable = DataTable()
-        with open(path) as file:
-            lines = file.readlines()
-        header = lines[0]
-        contents = lines[1:]
-        for line in contents:
-            index,question,sentence,label= line.strip().split("\t")
-            datable("index", index)
-            datable("question", question)
-            datable("sentence", sentence)
-            datable("label", label)
-            self.label_vocab.add(label)
-
-        return datable
-
     def _read_train(self, path):
         datable = DataTable()
         with open(path) as file:
@@ -47,6 +31,7 @@ class QNLIReader(BaseReader):
             self.label_vocab.add(label)
 
         return datable
+
     def _read_dev(self, path):
         datable = DataTable()
         with open(path) as file:
