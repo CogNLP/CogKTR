@@ -10,6 +10,7 @@ __all__ = [
 
     # reader
     "BaseReader",
+    "CONLL2003Reader",
     "SST2Reader",
 
     # datable
