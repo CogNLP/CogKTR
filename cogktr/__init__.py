@@ -33,11 +33,6 @@ __all__ = [
     # modules
 
     # toolkits
-    "load_json",
-    "save_json",
-    "load_model",
-    "save_model",
-    "Vocabulary",
 
     # utils
     "load_json",
@@ -45,5 +40,6 @@ __all__ = [
     "load_model",
     "save_model",
     "module2parallel",
+    "Vocabulary",
 
 ]
