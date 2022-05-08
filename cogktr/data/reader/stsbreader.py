@@ -18,7 +18,7 @@ class STSBReader(BaseReader):
         datable = DataTable()
         with open(path) as file:
             lines = file.readlines()
-        header = lines[1]
+        header = lines[0]
         contents = lines[1:]
         for line in contents:
             index, genre, filename, year, old_index, source1, source2, sentence1, sentence2, score = line.strip().split(
