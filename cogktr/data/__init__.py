@@ -2,20 +2,19 @@ from .processor import *
 from .reader import *
 from .datable import *
 from .datableset import *
+
 __all__ = [
-    #processor
+    # processor
     "BaseProcessor",
     "SST2Processor",
 
-    #reader
+    # reader
     "BaseReader",
     "SST2Reader",
 
-    #datable
+    # datable
     "DataTable",
 
-    #datableset
+    # datableset
     "DataTableSet",
-
-    #enhancers
 ]
