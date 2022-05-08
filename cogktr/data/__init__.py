@@ -11,6 +11,7 @@ __all__ = [
     # reader
     "BaseReader",
     "CONLL2003Reader",
+    "QNLIReader",
     "SST2Reader",
     "STSBReader",
 

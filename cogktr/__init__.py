@@ -17,6 +17,7 @@ __all__ = [
     "SST2Processor",
     "BaseReader",
     "CONLL2003Reader",
+    "QNLIReader",
     "SST2Reader",
     "STSBReader",
     "DataTable",
