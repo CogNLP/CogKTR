@@ -17,6 +17,9 @@ class CONLL2003Reader(BaseReader):
         self.pos_label_vocab = Vocabulary()
         self.syn_label_vocab = Vocabulary()
         self.ner_label_vocab = Vocabulary()
+        self.pos_label_vocab.add_dict({"<pad>":0})
+        self.syn_label_vocab.add_dict({"<pad>":0})
+        self.ner_label_vocab.add_dict({"<pad>":0})
 
     def _read_data(self, path):
         datable = DataTable()
