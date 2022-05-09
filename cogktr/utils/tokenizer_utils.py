@@ -24,8 +24,10 @@ class SequenceBertTokenizer:
             self,
             word_sequence,
             max_length=None,
+            add_special_tokens=True,
     ):
-        word_sequence = ["[CLS]"] + word_sequence + ["[SEP]"]
+        if add_special_tokens:
+            word_sequence = ["[CLS]"] + word_sequence + ["[SEP]"]
         input_ids = list()
         tokenized_text = list()
         token_type_ids = list()
@@ -64,5 +66,6 @@ if __name__ == "__main__":
     word_sequence = "Bert of Sesame Street likes to go to the library to learn cognitive knowledge!".strip().split()
     tokenized_text, head_flag = tokenizer.tokenize(word_sequence=word_sequence)
     input_ids, token_type_ids, attention_mask, head_flag_matrix = tokenizer.encode(word_sequence=word_sequence,
-                                                                                   max_length=128)
+                                                                                   max_length=128,
+                                                                                   add_special_tokens=True)
     print("end")
