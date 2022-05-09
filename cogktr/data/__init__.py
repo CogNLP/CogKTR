@@ -6,6 +6,7 @@ from .datableset import *
 __all__ = [
     # processor
     "BaseProcessor",
+    "CONLL2003Processor",
     "SST2Processor",
 
     # reader
