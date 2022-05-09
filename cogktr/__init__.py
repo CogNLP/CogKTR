@@ -40,6 +40,7 @@ __all__ = [
     "load_model",
     "save_model",
     "module2parallel",
+    "SequenceBertTokenizer",
     "Vocabulary",
 
 ]
