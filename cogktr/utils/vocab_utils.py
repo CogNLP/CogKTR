@@ -30,8 +30,8 @@ class Vocabulary():
             self.label2id_dict[label] = id
             self.id2label_dict[id] = label
             defined_label_set.add(label)
-            if id >= len(label_list):
-                raise IndexError("Defined dict id must smaller than label num.")
+            if id >= len(label_list) or id<0:
+                raise IndexError("Defined dict id must smaller than label num and bigger than 0.")
         inserting_label_set = self.label_set - defined_label_set
         inserting_label_list = list(inserting_label_set)
         inserting_label_list.sort()
