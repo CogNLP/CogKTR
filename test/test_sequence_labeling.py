@@ -13,4 +13,9 @@ processor = CONLL2003Processor(plm="bert-base-cased", max_token_len=128, vocab=v
 train_dataset = processor.process(train_data)
 dev_dataset = processor.process(dev_data)
 test_dataset = processor.process(test_data)
+
+model = BaseTextClassificationModel(plm="bert-base-cased", vocab=vocab)
+metric = BaseTextClassificationMetric(mode="binary")
+loss = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.00001)
 print("end")

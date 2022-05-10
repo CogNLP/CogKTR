@@ -19,10 +19,12 @@ class CONLL2003Processor:
             input_ids, token_type_ids, attention_mask, head_flag_matrix = self.tokenizer.encode(word_sequence=sentence,
                                                                                                 max_length=self.max_token_len,
                                                                                                 add_special_tokens=True)
+            ner_label=ner_label+(self.max_token_len-len(ner_label))*self.max_token_len*["<pad>"]
+            ner_label=ner_label[:self.max_token_len]
             datable("input_ids", input_ids)
             datable("attention_mask", attention_mask)
             datable("head_flag_matrix", head_flag_matrix)
-            datable("ner_label", ner_label)
+            datable("ner_label", self.vocab["ner_label_vocab"].labels2ids(ner_label))
         return DataTableSet(datable)
 
 

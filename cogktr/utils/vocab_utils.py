@@ -50,6 +50,12 @@ class Vocabulary():
     def id2label(self, id):
         return self.id2label_dict[id]
 
+    def labels2ids(self, words):
+        return [self.label2id(word) for word in words]
+
+    def ids2labels(self, ids):
+        return [self.id2label(id) for id in ids]
+
     def get_label2id_dict(self):
         return self.label2id_dict
 
@@ -69,6 +75,8 @@ if __name__ == "__main__":
     vocab.create()
     print(vocab.label2id("A"))
     print(vocab.id2label(0))
+    print(vocab.labels2ids(["A","B"]))
+    print(vocab.ids2labels([0,1]))
     print(vocab.get_label2id_dict())
     print(vocab.get_id2label_dict())
     print(len(vocab))
