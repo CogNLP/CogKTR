@@ -30,7 +30,7 @@ class Vocabulary():
             self.label2id_dict[label] = id
             self.id2label_dict[id] = label
             defined_label_set.add(label)
-            if id >= len(label_list) or id<0:
+            if id >= len(label_list) or id < 0:
                 raise IndexError("Defined dict id must smaller than label num and bigger than 0.")
         inserting_label_set = self.label_set - defined_label_set
         inserting_label_list = list(inserting_label_set)
@@ -75,8 +75,8 @@ if __name__ == "__main__":
     vocab.create()
     print(vocab.label2id("A"))
     print(vocab.id2label(0))
-    print(vocab.labels2ids(["A","B"]))
-    print(vocab.ids2labels([0,1]))
+    print(vocab.labels2ids(["A", "B"]))
+    print(vocab.ids2labels([0, 1]))
     print(vocab.get_label2id_dict())
     print(vocab.get_id2label_dict())
     print(len(vocab))
