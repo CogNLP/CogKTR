@@ -6,6 +6,7 @@ from cogktr import *
 torch.cuda.set_device(4)
 device = torch.device('cuda:4')
 
+# STSB dataset
 reader = STSBReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
@@ -15,4 +16,6 @@ dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 print("end")
 
+
+# QNLI dataset
 # reader = QNLIReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
