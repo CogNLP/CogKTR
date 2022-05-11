@@ -63,4 +63,3 @@ trainer = Trainer(model,
                   logger_path=None)
 trainer.train()
 print("end")
-

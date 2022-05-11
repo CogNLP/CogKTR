@@ -18,23 +18,23 @@ class BaseSentencePairModel(BaseModel):
 
     def loss(self, batch, loss_function):
         batch_len = len(batch)
-        input_ids,token_type_ids,attention_mask,label = batch
-        pred = self.forward(input_ids=input_ids,token_type_ids=token_type_ids,attention_mask=attention_mask)
+        input_ids, token_type_ids, attention_mask, label = batch
+        pred = self.forward(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
         loss = loss_function(pred, label) / batch_len
         return loss
 
-    def forward(self, input_ids,token_type_ids,attention_mask):
-        x = self.bert(input_ids,token_type_ids,attention_mask).pooler_output
+    def forward(self, input_ids, token_type_ids, attention_mask):
+        x = self.bert(input_ids, token_type_ids, attention_mask).pooler_output
         x = self.linear(x)
         return x
 
     def evaluate(self, batch, metric_function):
-        input_ids,token_type_ids,attention_mask,label = batch
-        pred = self.predict(input_ids,token_type_ids,attention_mask)
+        input_ids, token_type_ids, attention_mask, label = batch
+        pred = self.predict(input_ids, token_type_ids, attention_mask)
         metric_function.evaluate(pred, label)
 
-    def predict(self, input_ids,token_type_ids,attention_mask):
-        pred = self.forward(input_ids,token_type_ids,attention_mask)
+    def predict(self, input_ids, token_type_ids, attention_mask):
+        pred = self.forward(input_ids, token_type_ids, attention_mask)
         pred = F.softmax(pred, dim=1)
         pred = torch.max(pred, dim=1)[1]
         return pred
