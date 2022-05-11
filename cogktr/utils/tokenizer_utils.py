@@ -65,6 +65,7 @@ if __name__ == "__main__":
     tokenizer = SequenceBertTokenizer.from_pretrained("bert-base-cased")
     word_sequence = "Bert of Sesame Street likes to go to the library to learn cognitive knowledge!".strip().split()
     tokenized_text, head_flag = tokenizer.tokenize(word_sequence=word_sequence)
+    #TODO: encode return input_ids encode_plus return encoded_dict
     input_ids, token_type_ids, attention_mask, head_flag_matrix = tokenizer.encode(word_sequence=word_sequence,
                                                                                    max_length=128,
                                                                                    add_special_tokens=True)
