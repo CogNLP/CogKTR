@@ -17,15 +17,15 @@ class STSBProcessor:
         print("Processing data...")
         for sentence1, sentence2, score in tqdm(zip(data['sentence1'], data['sentence2'], data['score']),
                                                 total=len(data['score'])):
-            input_ids, token_type_ids, attention_mask = self.tokenizer.encode_plus(text=sentence1, text_pair=sentence2,
-                                                                                   truncation='longest_first',
-                                                                                   padding="max_length",
-                                                                                   add_special_tokens=True,
-                                                                                   max_length=self.max_token_len)
-            datable("input_ids", input_ids)
-            datable("token_type_ids", token_type_ids)
-            datable("attention_mask", attention_mask)
-            datable("score", score)
+            tokenized_data = self.tokenizer.encode_plus(text=sentence1, text_pair=sentence2,
+                                                        truncation='longest_first',
+                                                        padding="max_length",
+                                                        add_special_tokens=True,
+                                                        max_length=self.max_token_len)
+            datable("input_ids", tokenized_data["input_ids"])
+            datable("token_type_ids", tokenized_data["token_type_ids"])
+            datable("attention_mask", tokenized_data["attention_mask"])
+            datable("score", float(score))
         return DataTableSet(datable)
 
     def process_dev(self, data):
@@ -33,29 +33,29 @@ class STSBProcessor:
         print("Processing data...")
         for sentence1, sentence2, score in tqdm(zip(data['sentence1'], data['sentence2'], data['score']),
                                                 total=len(data['score'])):
-            input_ids, token_type_ids, attention_mask = self.tokenizer.encode_plus(text=sentence1, text_pair=sentence2,
-                                                                                   truncation='longest_first',
-                                                                                   padding="max_length",
-                                                                                   add_special_tokens=True,
-                                                                                   max_length=self.max_token_len)
-            datable("input_ids", input_ids)
-            datable("token_type_ids", token_type_ids)
-            datable("attention_mask", attention_mask)
-            datable("score", score)
+            tokenized_data = self.tokenizer.encode_plus(text=sentence1, text_pair=sentence2,
+                                                        truncation='longest_first',
+                                                        padding="max_length",
+                                                        add_special_tokens=True,
+                                                        max_length=self.max_token_len)
+            datable("input_ids", tokenized_data["input_ids"])
+            datable("token_type_ids", tokenized_data["token_type_ids"])
+            datable("attention_mask", tokenized_data["attention_mask"])
+            datable("score", float(score))
         return DataTableSet(datable)
 
     def process_test(self, data):
         datable = DataTable()
         print("Processing data...")
         for sentence1, sentence2 in tqdm(zip(data['sentence1'], data['sentence2']), total=len(data['sentence1'])):
-            input_ids, token_type_ids, attention_mask = self.tokenizer.encode_plus(text=sentence1, text_pair=sentence2,
-                                                                                   truncation='longest_first',
-                                                                                   padding="max_length",
-                                                                                   add_special_tokens=True,
-                                                                                   max_length=self.max_token_len)
-            datable("input_ids", input_ids)
-            datable("token_type_ids", token_type_ids)
-            datable("attention_mask", attention_mask)
+            tokenized_data = self.tokenizer.encode_plus(text=sentence1, text_pair=sentence2,
+                                                        truncation='longest_first',
+                                                        padding="max_length",
+                                                        add_special_tokens=True,
+                                                        max_length=self.max_token_len)
+            datable("input_ids", tokenized_data["input_ids"])
+            datable("token_type_ids", tokenized_data["token_type_ids"])
+            datable("attention_mask", tokenized_data["attention_mask"])
         return DataTableSet(datable)
 
 
