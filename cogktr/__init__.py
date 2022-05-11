@@ -31,6 +31,7 @@ __all__ = [
 
     # models
     "BaseModel",
+    "BaseSentencePairModel",
     "BaseTextClassificationModel",
 
     # modules
