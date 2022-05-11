@@ -7,6 +7,7 @@ __all__ = [
     # processor
     "BaseProcessor",
     "CONLL2003Processor",
+    "QNLIProcessor",
     "SST2Processor",
     "STSBProcessor",
 

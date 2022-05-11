@@ -19,3 +19,10 @@ print("end")
 
 # QNLI dataset
 # reader = QNLIReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+# train_data, dev_data, test_data = reader.read_all()
+# vocab = reader.read_vocab()
+# processor = QNLIProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
+# train_dataset = processor.process_train(train_data)
+# dev_dataset = processor.process_dev(dev_data)
+# test_dataset = processor.process_test(test_data)
+# print("end")
