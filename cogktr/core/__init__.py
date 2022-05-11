@@ -7,7 +7,7 @@ __all__ = [
 
     # metric
     "BaseMetric",
-    "BaseTextClassificationMetric",
+    "BaseClassificationMetric",
 
     # evaluator
 

@@ -9,7 +9,7 @@ from .utils import *
 __all__ = [
     # core
     "BaseMetric",
-    "BaseTextClassificationMetric",
+    "BaseClassificationMetric",
     "Trainer",
 
     # data

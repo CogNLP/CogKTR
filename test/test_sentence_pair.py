@@ -27,9 +27,9 @@ dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
 model = BaseSentencePairModel(plm="bert-base-cased", vocab=vocab)
-metric = BaseTextClassificationMetric(mode="binary")
+metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
 trainer = Trainer(model,
                   train_dataset,
