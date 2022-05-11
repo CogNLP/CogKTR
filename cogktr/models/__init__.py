@@ -4,6 +4,6 @@ from .basetextclassificationmodel import *
 
 __all__ = [
     "BaseModel",
-    "BaseSentencePairModel",
+    "BaseSentencePairClassificationModel",
     "BaseTextClassificationModel",
 ]

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import torch
 
 
-class BaseSentencePairModel(BaseModel):
+class BaseSentencePairClassificationModel(BaseModel):
     def __init__(self, vocab, plm):
         super().__init__()
         self.vocab = vocab
