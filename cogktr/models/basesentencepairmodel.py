@@ -69,4 +69,5 @@ class BaseSentencePairRegressionModel(BaseModel):
 
     def predict(self, input_ids, token_type_ids, attention_mask):
         pred = self.forward(input_ids, token_type_ids, attention_mask)
+        pred = pred.squeeze()  # shape:(B,1)->(B)
         return pred

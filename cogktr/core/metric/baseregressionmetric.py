@@ -16,6 +16,7 @@ class BaseRegressionMetric(BaseMetric):
 
     def get_metric(self, reset=True):
         evaluate_result = {}
+        # TODO:Check whether R2 is negative is correct
         r2 = r2_score(self.pre_list, self.label_list)
         mse = mean_squared_error(self.pre_list, self.label_list)
         mae = mean_absolute_error(self.pre_list, self.label_list)
