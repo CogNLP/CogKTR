@@ -8,6 +8,7 @@ __all__ = [
     "BaseProcessor",
     "CONLL2003Processor",
     "SST2Processor",
+    "STSBProcessor",
 
     # reader
     "BaseReader",
