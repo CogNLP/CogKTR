@@ -10,6 +10,7 @@ __all__ = [
     # core
     "BaseMetric",
     "BaseClassificationMetric",
+    "BaseRegressionMetric",
     "Trainer",
 
     # data
@@ -32,6 +33,7 @@ __all__ = [
     # models
     "BaseModel",
     "BaseSentencePairClassificationModel",
+    "BaseSentencePairRegressionModel",
     "BaseTextClassificationModel",
 
     # modules
