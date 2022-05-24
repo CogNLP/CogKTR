@@ -2,6 +2,7 @@ from cogktr.enhancers.linker import *
 import tagme
 
 
+# TODO: add cogie toolkit
 class WikipediaLinker(BaseLinker):
     def __init__(self, tool, path, lang="en"):
         super().__init__()
@@ -11,18 +12,18 @@ class WikipediaLinker(BaseLinker):
         self.path = path
         self.lang = lang
 
-    def link(self, sentence):
+    def link(self, sentence, threshold=0):
         link_dict = {}
         if self.tool == "tagme":
-            link_dict = self._tagme_link(sentence)
+            link_dict = self._tagme_link(sentence, threshold)
 
         return link_dict
 
-    def _tagme_link(self, sentence):
+    def _tagme_link(self, sentence, threshold):
         link_dict = {}
         tagme.GCUBE_TOKEN = "5ffc7520-9f20-4858-aabd-80d7bd1bde2f-843339462"
         entities = tagme.annotate(sentence, lang=self.lang)
-        for entity in entities.annotations:
+        for entity in entities.get_annotations(threshold):
             mention = entity.mention
             link_dict[mention] = {}
             link_dict[mention]["begin"] = entity.begin

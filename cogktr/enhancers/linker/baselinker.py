@@ -2,5 +2,5 @@ class BaseLinker:
     def __init__(self):
         pass
 
-    def link(self, sentence):
+    def link(self, sentence, *args):
         pass
