@@ -4,7 +4,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 
 
-class BaseTextClassificationMetric(BaseMetric):
+class BaseClassificationMetric(BaseMetric):
     def __init__(self,mode):
         super().__init__()
         if mode not in ["binary","multi"]:

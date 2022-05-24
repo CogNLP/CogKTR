@@ -1,5 +1,6 @@
 from .io_utils import *
 from .parallel_utils import *
+from .tokenizer_utils import *
 from .vocab_utils import *
 
 __all__ = [
@@ -12,6 +13,10 @@ __all__ = [
     # parallel_utils
     "module2parallel",
 
+    # tokenizer_utils
+    "SequenceBertTokenizer",
+
     # vocab_utils
     "Vocabulary",
+
 ]

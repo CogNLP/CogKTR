@@ -1,7 +1,9 @@
 from .basemetric import *
-from .basetextclassificationmetric import *
+from .baseclassificationmetric import *
+from .baseregressionmetric import *
 
 __all__ = [
     "BaseMetric",
-    "BaseTextClassificationMetric",
+    "BaseClassificationMetric",
+    "BaseRegressionMetric",
 ]

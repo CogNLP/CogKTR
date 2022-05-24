@@ -9,12 +9,16 @@ from .utils import *
 __all__ = [
     # core
     "BaseMetric",
-    "BaseTextClassificationMetric",
+    "BaseClassificationMetric",
+    "BaseRegressionMetric",
     "Trainer",
 
     # data
     "BaseProcessor",
+    "CONLL2003Processor",
+    "QNLIProcessor",
     "SST2Processor",
+    "STSBProcessor",
     "BaseReader",
     "CONLL2003Reader",
     "QNLIReader",
@@ -28,6 +32,8 @@ __all__ = [
 
     # models
     "BaseModel",
+    "BaseSentencePairClassificationModel",
+    "BaseSentencePairRegressionModel",
     "BaseTextClassificationModel",
 
     # modules
@@ -40,6 +46,7 @@ __all__ = [
     "load_model",
     "save_model",
     "module2parallel",
+    "SequenceBertTokenizer",
     "Vocabulary",
 
 ]
