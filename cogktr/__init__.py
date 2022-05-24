@@ -30,6 +30,9 @@ __all__ = [
 
     # enhancers
     "BaseLinker",
+    "WikipediaLinker",
+    "BaseSearcher",
+    "WikipediaSearcher",
 
     # models
     "BaseModel",
