@@ -34,6 +34,11 @@ class WikipediaSearcher(BaseSearcher):
     # TODO:use sparql to search neighbor node and more info
     def search(self, id):
         search_dict = {}
+        if self.tool == "blink":
+            search_dict = self._blink_search(id)
+        return search_dict
+
+    def _blink_search(self, id):
         search_dict[id] = {}
         search_dict[id]["desc"] = None
         if self.return_desc:
