@@ -7,6 +7,6 @@ datapath
 ├─ knowledge_graph
 │  ├─ wikipedia
 │  │  ├─ raw_data
-│  │  │  └─ dev-v2.0.json
+│  │  │  └─ entity.jsonl
 │  │  │
 ```
