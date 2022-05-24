@@ -29,6 +29,7 @@ __all__ = [
     "DataTableSet",
 
     # enhancers
+    "BaseLinker",
 
     # models
     "BaseModel",
