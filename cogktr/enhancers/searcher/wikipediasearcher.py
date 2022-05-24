@@ -39,6 +39,7 @@ class WikipediaSearcher(BaseSearcher):
         return search_dict
 
     def _blink_search(self, id):
+        search_dict = {}
         search_dict[id] = {}
         search_dict[id]["desc"] = None
         if self.return_desc:
