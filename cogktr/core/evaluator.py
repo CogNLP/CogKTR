@@ -22,6 +22,20 @@ class Evaluator:
             device="cpu",
             user_tqdm=True,
     ):
+        """
+        在指定数据据上验证模型指标
+        :param model: 待验证模型
+        :param checkpoint_path: 模型参数文件所在目录
+        :param dev_data: 验证数据集
+        :param metrics: 验证指标
+        :param sampler: 验证数据集对应的采样器
+        :param collate_fn: 拼接为batch的函数
+        :param drop_last: 是否丢掉最后一个数据
+        :param file_name: 模型参数文件的名称，默认为models.pt
+        :param batch_size: 验证时的batch_size
+        :param device: 模型移动到哪个设备上
+        :param user_tqdm: 是否使用tqdm进度条
+        """
 
 
         self.model = model
