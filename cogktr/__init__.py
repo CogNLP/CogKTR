@@ -29,6 +29,8 @@ __all__ = [
     "DataTableSet",
 
     # enhancers
+    "BaseEmbedder",
+    "WikipediaEmbedder",
     "BaseLinker",
     "WikipediaLinker",
     "BaseSearcher",
