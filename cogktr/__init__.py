@@ -35,6 +35,8 @@ __all__ = [
     "WikipediaLinker",
     "BaseSearcher",
     "WikipediaSearcher",
+    "BaseTagger",
+    "NerTagger",
 
     # models
     "BaseModel",

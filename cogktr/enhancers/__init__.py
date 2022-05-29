@@ -1,6 +1,7 @@
 from .embedder import *
 from .linker import *
 from .searcher import *
+from .tagger import *
 
 __all__ = [
     #embedder
@@ -16,4 +17,6 @@ __all__ = [
     "WikipediaSearcher",
 
     #tagger
+    "BaseTagger",
+    "NerTagger",
 ]
