@@ -39,7 +39,6 @@ class Trainer:
             grad_norm=None,
             use_tqdm=True,
             device=None,
-            device_ids=None,
             callbacks=None,
             check_code_level=logging.INFO,
             metric_key=None,
@@ -75,7 +74,6 @@ class Trainer:
         :param grad_norm:梯度裁剪
         :param use_tqdm:是否使用tqdm
         :param device:设备
-        :param device_ids:多卡 [0, 1, 2, 3]
         :param callbacks:回调函数
         :param check_code_level:
         :param metric_key:
@@ -110,7 +108,6 @@ class Trainer:
         self.collate_fn = collate_fn
         self.dev_collate_fn = dev_collate_fn if dev_collate_fn is not None else collate_fn
         self.drop_last = drop_last
-        self.device_ids = device_ids
         self.writer_path = writer_path
         self.fp16 = fp16
         self.fp16_opt_level = fp16_opt_level
@@ -118,13 +115,14 @@ class Trainer:
         self.check_code_level = check_code_level
         self.metric_key = metric_key
 
+        self.model.to(self.device)
+
         if self.fp16:
             try:
                 from apex import amp
             except ImportError:
                 raise ImportError(
                     "Please install apex from https://www.github.com/nvidia/apex to use fp16 training.")
-            self.model.to(self.device)
             self.model, self.optimizer = amp.initialize(model, optimizer, opt_level=self.fp16_opt_level)
 
         self.train_dataloader = DataLoader(dataset=self.train_data, batch_size=self.batch_size,
@@ -156,7 +154,6 @@ class Trainer:
             self.dev_dataloader = DataLoader(dataset=self.dev_data, batch_size=self.dev_batch_size,
                                              sampler=self.dev_sampler, drop_last=self.drop_last,
                                              collate_fn=self.dev_collate_fn)
-        self.model = module2parallel(self.model, self.device_ids)
 
         if self.writer_path:
             self.writer_path = os.path.join(self.writer_path, self.task)
