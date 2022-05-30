@@ -5,6 +5,7 @@ import time
 import os
 import logging
 from cogktr.utils.io_utils import load_model
+from cogktr.utils.log_utils import logger
 
 
 class Evaluator:
@@ -61,15 +62,10 @@ class Evaluator:
             raise ValueError("Pretrained model file {} does not exist!".format(model_file))
 
         self.model.to(self.device)
-        logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-                            datefmt='%Y-%m-%d %H:%M:%S')
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.INFO)
 
 
     def evaluate(self):
-        self.logger.info("Start Evaluating...")
-        self.logger.info("Start time = %s", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+        logger.info("Start Evaluating...")
         self.model.eval()
         if self.use_tqdm:
             progress = enumerate(tqdm(self.dev_dataloader, desc="Evaluating", leave=False), 1)
@@ -79,5 +75,4 @@ class Evaluator:
             for step, batch in progress:
                 self.model.evaluate(batch, self.metrics)
         evaluate_result = self.metrics.get_metric()
-        self.logger.info("Evaluate result = %s", str(evaluate_result))
-        self.logger.info("End time = %s", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
+        logger.info("Evaluate result = %s", str(evaluate_result))
