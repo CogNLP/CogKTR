@@ -3,9 +3,13 @@ import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.core.evaluator import Evaluator
+from cogktr.utils.general_utils import init_cogktr
 
-torch.cuda.set_device(3)
-device = torch.device('cuda:3')
+device,output_path = init_cogktr(
+    device_id=0,
+    output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
+    folder_tag="resume_training",
+)
 
 reader = QNLIReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
 train_data, dev_data, test_data = reader.read_all()
@@ -50,20 +54,19 @@ trainer = Trainer(model,
                   drop_last=False,
                   gradient_accumulation_steps=1,
                   num_workers=5,
-                  save_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/",
-                  save_file=None,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
-                  save_steps=1000,
+                  checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
+                  validate_steps=100,      # validation setting
+                  save_steps=100,         # when to save model result
+                  output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
                   device=device,
                   callbacks=None,
                   metric_key=None,
-                  writer_path=None,
                   fp16=False,
                   fp16_opt_level='O1',
-                  logger_path=None)
+                  )
 trainer.train()
 print("end")
