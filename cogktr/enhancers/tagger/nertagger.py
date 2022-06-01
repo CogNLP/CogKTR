@@ -8,6 +8,7 @@ class NerTagger(BaseTagger):
         super().__init__()
         if tool not in ["flair"]:
             raise ValueError("Please set a tool!")
+        self.knowledge_type = "ner"
         self.tool = tool
         if self.tool == "flair":
             self.nertagger = SequenceTagger.load('ner')
@@ -32,9 +33,8 @@ class NerTagger(BaseTagger):
             for word in entity:
                 label_list[word.idx - 1] = entity.tag
 
-        tag_dict["sentence"] = sentence
-        tag_dict["token"] = token_list
-        tag_dict["label"] = label_list
+        tag_dict["tokens"] = token_list
+        tag_dict["labels"] = label_list
 
         return tag_dict
 

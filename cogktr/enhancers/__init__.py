@@ -2,6 +2,7 @@ from .embedder import *
 from .linker import *
 from .searcher import *
 from .tagger import *
+from .enhancer import *
 
 __all__ = [
     #embedder
@@ -19,4 +20,7 @@ __all__ = [
     #tagger
     "BaseTagger",
     "NerTagger",
+
+    #enhancer
+    "Enhancer",
 ]

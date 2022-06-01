@@ -1,3 +1,6 @@
+import os
+
+os.environ['CUDA_VISIBLE_DEVICES'] = "4"
 from cogktr.enhancers.linker import *
 import tagme
 
@@ -8,6 +11,7 @@ class WikipediaLinker(BaseLinker):
         super().__init__()
         if tool not in ["tagme"]:
             raise ValueError("Please set a tool!")
+        self.knowledge_type = "wikipedia"
         self.tool = tool
         self.lang = lang
 

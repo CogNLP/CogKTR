@@ -37,6 +37,7 @@ __all__ = [
     "WikipediaSearcher",
     "BaseTagger",
     "NerTagger",
+    "Enhancer",
 
     # models
     "BaseModel",

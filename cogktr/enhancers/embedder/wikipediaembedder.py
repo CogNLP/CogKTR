@@ -36,13 +36,14 @@ class WikipediaEmbedder(BaseEmbedder):
             similar_entities_list = self.wiki2vec.most_similar(self.wiki2vec.get_entity(title),
                                                                self.return_similar_entities_num)
             for item in similar_entities_list:
-                item_dict = {}
-                item_dict["similar_entity_title"] = item[0].title
-                item_dict["similar_rank"] = similar_rank
-                item_dict["similarity"] = item[1]
-                item_dict["similar_entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(item[0].title))
-                embed_dict[title]["similar_entities"].append(item_dict)
-                similar_rank += 1
+                if hasattr(item[0], "title"):
+                    item_dict = {}
+                    item_dict["similar_entity_title"] = item[0].title
+                    item_dict["similar_rank"] = similar_rank
+                    item_dict["similarity"] = item[1]
+                    item_dict["similar_entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(item[0].title))
+                    embed_dict[title]["similar_entities"].append(item_dict)
+                    similar_rank += 1
         return embed_dict
 
 
