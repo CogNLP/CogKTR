@@ -20,6 +20,7 @@ __all__ = [
     #tagger
     "BaseTagger",
     "NerTagger",
+    "SrlTagger",
 
     #enhancer
     "Enhancer",
