@@ -14,6 +14,11 @@ reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_cla
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
+enhancer = Enhancer(return_entity_ebd=True)
+enhancer.set_config(
+    WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
+    WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
+
 processor = SST2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
