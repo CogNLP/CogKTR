@@ -79,7 +79,7 @@ TABLE_DATA_EMBEDDER=[
         "Embedder",
         "WikipediaEmbedder",
         "Wikipedia2vec",
-        "en_embed,similar_embed",
+        "en_ebd,similar_ebd",
     ],
     [
         "Embedder",
