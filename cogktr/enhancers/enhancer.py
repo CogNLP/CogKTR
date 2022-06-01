@@ -1,83 +1,187 @@
+from rich.console import Console
+from rich.table import Table
+from cogktr.enhancers.tagger import PosTagger, NerTagger, SrlTagger
+from cogktr.enhancers.linker import WikipediaLinker
+from cogktr.enhancers.searcher import WikipediaSearcher
+from cogktr.enhancers.embedder import WikipediaEmbedder
+from cogktr.utils.constant_utils import TABLE_DATA_TAGGER, TABLE_DATA_LINKER, TABLE_DATA_SEARCHER, TABLE_DATA_EMBEDDER
+
+
 class Enhancer:
     def __init__(self,
-                 tagger=None,
-                 linker=None,
-                 searcher=None,
-                 embedder=None):
+                 return_pos=False,
+                 return_ner=False,
+                 return_spo=False,
+                 return_srl=False,
+                 return_event=False,
+                 return_entity_desc=False,
+                 return_entity_ebd=False):
+        self.return_pos = return_pos
+        self.return_ner = return_ner
+        self.return_spo = return_spo
+        self.return_srl = return_srl
+        self.return_event = return_event
+        self.return_entity_desc = return_entity_desc
+        self.return_entity_ebd = return_entity_ebd
 
-        self.tagger_list=self._to_list(tagger)
-        self.linker_list=self._to_list(linker)
-        self.searcher_list=self._to_list(searcher)
-        self.embedder_list=self._to_list(embedder)
+        self._init_config()
+        self._init_module()
 
-        self.discrete_knowledge={}
-        self.discrete_knowledge["ner"]= {}
-        self.discrete_knowledge["wikipedia"]= {}
-        self.discrete_knowledge["wikipedia"]["entity_title"]= {}
-        self.discrete_knowledge["wikipedia"]["neighbor_entity_title"]= {}
-        self.continuous_knowledge={}
-        self.continuous_knowledge["wikipedia"]= {}
-        self.continuous_knowledge["wikipedia"]["entity_embedding"]= {}
-        self.continuous_knowledge["wikipedia"]["neighbor_entity_embedding"]= {}
+    def _init_config(self):
+        self.tool_config = {}
+        self.tool_config["PosTagger"] = "flair"
+        self.tool_config["NerTagger"] = "flair"
+        self.tool_config["SpoTagger"] = None
+        self.tool_config["SrlTagger"] = "allennlp"
+        self.tool_config["EventTagger"] = None
+        self.tool_config["WikipediaLinker"] = "tagme"
+        self.tool_config["WikipediaSearcher"] = "blink"
+        self.tool_config["WikipediaEmbedder"] = "wikipedia2vec"
 
+        self.path_config = {}
+        self.path_config[
+            "WikipediaSearcher"] = "/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl"
+        self.path_config[
+            "WikipediaEmbedder"] = "/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl"
 
-    def _to_list(self,module):
-        module_list=[]
-        if not isinstance(module,list) and module is not None:
-            module_list.append(module)
-        if isinstance(module,list):
-            module_list=module
-        return module_list
+    def _init_module(self):
+        if self.return_pos:
+            self.pos_tagger = PosTagger(tool=self.tool_config["NerTagger"])
+        if self.return_ner:
+            self.ner_tagger = NerTagger(tool=self.tool_config["NerTagger"])
+        if self.return_srl:
+            self.srl_tagger = SrlTagger(tool=self.tool_config["SrlTagger"])
+        if self.return_entity_desc or self.return_entity_ebd:
+            self.wikipedia_linker = WikipediaLinker(tool=self.tool_config["WikipediaLinker"])
+        if self.return_entity_desc:
+            self.wikipedia_searcher = WikipediaSearcher(tool=self.tool_config["WikipediaSearcher"],
+                                                        path=self.path_config["WikipediaSearcher"])
+        if self.return_entity_ebd:
+            self.wikipedia_embedder = WikipediaEmbedder(tool=self.tool_config["WikipediaEmbedder"],
+                                                        path=self.path_config["WikipediaEmbedder"])
 
-    def get_discrete_knowledge(self,sentence):
-        for tagger in self.tagger_list:
-            self.discrete_knowledge[tagger.knowledge_type]=tagger.tag(sentence)
+    def set_config(self,
+                   PosTaggerTool=None,
+                   NerTaggerTool=None,
+                   SpoTaggerTool=None,
+                   SrlTaggerTool=None,
+                   EventTaggerTool=None,
+                   WikipediaLinkerTool=None,
+                   WikipediaSearcherTool=None,
+                   WikipediaEmbedderTool=None,
+                   WikipediaSearcherPath=None,
+                   WikipediaEmbedderPath=None):
+        if PosTaggerTool is not None:
+            self.tool_config["PosTagger"] = PosTaggerTool
+        if NerTaggerTool is not None:
+            self.tool_config["NerTagger"] = NerTaggerTool
+        if SpoTaggerTool is not None:
+            self.tool_config["SpoTagger"] = SpoTaggerTool
+        if SrlTaggerTool is not None:
+            self.tool_config["SrlTagger"] = SrlTaggerTool
+        if EventTaggerTool is not None:
+            self.tool_config["EventTagger"] = EventTaggerTool
+        if WikipediaLinkerTool is not None:
+            self.tool_config["WikipediaLinker"] = WikipediaLinkerTool
+        if WikipediaSearcherTool is not None:
+            self.tool_config["WikipediaSearcher"] = WikipediaSearcherTool
+        if WikipediaEmbedderTool is not None:
+            self.tool_config["WikipediaEmbedder"] = WikipediaEmbedderTool
+        if WikipediaSearcherPath is not None:
+            self.path_config["WikipediaSearcher"] = WikipediaSearcherPath
+        if WikipediaEmbedderPath is not None:
+            self.path_config["WikipediaEmbedder"] = WikipediaEmbedderPath
 
-        for linker in self.linker_list:
-            self.discrete_knowledge[linker.knowledge_type]=linker.link(sentence)
+    def get_knowledge(self, sentence):
+        knowledge_dict = {}
+        link_list = []
+        if self.return_pos:
+            knowledge_dict["pos"] = self.pos_tagger.tag(sentence)
+        if self.return_ner:
+            knowledge_dict["ner"] = self.ner_tagger.tag(sentence)
+        if self.return_srl:
+            knowledge_dict["srl"] = self.srl_tagger.tag(sentence)
+        if self.return_entity_desc or self.return_entity_ebd:
+            link_list = self.wikipedia_linker.link(sentence)
+        if self.return_entity_desc:
+            for i, entity in enumerate(link_list):
+                link_list[i]["desc"] = self.wikipedia_searcher.search(entity["id"])
+        if self.return_entity_ebd:
+            for i, entity in enumerate(link_list):
+                link_list[i]["ebd"] = self.wikipedia_embedder.embed(entity["title"])
+            knowledge_dict["wikipedia"] = link_list
 
-
-        for searcher in self.searcher_list:
-            for metion,value_dict in self.discrete_knowledge["wikipedia"].items():
-                self.discrete_knowledge["wikipedia"][metion]["desc"]=searcher.search(value_dict["id"])[value_dict["id"]]["desc"]
-        return self.discrete_knowledge
-
-
-
-    def get_continuous_knowledge(self,sentence):
-        for linker in self.linker_list:
-            self.continuous_knowledge[linker.knowledge_type]=linker.link(sentence)
-
-        for embedder in self.embedder_list:
-            for metion,value_dict in self.continuous_knowledge["wikipedia"].items():
-                self.continuous_knowledge["wikipedia"][metion]["entity_embedding"]=embedder.embed(value_dict["title"])[value_dict["title"]]["entity_embedding"]
-                self.continuous_knowledge["wikipedia"][metion]["neighbor_entity_embedding"]=embedder.embed(value_dict["title"])[value_dict["title"]]["similar_entities"]
-        return self.continuous_knowledge
+        return knowledge_dict
 
     def info(self):
+        # console = Console()
+        # example_dict = self.get_knowledge(sentence="Bert likes reading in the Sesame Street Library.")
+        # console.log(example_dict, log_locals=True)
         pass
 
+    def help_tagger(self):
+        self._help(TABLE=TABLE_DATA_TAGGER)
+
+    def help_linker(self):
+        self._help(TABLE=TABLE_DATA_LINKER)
+
+    def help_searcher(self):
+        self._help(TABLE=TABLE_DATA_SEARCHER)
+
+    def help_embedder(self):
+        self._help(TABLE=TABLE_DATA_EMBEDDER)
+
     def help(self):
-        pass
+        self.help_tagger()
+        self.help_linker()
+        self.help_searcher()
+        self.help_embedder()
+
+    def _help(self, TABLE):
+        console = Console()
+
+        table = Table(show_header=True)
+        table.title = ("[not italic]:book:[/] CogKTR Enhancer Library [not italic]:book:[/]")
+        table.add_column("Enhance Module")
+        table.add_column("Enhance Function")
+        table.add_column("Tool")
+        table.add_column("Return Knowledge")
+        table.columns[0].justify = "left"
+        table.columns[1].justify = "left"
+        table.columns[2].justify = "left"
+        table.columns[3].justify = "left"
+        table.columns[0].style = "red"
+        table.columns[0].header_style = "bold red"
+        table.columns[1].style = "blue"
+        table.columns[1].header_style = "bold blue"
+        table.columns[2].style = "green"
+        table.columns[2].header_style = "bold green"
+        table.columns[3].style = "cyan"
+        table.columns[3].header_style = "bold cyan"
+        table.row_styles = ["none", "dim"]
+        table.border_style = "bright_yellow"
+        table.width = console.width
+        for row in TABLE:
+            table.add_row(*row)
+        console.print(table)
 
 
 if __name__ == "__main__":
     from cogktr import *
-    tagger = NerTagger(tool="flair")
-    linker = WikipediaLinker(tool="tagme")
-    searcher = WikipediaSearcher(tool="blink",
-                                 path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl")
-    embedder = WikipediaEmbedder(tool="wikipedia2vec",
-                                 path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
 
-    enhancer=Enhancer(tagger=tagger,
-                      linker=linker,
-                      searcher=searcher,
-                      embedder=embedder)
-
-    sentence="Bert likes reading in the Sesame Street Library."
-    discrete_knowledge_dict=enhancer.get_discrete_knowledge(sentence)
-    continuous_knowledge_dict=enhancer.get_continuous_knowledge(sentence)
-    enhancer.info()
+    enhancer = Enhancer(return_pos=True,
+                        return_ner=True,
+                        return_spo=True,
+                        return_srl=True,
+                        return_event=True,
+                        return_entity_desc=True,
+                        return_entity_ebd=True)
     enhancer.help()
+    enhancer.set_config(
+        WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
+        WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
+    enhancer.info()
+    sentence = "Bert likes reading in the Sesame Street Library."
+    knowledge_dict = enhancer.get_knowledge(sentence=sentence)
+
     print("end")

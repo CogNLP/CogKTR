@@ -36,6 +36,7 @@ __all__ = [
     "BaseSearcher",
     "WikipediaSearcher",
     "BaseTagger",
+    "PosTagger",
     "NerTagger",
     "SrlTagger",
     "Enhancer",
