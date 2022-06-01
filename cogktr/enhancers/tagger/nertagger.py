@@ -10,7 +10,7 @@ class NerTagger(BaseTagger):
             raise ValueError("{} in SrlTagger is not supported!".format(tool))
 
         self.tool = tool
-        self.knowledge_type = "ner"
+        self.knowledge_type = "nertagger"
         if self.tool == "flair":
             self.nertagger = SequenceTagger.load('ner')
 

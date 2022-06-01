@@ -10,7 +10,7 @@ class PosTagger(BaseTagger):
             raise ValueError("{} in SrlTagger is not supported!".format(tool))
 
         self.tool = tool
-        self.knowledge_type = "pos"
+        self.knowledge_type = "postagger"
         if self.tool == "flair":
             self.nertagger = SequenceTagger.load('pos')
 

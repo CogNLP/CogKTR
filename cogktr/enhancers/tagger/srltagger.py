@@ -8,7 +8,7 @@ class SrlTagger(BaseTagger):
             raise ValueError("{} in SrlTagger is not supported!".format(tool))
 
         self.tool = tool
-        self.knowledge_type = "srl"
+        self.knowledge_type = "srltagger"
         if self.tool == "allennlp":
             self.srltagger = Predictor.from_path("https://storage.googleapis.com/allennlp-public-models/structured-prediction-srl-bert.2020.12.15.tar.gz")
 
