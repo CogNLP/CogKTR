@@ -2,43 +2,43 @@ TABLE_DATA_TAGGER = [
     [
         "Tagger",
         "PosTagger",
-        "Flair",
+        "flair",
         "tokens,labels",
     ],
     [
         "Tagger",
         "NerTagger",
-        "Flair",
+        "flair",
         "tokens,labels",
     ],
     [
         "Tagger",
         "NerTagger",
-        "CogIE",
+        "cogie",
         "None",
     ],
     [
         "Tagger",
         "SpoTagger",
-        "CogIE",
+        "cogie",
         "None",
     ],
     [
         "Tagger",
         "SrlTagger",
-        "Allennlp",
+        "allennlp",
         "tokens,arguments,roles",
     ],
     [
         "Tagger",
         "SrlTagger",
-        "CogIE",
+        "cogie",
         "None",
     ],
     [
         "Tagger",
         "EventTagger",
-        "CogIE",
+        "cogie",
         "None",
     ],
 ]
@@ -48,13 +48,13 @@ TABLE_DATA_LINKER=[
     [
         "Linker",
         "WikipediaLinker",
-        "Tagme",
+        "tagme",
         "begins,ends,ids,titles,mentions",
     ],
     [
         "Linker",
         "WikipediaLinker",
-        "CogIE",
+        "cogie",
         "None",
     ],
 ]
@@ -63,13 +63,13 @@ TABLE_DATA_SEARCHER=[
     [
         "Searcher",
         "WikipediaSearcher",
-        "Local Blink",
+        "blink",
         "desc",
     ],
     [
         "Searcher",
         "WikipediaSearcher",
-        "KILT",
+        "kilt",
         "None",
     ],
 ]
@@ -78,13 +78,13 @@ TABLE_DATA_EMBEDDER=[
     [
         "Embedder",
         "WikipediaEmbedder",
-        "Wikipedia2vec",
+        "wikipedia2vec",
         "en_ebd,similar_ebd",
     ],
     [
         "Embedder",
         "WikipediaEmbedder",
-        "CogKGE",
+        "cogkge",
         "None",
     ],
 ]
