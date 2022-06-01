@@ -51,6 +51,10 @@ __all__ = [
     # toolkits
 
     # utils
+    "TABLE_DATA_TAGGER",
+    "TABLE_DATA_LINKER",
+    "TABLE_DATA_SEARCHER",
+    "TABLE_DATA_EMBEDDER",
     "load_json",
     "save_json",
     "load_model",
