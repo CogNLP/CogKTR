@@ -3,12 +3,11 @@ import json
 from tqdm import tqdm
 
 
-# TODO: add cogie toolkit
 class WikipediaSearcher(BaseSearcher):
     def __init__(self, tool, path, return_desc=True):
         super().__init__()
         if tool not in ["blink"]:
-            raise ValueError("Please set a tool!")
+            raise ValueError("{} in WikipediaSearcher is not supported!".format(tool))
         self.tool = tool
         self.path = path
         self.return_desc = return_desc
@@ -40,10 +39,9 @@ class WikipediaSearcher(BaseSearcher):
 
     def _blink_search(self, id):
         search_dict = {}
-        search_dict[id] = {}
-        search_dict[id]["desc"] = None
+        search_dict["desc"] = None
         if self.return_desc:
-            search_dict[id]["desc"] = self.id2desc[id]
+            search_dict["desc"] = self.id2desc[id]
         return search_dict
 
 
