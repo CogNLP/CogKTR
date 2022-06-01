@@ -4,5 +4,5 @@ from .wikipediasearcher import *
 __all__ = [
     "BaseSearcher",
     "WikipediaSearcher",
-    # TODO: add cogie toolkit
+    # TODO: add KILT
 ]
