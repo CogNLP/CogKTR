@@ -7,7 +7,7 @@ class NerTagger(BaseTagger):
     def __init__(self, tool):
         super().__init__()
         if tool not in ["flair"]:
-            raise ValueError("{} in SrlTagger is not supported!".format(tool))
+            raise ValueError("{} in NerTagger is not supported!".format(tool))
 
         self.tool = tool
         self.knowledge_type = "nertagger"

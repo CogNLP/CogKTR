@@ -8,7 +8,7 @@ class WikipediaEmbedder(BaseEmbedder):
                  return_similar_entities_num=10):
         super().__init__()
         if tool not in ["wikipedia2vec"]:
-            raise ValueError("Please set a tool!")
+            raise ValueError("{} in WikipediaEmbedder is not supported!".format(tool))
         self.tool = tool
         self.path = path
         self.return_entity_embedding = return_entity_embedding
@@ -25,13 +25,12 @@ class WikipediaEmbedder(BaseEmbedder):
 
     def _wikipedia2vec_embed(self, title):
         embed_dict = {}
-        embed_dict[title] = {}
-        embed_dict[title]["entity_embedding"] = None
-        embed_dict[title]["similar_entities"] = None
+        embed_dict["entity_embedding"] = np.array(0)
+        embed_dict["similar_entities"] = []
         if self.return_entity_embedding:
-            embed_dict[title]["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title))
+            embed_dict["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title))
         if self.return_similar_entities:
-            embed_dict[title]["similar_entities"] = []
+            embed_dict["similar_entities"] = []
             similar_rank = 1
             similar_entities_list = self.wiki2vec.most_similar(self.wiki2vec.get_entity(title),
                                                                self.return_similar_entities_num)
@@ -42,7 +41,7 @@ class WikipediaEmbedder(BaseEmbedder):
                     item_dict["similar_rank"] = similar_rank
                     item_dict["similarity"] = item[1]
                     item_dict["similar_entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(item[0].title))
-                    embed_dict[title]["similar_entities"].append(item_dict)
+                    embed_dict["similar_entities"].append(item_dict)
                     similar_rank += 1
         return embed_dict
 

@@ -6,7 +6,7 @@ class WikipediaLinker(BaseLinker):
     def __init__(self, tool, lang="en"):
         super().__init__()
         if tool not in ["tagme"]:
-            raise ValueError("{} in SrlTagger is not supported!".format(tool))
+            raise ValueError("{} in WikipediaLinker is not supported!".format(tool))
         self.knowledge_type = "wikipedialinker"
         self.tool = tool
         self.lang = lang
