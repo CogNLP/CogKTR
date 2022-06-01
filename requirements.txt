@@ -7,3 +7,5 @@ tensorboard==2.9.0
 prettytable==3.3.0
 wikipedia2vec==1.0.5
 flair==0.11.3
+allennlp==2.9.3s
+allennlp-models==2.9.3

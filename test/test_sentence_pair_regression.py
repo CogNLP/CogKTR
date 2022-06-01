@@ -2,9 +2,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
+from cogktr.utils.general_utils import init_cogktr
 
-torch.cuda.set_device(4)
-device = torch.device('cuda:4')
+device,output_path = init_cogktr(
+    device_id=0,
+    output_path="/data/hongbang/CogKTR/datapath/sentence_pair/STS_B/experimental_result",
+    folder_tag="simple_test",
+)
 
 reader = STSBReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
 train_data, dev_data, test_data = reader.read_all()
@@ -33,21 +37,18 @@ trainer = Trainer(model,
                   drop_last=False,
                   gradient_accumulation_steps=1,
                   num_workers=5,
-                  save_path=None,
-                  save_file=None,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=None,
-                  save_steps=None,
+                  validate_steps=100,
+                  save_steps=100,
+                  output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
                   device=device,
-                  device_ids=[4],
                   callbacks=None,
                   metric_key=None,
-                  writer_path=None,
                   fp16=False,
                   fp16_opt_level='O1',
-                  logger_path=None)
+                  )
 trainer.train()
 print("end")
