@@ -2,18 +2,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
+from cogktr.utils.general_utils import init_cogktr
 
-torch.cuda.set_device(4)
-device = torch.device('cuda:4')
-
-# tagger=XXXTagger()
-# linker=XXXLinker()
-# searcher=XXXSearcher()
-# embedder=XXXEmbedder()
-# enhancer=Enhancer(tagger=tagger,
-#                   linker=linker,
-#                   searcher=searcher,
-#                   embedder=embedder)
+device,output_path = init_cogktr(
+    device_id=4,
+    output_path="/data/mentianyi/CogKTR/datapath/text_classification/SST_2/experimental_result",
+    folder_tag="simple_test",
+)
 
 reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
@@ -43,21 +38,18 @@ trainer = Trainer(model,
                   drop_last=False,
                   gradient_accumulation_steps=1,
                   num_workers=5,
-                  save_path=None,
-                  save_file=None,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=None,
-                  save_steps=None,
+                  validate_steps=100,
+                  save_steps=100,
+                  output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
                   device=device,
-                  device_ids=[4],
                   callbacks=None,
                   metric_key=None,
-                  writer_path=None,
                   fp16=False,
                   fp16_opt_level='O1',
-                  logger_path=None)
+                  )
 trainer.train()
 print("end")
