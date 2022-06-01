@@ -7,9 +7,10 @@ class NerTagger(BaseTagger):
     def __init__(self, tool):
         super().__init__()
         if tool not in ["flair"]:
-            raise ValueError("Please set a tool!")
-        self.knowledge_type = "ner"
+            raise ValueError("{} in SrlTagger is not supported!".format(tool))
+
         self.tool = tool
+        self.knowledge_type = "ner"
         if self.tool == "flair":
             self.nertagger = SequenceTagger.load('ner')
 
