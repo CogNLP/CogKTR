@@ -9,3 +9,4 @@ wikipedia2vec==1.0.5
 flair==0.11.3
 allennlp==2.9.3s
 allennlp-models==2.9.3
+rich==12.4.4
