@@ -7,11 +7,11 @@ from tqdm import tqdm
 
 
 class SST24KTEMBProcessor:
-    def __init__(self, plm, max_token_len, vocab,enhancer):
+    def __init__(self, plm, max_token_len, vocab, enhancer):
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
-        self.enhancer=enhancer
+        self.enhancer = enhancer
         self.tokenizer = BertTokenizer.from_pretrained(plm)
 
     def process_train(self, data):
@@ -20,7 +20,7 @@ class SST24KTEMBProcessor:
         for sentence, label in tqdm(zip(data['sentence'], data['label']), total=len(data['sentence'])):
             token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
                                           max_length=self.max_token_len)
-            datable("wikipedia",self.enhancer.get_knowledge(sentence)["wikipedia"])
+            datable("wikipedia", self.enhancer.get_knowledge(sentence)["wikipedia"])
             datable("token", token)
             datable("label", self.vocab["label_vocab"].label2id(label))
         return DataTableSet(datable)
@@ -31,7 +31,7 @@ class SST24KTEMBProcessor:
         for sentence, label in tqdm(zip(data['sentence'], data['label']), total=len(data['sentence'])):
             token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
                                           max_length=self.max_token_len)
-            datable("wikipedia",self.enhancer.get_knowledge(sentence)["wikipedia"])
+            datable("wikipedia", self.enhancer.get_knowledge(sentence)["wikipedia"])
             datable("token", token)
             datable("label", self.vocab["label_vocab"].label2id(label))
         return DataTableSet(datable)
@@ -42,7 +42,7 @@ class SST24KTEMBProcessor:
         for sentence in tqdm(zip(data['sentence']), total=len(data['sentence'])):
             token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
                                           max_length=self.max_token_len)
-            datable("wikipedia",self.enhancer.get_knowledge(sentence)["wikipedia"])
+            datable("wikipedia", self.enhancer.get_knowledge(sentence)["wikipedia"])
             datable("token", token)
         return DataTableSet(datable)
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     enhancer.set_config(
         WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
         WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
-    processor = SST24KTEMBProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab,enhancer=enhancer)
+    processor = SST24KTEMBProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab, enhancer=enhancer)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)
