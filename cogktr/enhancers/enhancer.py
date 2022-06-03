@@ -114,12 +114,12 @@ class Enhancer:
             for i, entity in enumerate(link_list_copy):
                 list_point = i - unaligned_num
                 entity_embedding = self.wikipedia_embedder.embed(entity["title"])
-                if entity_embedding["entity_embedding"].all() == np.array(0):
+                if entity_embedding["entity_embedding"].all() == np.array(100):
                     # Delete unaligned entity title
                     del link_list[list_point]
                     unaligned_num += 1
                 else:
-                    link_list[list_point]["ebd"] = entity_embedding
+                    link_list[list_point]["emb"] = entity_embedding
 
         knowledge_dict["wikipedia"] = link_list
 

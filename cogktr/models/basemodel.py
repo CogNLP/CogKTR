@@ -16,3 +16,6 @@ class BaseModel(nn.Module):
 
     def predict(self, *args):
         pass
+
+    def get_batch(self, batch):
+        pass

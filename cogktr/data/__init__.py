@@ -9,6 +9,8 @@ __all__ = [
     "CONLL2003Processor",
     "QNLIProcessor",
     "SST2Processor",
+    "SST24KGEMBProcessor",
+    "SST24KTEMBProcessor",
     "STSBProcessor",
 
     # reader

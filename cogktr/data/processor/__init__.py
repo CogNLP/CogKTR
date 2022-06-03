@@ -1,8 +1,8 @@
 from .baseprocessor import *
-from cogktr.data.processor.conll2003processors.conll2003processor import *
-from cogktr.data.processor.qnliprocessors.qnliprocessor import *
-from cogktr.data.processor.sst2processors.sst2processor import *
-from cogktr.data.processor.stsbprocessors.stsbprocessor import *
+from cogktr.data.processor.conll2003processors import *
+from cogktr.data.processor.qnliprocessors import *
+from cogktr.data.processor.sst2processors import *
+from cogktr.data.processor.stsbprocessors import *
 
 __all__ = [
     # baseprocessor
@@ -18,6 +18,8 @@ __all__ = [
 
     # sst2processor
     "SST2Processor",
+    "SST24KGEMBProcessor",
+    "SST24KTEMBProcessor",
 
     # stsbprocessor
     "STSBProcessor",

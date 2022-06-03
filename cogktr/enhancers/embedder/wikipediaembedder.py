@@ -25,7 +25,7 @@ class WikipediaEmbedder(BaseEmbedder):
 
     def _wikipedia2vec_embed(self, title):
         embed_dict = {}
-        embed_dict["entity_embedding"] = np.array(0)
+        embed_dict["entity_embedding"] = np.zeros(100)
         embed_dict["similar_entities"] = []
         if self.return_entity_embedding:
             try:
