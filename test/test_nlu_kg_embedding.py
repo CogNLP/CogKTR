@@ -10,7 +10,7 @@ device,output_path = init_cogktr(
     device_id=5,
     output_path="/data/mentianyi/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
-)
+)#TODO:device_id这里限制不住
 
 reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
