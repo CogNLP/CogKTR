@@ -1,5 +1,7 @@
 from rich.console import Console
 from rich.table import Table
+import numpy as np
+import copy
 from cogktr.enhancers.tagger import PosTagger, NerTagger, SrlTagger
 from cogktr.enhancers.linker import WikipediaLinker
 from cogktr.enhancers.searcher import WikipediaSearcher
@@ -106,9 +108,19 @@ class Enhancer:
         if self.return_entity_desc:
             for i, entity in enumerate(link_list):
                 link_list[i]["desc"] = self.wikipedia_searcher.search(entity["id"])
+        link_list_copy = copy.deepcopy(link_list)
         if self.return_entity_ebd:
-            for i, entity in enumerate(link_list):
-                link_list[i]["ebd"] = self.wikipedia_embedder.embed(entity["title"])
+            unaligned_num = 0
+            for i, entity in enumerate(link_list_copy):
+                list_point = i - unaligned_num
+                entity_embedding = self.wikipedia_embedder.embed(entity["title"])
+                if entity_embedding["entity_embedding"].all() == np.array(0):
+                    # Delete unaligned entity title
+                    del link_list[list_point]
+                    unaligned_num += 1
+                else:
+                    link_list[list_point]["ebd"] = entity_embedding
+
         knowledge_dict["wikipedia"] = link_list
 
         return knowledge_dict
