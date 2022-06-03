@@ -109,7 +109,7 @@ class Enhancer:
         if self.return_entity_ebd:
             for i, entity in enumerate(link_list):
                 link_list[i]["ebd"] = self.wikipedia_embedder.embed(entity["title"])
-            knowledge_dict["wikipedia"] = link_list
+        knowledge_dict["wikipedia"] = link_list
 
         return knowledge_dict
 

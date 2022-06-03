@@ -11,7 +11,7 @@ class WikipediaLinker(BaseLinker):
         self.tool = tool
         self.lang = lang
 
-    def link(self, sentence, threshold=0):
+    def link(self, sentence, threshold=0.1):
         link_list = []
         if self.tool == "tagme":
             link_list = self._tagme_link(sentence, threshold)

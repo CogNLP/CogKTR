@@ -4,7 +4,7 @@ import numpy as np
 
 
 class WikipediaEmbedder(BaseEmbedder):
-    def __init__(self, tool, path, return_entity_embedding=True, return_similar_entities=True,
+    def __init__(self, tool, path, return_entity_embedding=True, return_similar_entities=False,
                  return_similar_entities_num=10):
         super().__init__()
         if tool not in ["wikipedia2vec"]:
@@ -28,7 +28,10 @@ class WikipediaEmbedder(BaseEmbedder):
         embed_dict["entity_embedding"] = np.array(0)
         embed_dict["similar_entities"] = []
         if self.return_entity_embedding:
-            embed_dict["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title))
+            try:
+                embed_dict["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title))
+            except:
+                pass
         if self.return_similar_entities:
             embed_dict["similar_entities"] = []
             similar_rank = 1
