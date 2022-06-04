@@ -1,4 +1,4 @@
-from cogktr.enhancers.linker import *
+from cogktr.enhancers.linker import BaseLinker
 import tagme
 
 

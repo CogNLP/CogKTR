@@ -1,4 +1,4 @@
-from cogktr.enhancers.searcher import *
+from cogktr.enhancers.searcher import BaseSearcher
 import json
 from tqdm import tqdm
 

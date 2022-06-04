@@ -1,4 +1,4 @@
-from cogktr.enhancers.embedder import *
+from cogktr.enhancers.embedder import BaseEmbedder
 from wikipedia2vec import Wikipedia2Vec
 import numpy as np
 

@@ -1,4 +1,4 @@
-from cogktr.enhancers.tagger import *
+from cogktr.enhancers.tagger import BaseTagger
 from flair.models import SequenceTagger
 from flair.data import Sentence
 

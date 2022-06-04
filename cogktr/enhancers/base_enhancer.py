@@ -107,19 +107,21 @@ class BaseEnhancer:
             link_list = self.wikipedia_linker.link(sentence)
         if self.return_entity_desc:
             for i, entity in enumerate(link_list):
-                link_list[i]["desc"] = self.wikipedia_searcher.search(entity["id"])
+                link_list[i]["desc"] = self.wikipedia_searcher.search(entity["id"])["desc"]
         link_list_copy = copy.deepcopy(link_list)
         if self.return_entity_ebd:
             unaligned_num = 0
             for i, entity in enumerate(link_list_copy):
                 list_point = i - unaligned_num
-                entity_embedding = self.wikipedia_embedder.embed(entity["title"])
-                if entity_embedding["entity_embedding"].all() == np.array(100):
+                entity_embedding = self.wikipedia_embedder.embed(entity["title"])["entity_embedding"]
+                similar_entities = self.wikipedia_embedder.embed(entity["title"])["similar_entities"]
+                if entity_embedding.all() == np.array(100):
                     # Delete unaligned entity title
                     del link_list[list_point]
                     unaligned_num += 1
                 else:
-                    link_list[list_point]["emb"] = entity_embedding
+                    link_list[list_point]["entity_embedding"] = entity_embedding
+                    link_list[list_point]["similar_entities"] = similar_entities
 
         knowledge_dict["wikipedia"] = link_list
 
@@ -182,12 +184,12 @@ if __name__ == "__main__":
     from cogktr import *
 
     enhancer = BaseEnhancer(return_pos=True,
-                        return_ner=True,
-                        return_spo=True,
-                        return_srl=True,
-                        return_event=True,
-                        return_entity_desc=True,
-                        return_entity_ebd=True)
+                            return_ner=True,
+                            return_spo=True,
+                            return_srl=True,
+                            return_event=True,
+                            return_entity_desc=True,
+                            return_entity_ebd=True)
     enhancer.help()
     enhancer.set_config(
         WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
@@ -195,5 +197,4 @@ if __name__ == "__main__":
     enhancer.info()
     sentence = "Bert likes reading in the Sesame Street Library."
     knowledge_dict = enhancer.get_knowledge(sentence=sentence)
-
     print("end")
