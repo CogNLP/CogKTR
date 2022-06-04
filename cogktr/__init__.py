@@ -41,7 +41,7 @@ __all__ = [
     "PosTagger",
     "NerTagger",
     "SrlTagger",
-    "Enhancer",
+    "BaseEnhancer",
 
     # models
     "BaseModel",

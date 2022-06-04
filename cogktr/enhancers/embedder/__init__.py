@@ -1,5 +1,5 @@
-from .baseembedder import *
-from .wikipediaembedder import *
+from .base_embedder import *
+from .wikipedia_embedder import *
 
 __all__ = [
     "BaseEmbedder",

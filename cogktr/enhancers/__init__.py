@@ -2,7 +2,7 @@ from .embedder import *
 from .linker import *
 from .searcher import *
 from .tagger import *
-from .enhancer import *
+from .base_enhancer import *
 
 __all__ = [
     #embedder
@@ -24,5 +24,5 @@ __all__ = [
     "SrlTagger",
 
     #enhancer
-    "Enhancer",
+    "BaseEnhancer",
 ]

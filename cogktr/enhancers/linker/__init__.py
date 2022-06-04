@@ -1,5 +1,5 @@
-from .baselinker import *
-from .wikipedialinker import *
+from .base_linker import *
+from .wikipedia_linker import *
 
 __all__ = [
     "BaseLinker",

@@ -9,7 +9,7 @@ from cogktr.enhancers.embedder import WikipediaEmbedder
 from cogktr.utils.constant_utils import TABLE_DATA_TAGGER, TABLE_DATA_LINKER, TABLE_DATA_SEARCHER, TABLE_DATA_EMBEDDER
 
 
-class Enhancer:
+class BaseEnhancer:
     def __init__(self,
                  return_pos=False,
                  return_ner=False,
@@ -181,7 +181,7 @@ class Enhancer:
 if __name__ == "__main__":
     from cogktr import *
 
-    enhancer = Enhancer(return_pos=True,
+    enhancer = BaseEnhancer(return_pos=True,
                         return_ner=True,
                         return_spo=True,
                         return_srl=True,
