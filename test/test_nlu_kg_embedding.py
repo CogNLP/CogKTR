@@ -1,6 +1,3 @@
-import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = '4'
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -8,7 +5,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=5,
+    device_id=4,
     output_path="/data/mentianyi/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )  # TODO:device_id这里限制不住
@@ -17,7 +14,7 @@ reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_cla
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-enhancer = Enhancer(return_entity_ebd=True)
+enhancer = BaseEnhancer(return_entity_ebd=True)
 enhancer.set_config(
     WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
     WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
