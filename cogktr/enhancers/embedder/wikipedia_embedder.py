@@ -73,8 +73,11 @@ class WikipediaEmbedder(BaseEmbedder):
     def _cogkge_embed(self, id):
         embed_dict = {}
         embed_dict["entity_embedding"] = np.zeros(100)
-        embed_dict["entity_embedding"] = self.model.e_embedding(
-            torch.tensor(self.node_lut.vocab.word2idx[id]).to("cuda:0")).detach().cpu().numpy()
+        try:
+            embed_dict["entity_embedding"] = self.model.e_embedding(
+                torch.tensor(self.node_lut.vocab.word2idx[id]).to("cuda:0")).detach().cpu().numpy()
+        except:
+            pass
         return embed_dict
 
 
