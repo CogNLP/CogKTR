@@ -9,7 +9,7 @@ from cogktr.enhancers.embedder import WikipediaEmbedder
 from cogktr.utils.constant_utils import TABLE_DATA_TAGGER, TABLE_DATA_LINKER, TABLE_DATA_SEARCHER, TABLE_DATA_EMBEDDER
 
 
-class BaseEnhancer:
+class Enhancer:
     def __init__(self,
                  return_pos=False,
                  return_ner=False,
@@ -183,13 +183,13 @@ class BaseEnhancer:
 if __name__ == "__main__":
     from cogktr import *
 
-    enhancer = BaseEnhancer(return_pos=True,
-                            return_ner=True,
-                            return_spo=True,
-                            return_srl=True,
-                            return_event=True,
-                            return_entity_desc=True,
-                            return_entity_ebd=True)
+    enhancer = Enhancer(return_pos=True,
+                        return_ner=True,
+                        return_spo=True,
+                        return_srl=True,
+                        return_event=True,
+                        return_entity_desc=True,
+                        return_entity_ebd=True)
     enhancer.help()
     enhancer.set_config(
         WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",

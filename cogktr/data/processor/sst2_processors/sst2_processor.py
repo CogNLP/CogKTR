@@ -1,11 +1,11 @@
-from cogktr.data.reader.sst2_reader import SST2Reader
+from cogktr.data.reader.sst2_reader import Sst2Reader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizer
 from tqdm import tqdm
 
 
-class SST2Processor:
+class Sst2Processor:
     def __init__(self, plm, max_token_len, vocab):
         self.plm = plm
         self.max_token_len = max_token_len
@@ -43,10 +43,10 @@ class SST2Processor:
 
 
 if __name__ == "__main__":
-    reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+    reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
-    processor = SST2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+    processor = Sst2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)

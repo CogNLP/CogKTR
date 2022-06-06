@@ -1,4 +1,4 @@
-from cogktr.data.processor.sst2processors import SST2Processor
+from cogktr.data.processor.sst2_processors import SST2Processor
 from cogktr.enhancers.linker.wikipedia_linker import WikipediaLinker
 from cogktr.enhancers.searcher.wikipedia_searcher import WikipediaSearcher
 from cogktr.data.reader.sst2_reader import SST2Reader
@@ -34,7 +34,7 @@ class KTSST2Processor(SST2Processor):
 
 
 if __name__ == "__main__":
-    #sentence = KTSST2Processor.integrate_kt(sentence="Bert likes reading in the library.",
+    # sentence = KTSST2Processor.integrate_kt(sentence="Bert likes reading in the library.",
     #                                        knowledge_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikipedia/entity.jsonl")
     reader = SST2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()

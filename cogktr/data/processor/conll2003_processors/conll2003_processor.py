@@ -1,11 +1,11 @@
-from cogktr.data.reader.conll2003_reader import CONLL2003Reader
+from cogktr.data.reader.conll2003_reader import Conll2003Reader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from tqdm import tqdm
 from cogktr.utils.tokenizer_utils import SequenceBertTokenizer
 
 
-class CONLL2003Processor:
+class Conll2003Processor:
     def __init__(self, plm, max_token_len, vocab):
         self.plm = plm
         self.max_token_len = max_token_len
@@ -29,10 +29,10 @@ class CONLL2003Processor:
 
 
 if __name__ == "__main__":
-    reader = CONLL2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
+    reader = Conll2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
-    processor = CONLL2003Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+    processor = Conll2003Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
     train_dataset = processor.process(train_data)
     dev_dataset = processor.process(dev_data)
     test_dataset = processor.process(test_data)

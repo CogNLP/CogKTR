@@ -6,20 +6,20 @@ from .datableset import *
 __all__ = [
     # processor
     "BaseProcessor",
-    "CONLL2003Processor",
-    "QNLIProcessor",
-    "SST2Processor",
-    "SST24KGEMBProcessor",
-    "SST24KTEMBProcessor",
-    "STSBProcessor",
+    "Conll2003Processor",
+    "QnliProcessor",
+    "Sst2Processor",
+    "Sst24KgembProcessor",
+    "Sst24KtembProcessor",
+    "StsbProcessor",
 
     # reader
     "BaseReader",
-    "CONLL2003Reader",
-    "QNLIReader",
-    "SQUAD2Reader",
-    "SST2Reader",
-    "STSBReader",
+    "Conll2003Reader",
+    "QnliReader",
+    "Squad2Reader",
+    "Sst2Reader",
+    "StsbReader",
 
     # datable
     "DataTable",

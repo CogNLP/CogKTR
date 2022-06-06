@@ -1,7 +1,7 @@
 import torch
 
-from cogktr.data.reader.sst2_reader import SST2Reader
-from cogktr.enhancers import BaseEnhancer
+from cogktr.data.reader.sst2_reader import Sst2Reader
+from cogktr.enhancers import Enhancer
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizerFast
@@ -9,7 +9,7 @@ from tqdm import tqdm
 import numpy as np
 
 
-class SST24KGEMBProcessor:
+class Sst24KgembProcessor:
     def __init__(self, plm, max_token_len, vocab, enhancer):
         self.plm = plm
         self.max_token_len = max_token_len
@@ -88,14 +88,14 @@ class SST24KGEMBProcessor:
 
 
 if __name__ == "__main__":
-    reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+    reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
     enhancer = Enhancer(return_entity_ebd=True)
     enhancer.set_config(
         WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
         WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
-    processor = SST24KGEMBProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab, enhancer=enhancer)
+    processor = Sst24KgembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab, enhancer=enhancer)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)
