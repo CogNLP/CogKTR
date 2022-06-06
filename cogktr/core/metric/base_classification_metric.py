@@ -1,15 +1,15 @@
-from cogktr.core.metric.basemetric import BaseMetric
+from cogktr.core.metric.base_metric import BaseMetric
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 
 
 class BaseClassificationMetric(BaseMetric):
-    def __init__(self,mode):
+    def __init__(self, mode):
         super().__init__()
-        if mode not in ["binary","multi"]:
+        if mode not in ["binary", "multi"]:
             raise ValueError("Please choose mode in binary or multi")
-        self.mode=mode
+        self.mode = mode
         self.pre_list = list()
         self.label_list = list()
 
@@ -18,8 +18,8 @@ class BaseClassificationMetric(BaseMetric):
         self.label_list = self.label_list + label.cpu().tolist()
 
     def get_metric(self, reset=True):
-        evaluate_result={}
-        if self.mode=="binary":
+        evaluate_result = {}
+        if self.mode == "binary":
             P = precision_score(self.pre_list, self.label_list, average="binary")
             R = recall_score(self.pre_list, self.label_list, average="binary")
             F1 = f1_score(self.pre_list, self.label_list, average="binary")
@@ -27,7 +27,7 @@ class BaseClassificationMetric(BaseMetric):
                                "R": R,
                                "F1": F1,
                                }
-        if self.mode=="multi":
+        if self.mode == "multi":
             micro_P = precision_score(self.pre_list, self.label_list, average="micro")
             micro_R = recall_score(self.pre_list, self.label_list, average="micro")
             micro_F1 = f1_score(self.pre_list, self.label_list, average="micro")

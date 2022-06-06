@@ -48,8 +48,8 @@ __all__ = [
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
     "BaseTextClassificationModel",
-    "KgEmbModel4TC",
-    "KtEmbModel4TC",
+    "KgembModel4TC",
+    "KtembModel4TC",
 
     # modules
 

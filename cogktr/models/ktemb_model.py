@@ -1,11 +1,11 @@
-from cogktr.models.basemodel import BaseModel
+from cogktr.models.base_model import BaseModel
 import torch.nn as nn
 from transformers import BertModel
 import torch.nn.functional as F
 import torch
 
 
-class KtEmbModel4TC(BaseModel):
+class KtembModel4TC(BaseModel):
     def __init__(self, vocab, plm):
         super().__init__()
         self.vocab = vocab

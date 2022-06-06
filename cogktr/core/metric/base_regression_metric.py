@@ -1,4 +1,4 @@
-from cogktr.core.metric.basemetric import BaseMetric
+from cogktr.core.metric.base_metric import BaseMetric
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score

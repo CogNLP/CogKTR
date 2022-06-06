@@ -1,4 +1,4 @@
-from cogktr.models.basemodel import BaseModel
+from cogktr.models.base_model import BaseModel
 import torch.nn as nn
 from transformers import BertModel
 import torch.nn.functional as F
@@ -19,7 +19,7 @@ class MLP(nn.Module):
 
 
 
-class KgEmbModel4TC(BaseModel):
+class KgembModel4TC(BaseModel):
     def __init__(self, vocab, plm):
         super().__init__()
         self.vocab = vocab
