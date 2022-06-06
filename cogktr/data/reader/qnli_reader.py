@@ -1,11 +1,11 @@
 import os
-from cogktr.data.reader.basereader import BaseReader
+from cogktr.data.reader.base_reader import BaseReader
 from cogktr.data.datable import DataTable
 from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.download_utils import Downloader
 
 
-class QNLIReader(BaseReader):
+class QnliReader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
@@ -74,7 +74,7 @@ class QNLIReader(BaseReader):
 
 
 if __name__ == "__main__":
-    reader = QNLIReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+    reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
     print("end")

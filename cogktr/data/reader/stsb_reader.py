@@ -1,10 +1,10 @@
 import os
-from cogktr.data.reader.basereader import BaseReader
+from cogktr.data.reader.base_reader import BaseReader
 from cogktr.data.datable import DataTable
 from cogktr.utils.download_utils import Downloader
 
 
-class STSBReader(BaseReader):
+class StsbReader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
@@ -90,7 +90,7 @@ class STSBReader(BaseReader):
 
 
 if __name__ == "__main__":
-    reader = STSBReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
+    reader = StsbReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
     print("end")

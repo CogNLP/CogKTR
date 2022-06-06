@@ -1,4 +1,4 @@
-from cogktr.data.reader.qnlireader import QNLIReader
+from cogktr.data.reader.qnli_reader import QNLIReader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizer

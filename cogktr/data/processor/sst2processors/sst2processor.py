@@ -1,4 +1,4 @@
-from cogktr.data.reader.sst2reader import SST2Reader
+from cogktr.data.reader.sst2_reader import SST2Reader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizer

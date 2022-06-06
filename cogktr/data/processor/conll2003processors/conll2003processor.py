@@ -1,4 +1,4 @@
-from cogktr.data.reader.conll2003reader import CONLL2003Reader
+from cogktr.data.reader.conll2003_reader import CONLL2003Reader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from tqdm import tqdm

@@ -1,11 +1,11 @@
 import os
-from cogktr.data.reader.basereader import BaseReader
+from cogktr.data.reader.base_reader import BaseReader
 from cogktr.data.datable import DataTable
 from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.download_utils import Downloader
 
 
-class CONLL2003Reader(BaseReader):
+class Conll2003Reader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
@@ -69,7 +69,7 @@ class CONLL2003Reader(BaseReader):
 
 
 if __name__ == "__main__":
-    reader = CONLL2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
+    reader = Conll2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
     print("end")
