@@ -54,6 +54,6 @@ class WikipediaLinker(BaseLinker):
 
 
 if __name__ == "__main__":
-    linker = WikipediaLinker(tool="cogie")
+    linker = WikipediaLinker(tool="blink")
     link_list = linker.link("Bert likes reading in the Sesame Street Library.")
     print("end")

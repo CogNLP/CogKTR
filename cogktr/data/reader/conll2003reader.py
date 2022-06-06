@@ -2,12 +2,15 @@ import os
 from cogktr.data.reader.basereader import BaseReader
 from cogktr.data.datable import DataTable
 from cogktr.utils.vocab_utils import Vocabulary
+from cogktr.utils.download_utils import Downloader
 
 
 class CONLL2003Reader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
+        downloader = Downloader()
+        downloader.download_conll2003_raw_data(raw_data_path)
         self.train_file = 'train.txt'
         self.dev_file = 'valid.txt'
         self.test_file = 'test.txt'
@@ -17,9 +20,9 @@ class CONLL2003Reader(BaseReader):
         self.pos_label_vocab = Vocabulary()
         self.syn_label_vocab = Vocabulary()
         self.ner_label_vocab = Vocabulary()
-        self.pos_label_vocab.add_dict({"<pad>":0})
-        self.syn_label_vocab.add_dict({"<pad>":0})
-        self.ner_label_vocab.add_dict({"<pad>":0})
+        self.pos_label_vocab.add_dict({"<pad>": 0})
+        self.syn_label_vocab.add_dict({"<pad>": 0})
+        self.ner_label_vocab.add_dict({"<pad>": 0})
 
     def _read_data(self, path):
         datable = DataTable()

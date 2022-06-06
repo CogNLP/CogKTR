@@ -60,6 +60,7 @@ __all__ = [
     "TABLE_DATA_LINKER",
     "TABLE_DATA_SEARCHER",
     "TABLE_DATA_EMBEDDER",
+    "Downloader",
     "load_json",
     "save_json",
     "load_model",

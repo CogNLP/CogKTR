@@ -2,12 +2,15 @@ import os
 from cogktr.data.reader.basereader import BaseReader
 from cogktr.data.datable import DataTable
 from cogktr.utils.vocab_utils import Vocabulary
+from cogktr.utils.download_utils import Downloader
 
 
 class SST2Reader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
+        downloader = Downloader()
+        downloader.download_sst2_raw_data(raw_data_path)
         self.train_file = 'train.tsv'
         self.dev_file = 'dev.tsv'
         self.test_file = 'test.tsv'

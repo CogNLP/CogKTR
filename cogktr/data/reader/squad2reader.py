@@ -2,12 +2,15 @@ import os
 from cogktr.data.reader.basereader import BaseReader
 from cogktr.data.datable import DataTable
 from cogktr.utils.io_utils import load_json
+from cogktr.utils.download_utils import Downloader
 
 
 class SQUAD2Reader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
+        downloader = Downloader()
+        downloader.download_squad2_raw_data(raw_data_path)
         self.train_file = 'train-v2.0.json'
         self.dev_file = 'dev-v2.0.json'
         self.test_file = ''
