@@ -66,6 +66,13 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
+    def download_cogkge_knowledge(self, output_file):
+        dataset_list = ["vocab.pkl", "Model.pkl"]
+        zip_name = "KNOWLEDGE_COGKGE.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
 
 if __name__ == "__main__":
     downloader = Downloader()
@@ -74,5 +81,8 @@ if __name__ == "__main__":
     downloader.download_squad2_raw_data("/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
     downloader.download_sst2_raw_data("/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     downloader.download_stsb_raw_data("/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
-    downloader.download_wikipedia2vec_knowledge("/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data")
-    downloader.download_wikipedia_entity_description_knowledge("/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data")
+    downloader.download_wikipedia2vec_knowledge(
+        "/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data")
+    downloader.download_wikipedia_entity_description_knowledge(
+        "/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data")
+    downloader.download_cogkge_knowledge("/data/mentianyi/code/CogKTR/datapath/knowledge_graph/cogkge/raw_data")
