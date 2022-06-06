@@ -4,10 +4,15 @@ from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizer
 from tqdm import tqdm
+import transformers
+from cogktr.data.processor.base_processor import BaseProcessor
+
+transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class Sst24KtembProcessor:
+class Sst24KtembProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab, enhancer):
+        super().__init__()
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
