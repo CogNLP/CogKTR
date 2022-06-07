@@ -45,6 +45,7 @@ def init_logger(log_file=None,rank=-1):
             },
         },
     }
+    LOGGING_DICT['loggers']['']['level'] = 'INFO' if rank in [-1, 0] else 'WARN'
     if log_file is None or rank not in [-1,0]:
         LOGGING_DICT['loggers']['']['handlers'] = ['stream']
         del LOGGING_DICT['handlers']['file']
