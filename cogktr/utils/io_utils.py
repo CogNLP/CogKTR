@@ -16,7 +16,7 @@ def save_json(data, file_path):
     if not isinstance(file_path, Path):
         file_path = Path(file_path)
     with open(str(file_path), 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=4)
 
 
 def load_model(model, model_path):

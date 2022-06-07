@@ -46,11 +46,11 @@ class WikipediaEmbedder(BaseEmbedder):
 
     def _wikipedia2vec_embed(self, title):
         embed_dict = {}
-        embed_dict["entity_embedding"] = np.zeros(100)
+        embed_dict["entity_embedding"] = np.zeros(100).tolist()
         embed_dict["similar_entities"] = []
         if self.return_entity_embedding:
             try:
-                embed_dict["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title))
+                embed_dict["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title)).tolist()
             except:
                 pass
         if self.return_similar_entities:
@@ -71,10 +71,10 @@ class WikipediaEmbedder(BaseEmbedder):
 
     def _cogkge_embed(self, id):
         embed_dict = {}
-        embed_dict["entity_embedding"] = np.zeros(100)
+        embed_dict["entity_embedding"] = np.zeros(100).tolist()
         try:
             embed_dict["entity_embedding"] = self.model.e_embedding(
-                torch.tensor(self.node_lut.vocab.word2idx[id]).to("cuda:0")).detach().cpu().numpy()
+                torch.tensor(self.node_lut.vocab.word2idx[id]).to("cuda:0")).detach().cpu().numpy().tolist()
         except:
             pass
         return embed_dict

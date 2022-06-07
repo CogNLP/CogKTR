@@ -41,7 +41,10 @@ class WikipediaSearcher(BaseSearcher):
         search_dict = {}
         search_dict["desc"] = None
         if self.return_desc:
-            search_dict["desc"] = self.id2desc[id]
+            try:
+                search_dict["desc"] = self.id2desc[id]
+            except:
+                pass
         return search_dict
 
 
