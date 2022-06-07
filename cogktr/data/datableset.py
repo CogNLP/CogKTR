@@ -5,15 +5,13 @@ from cogktr.data.datable import DataTable
 
 
 class DataTableSet(Dataset):
-    def __init__(self, datable: DataTable, device=torch.device('cuda'), name=None, to_device=True, shuffle=True):
+    def __init__(self, datable: DataTable, name=None, to_device=True, shuffle=True):
         self.datable = datable
         self.length = len(self.datable)
-        self.to_device = to_device
         self.type2type = {}
         self.type2type[int] = torch.long
         self.type2type[float] = torch.float
         self.type2type[bool] = torch.bool
-        self.device = device
         self._name = name
         self.shuffle = shuffle
 
@@ -30,16 +28,17 @@ class DataTableSet(Dataset):
                         else:
                             data = data[0]
                     else:
-                        if type(data) in self.type2type and self.to_device:
+                        if type(data) in self.type2type:
                             dtype = self.type2type[type(data)]
                             item.append(
-                                torch.tensor(self.datable.datas[header][index], dtype=dtype, device=self.device))
+                                torch.tensor(self.datable.datas[header][index], dtype=dtype))
                         else:
                             item.append(self.datable.datas[header][index])
                         break
             else:
                 item.append(self.datable.datas[header][index])
-        return tuple(item)
+        return {key:value for key,value in zip(self.datable.headers,item)}
+        # return tuple(item)
 
     def __len__(self):
         return self.length
