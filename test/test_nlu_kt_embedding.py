@@ -10,21 +10,16 @@ device, output_path = init_cogktr(
     folder_tag="simple_test",
 )
 
-reader = SST2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-enhancer = Enhancer(return_entity_desc=True)
-enhancer.set_config(
-    WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
-    WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
-
-processor = SST2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+processor = Sst2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = KtEmbModel4TC(plm="bert-base-cased", vocab=vocab)
+model = KtembModel4TC(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
