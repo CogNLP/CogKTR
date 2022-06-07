@@ -2,27 +2,27 @@ from .embedder import *
 from .linker import *
 from .searcher import *
 from .tagger import *
-from .base_enhancer import *
+from .enhancer import *
 
 __all__ = [
-    #embedder
+    # embedder
     "BaseEmbedder",
     "WikipediaEmbedder",
 
-    #linker
+    # linker
     "BaseLinker",
     "WikipediaLinker",
 
-    #searcher
+    # searcher
     "BaseSearcher",
     "WikipediaSearcher",
 
-    #tagger
+    # tagger
     "BaseTagger",
     "NerTagger",
     "PosTagger",
     "SrlTagger",
 
-    #enhancer
-    "BaseEnhancer",
+    # enhancer
+    "Enhancer",
 ]

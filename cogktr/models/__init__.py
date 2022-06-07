@@ -1,14 +1,14 @@
-from .basemodel import *
-from .basesentencepairmodel import *
-from .basetextclassificationmodel import *
-from .kg_emb_model import *
-from .kt_emb_model import *
+from .base_model import *
+from .base_sentence_pair_model import *
+from .base_text_classification_model import *
+from .kgemb_model import *
+from .ktemb_model import *
 
 __all__ = [
     "BaseModel",
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
     "BaseTextClassificationModel",
-    "KgEmbModel4TC",
-    "KtEmbModel4TC",
+    "KgembModel4TC",
+    "KtembModel4TC",
 ]

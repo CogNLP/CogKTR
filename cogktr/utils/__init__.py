@@ -1,4 +1,5 @@
 from .constant_utils import *
+from .download_utils import *
 from .io_utils import *
 from .parallel_utils import *
 from .tokenizer_utils import *
@@ -10,6 +11,9 @@ __all__ = [
     "TABLE_DATA_LINKER",
     "TABLE_DATA_SEARCHER",
     "TABLE_DATA_EMBEDDER",
+
+    # download_utils
+    "Downloader",
 
     # io_utils
     "load_json",

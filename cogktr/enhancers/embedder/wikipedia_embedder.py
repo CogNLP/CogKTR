@@ -1,7 +1,6 @@
 from cogktr.enhancers.embedder import BaseEmbedder
 from wikipedia2vec import Wikipedia2Vec
 import numpy as np
-
 import torch
 from cogkge import *
 from cogkge.data.lut import LookUpTable
