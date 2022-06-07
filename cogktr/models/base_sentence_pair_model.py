@@ -18,7 +18,7 @@ class BaseSentencePairClassificationModel(BaseModel):
 
     def loss(self, batch, loss_function):
         batch_len = len(batch)
-        input_ids, token_type_ids, attention_mask, label = batch
+        input_ids, token_type_ids, attention_mask, label = batch.values()
         pred = self.forward(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
         loss = loss_function(pred, label) / batch_len
         return loss
@@ -29,7 +29,7 @@ class BaseSentencePairClassificationModel(BaseModel):
         return x
 
     def evaluate(self, batch, metric_function):
-        input_ids, token_type_ids, attention_mask, label = batch
+        input_ids, token_type_ids, attention_mask, label = batch.values()
         pred = self.predict(input_ids, token_type_ids, attention_mask)
         metric_function.evaluate(pred, label)
 
@@ -51,7 +51,7 @@ class BaseSentencePairRegressionModel(BaseModel):
 
     def loss(self, batch, loss_function):
         batch_len = len(batch)
-        input_ids, token_type_ids, attention_mask, label = batch
+        input_ids, token_type_ids, attention_mask, label = batch.values()
         pred = self.forward(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)
         pred = pred.squeeze()  # shape:(B,1)->(B)
         loss = loss_function(pred, label) / batch_len
@@ -63,7 +63,7 @@ class BaseSentencePairRegressionModel(BaseModel):
         return x
 
     def evaluate(self, batch, metric_function):
-        input_ids, token_type_ids, attention_mask, label = batch
+        input_ids, token_type_ids, attention_mask, label = batch.values()
         pred = self.predict(input_ids, token_type_ids, attention_mask)
         metric_function.evaluate(pred, label)
 
