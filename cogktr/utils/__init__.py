@@ -2,7 +2,7 @@ from .constant_utils import *
 from .download_utils import *
 from .io_utils import *
 from .parallel_utils import *
-from .tokenizer_utils import *
+from .transformers_utils import *
 from .vocab_utils import *
 
 __all__ = [
