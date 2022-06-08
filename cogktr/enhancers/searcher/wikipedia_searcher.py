@@ -1,12 +1,13 @@
 from cogktr.enhancers.searcher import BaseSearcher
 import json
 from tqdm import tqdm
+from cogktr.enhancers.searcher.kilt_searcher import KnowledgeSource
 
 
 class WikipediaSearcher(BaseSearcher):
     def __init__(self, tool, path, return_desc=True):
         super().__init__()
-        if tool not in ["blink"]:
+        if tool not in ["blink", "kilt"]:
             raise ValueError("{} in WikipediaSearcher is not supported!".format(tool))
         self.tool = tool
         self.path = path
@@ -35,6 +36,8 @@ class WikipediaSearcher(BaseSearcher):
         search_dict = {}
         if self.tool == "blink":
             search_dict = self._blink_search(id)
+        if self.tool == "kilt":
+            search_dict = self._kilt_search(id)
         return search_dict
 
     def _blink_search(self, id):
@@ -45,6 +48,14 @@ class WikipediaSearcher(BaseSearcher):
                 search_dict["desc"] = self.id2desc[id]
             except:
                 pass
+        return search_dict
+
+    def _kilt_search(self, id):
+        ks = KnowledgeSource()
+        search_dict = {}
+        search_dict["desc"] = None
+        if self.return_desc:
+            search_dict["desc"] = ks.get_page_by_id(id)["wikidata_info"]["description"]
         return search_dict
 
 

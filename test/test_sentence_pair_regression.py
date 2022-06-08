@@ -5,8 +5,8 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=5,
-    output_path="/data/mentianyi/CogKTR/datapath/sentence_pair/STS_B/experimental_result",
+    device_id=4,
+    output_path="/data/hongbang/CogKTR/datapath/sentence_pair/STS_B/experimental_result",
     folder_tag="simple_test",
 )
 

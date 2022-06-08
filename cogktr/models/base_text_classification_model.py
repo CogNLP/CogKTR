@@ -18,10 +18,9 @@ class BaseTextClassificationModel(BaseModel):
         self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 
     def loss(self, batch, loss_function):
-        batch_len = len(batch)
-        token, label = batch
+        token, label = self.get_batch(batch)
         pred = self.forward(token=token)
-        loss = loss_function(pred, label) / batch_len
+        loss = loss_function(pred, label)
         return loss
 
     def forward(self, token):
@@ -30,7 +29,7 @@ class BaseTextClassificationModel(BaseModel):
         return x
 
     def evaluate(self, batch, metric_function):
-        token, label = batch
+        token, label = self.get_batch(batch)
         pred = self.predict(token)
         metric_function.evaluate(pred, label)
 
@@ -39,3 +38,8 @@ class BaseTextClassificationModel(BaseModel):
         pred = F.softmax(pred, dim=1)
         pred = torch.max(pred, dim=1)[1]
         return pred
+
+    def get_batch(self, batch):
+        token = batch["token"]
+        label = batch["label"]
+        return token, label
