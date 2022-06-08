@@ -47,6 +47,7 @@ __all__ = [
     "BaseModel",
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
+    "BaseSequenceLabelingModel",
     "BaseTextClassificationModel",
     "KgembModel4TC",
     "KtembModel4TC",
