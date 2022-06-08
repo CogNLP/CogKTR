@@ -32,7 +32,6 @@ class Squad2Reader(BaseReader):
                     question_text = qa["question"]
                     start_position_character = None
                     answer_text = None
-                    answers = []
 
                     is_impossible = qa.get("is_impossible", False)
                     if not is_impossible:
@@ -64,6 +63,7 @@ class Squad2Reader(BaseReader):
                             min(start_position_character + len(answer_text) - 1, len(char_to_word_offset) - 1)
                         ]
                     datable("qas_id",qas_id)
+                    datable("is_impossible",is_impossible)
                     datable("question_text",question_text)
                     datable("context_text",context_text)
                     datable("answer_text",answer_text)
