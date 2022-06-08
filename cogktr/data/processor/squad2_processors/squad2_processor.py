@@ -23,10 +23,10 @@ class Squad2Processor(BaseProcessor):
     def process(self, data):
         datable = DataTable()
         print("Processing data...")
-        dict_data = {}
-        for head in data.headers:
-            dict_data[head] = data[head][0:100]
-        data = dict_data
+        # dict_data = {}
+        # for head in data.headers:
+        #     dict_data[head] = data[head][0:1000]
+        # data = dict_data
         for qas_id,is_impossible, \
             question_text,context_text,\
             answer_text,start_position,end_position,\

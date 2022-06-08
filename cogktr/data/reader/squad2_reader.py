@@ -74,7 +74,7 @@ class Squad2Reader(BaseReader):
         return datable
 
     def _read_dev(self, path):
-        return None
+        return self._read_train(path)
 
     def _read_test(self, path):
         return None
