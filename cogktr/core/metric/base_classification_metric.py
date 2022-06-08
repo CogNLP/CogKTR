@@ -14,8 +14,8 @@ class BaseClassificationMetric(BaseMetric):
         self.pre_list = list()
 
     def evaluate(self, pred, label):
-        self.label_list = self.label_list + pred.cpu().tolist()
-        self.pre_list = self.pre_list + label.cpu().tolist()
+        self.label_list = self.label_list + label.cpu().tolist()
+        self.pre_list = self.pre_list + pred.cpu().tolist()
 
     def get_metric(self, reset=True):
         evaluate_result = {}
