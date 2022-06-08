@@ -16,7 +16,7 @@ def save_json(data, file_path):
     if not isinstance(file_path, Path):
         file_path = Path(file_path)
     with open(str(file_path), 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=4)
 
 
 def load_model(model, model_path):
@@ -24,7 +24,7 @@ def load_model(model, model_path):
         model_path = str(model_path)
     print(f"loading model from {str(model_path)} .")
     states = torch.load(model_path)
-    if isinstance(model, nn.DataParallel):
+    if isinstance(model, nn.parallel.DistributedDataParallel):
         model.module.load_state_dict(states)
     else:
         model.load_state_dict(states, strict=False)

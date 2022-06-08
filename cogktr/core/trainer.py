@@ -8,7 +8,9 @@ import logging
 from cogktr.utils.io_utils import save_model, load_model
 from torch.utils.tensorboard import SummaryWriter
 from cogktr.utils.log_utils import logger
-
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+from cogktr.utils.general_utils import reduce_mean,move_dict_value_to_device
 
 class Trainer:
     def __init__(
@@ -43,6 +45,7 @@ class Trainer:
             fp16=False,
             fp16_opt_level='O1',
             checkpoint_path=None,
+            rank=-1,
     ):
         """
         训练器构造函数
@@ -99,19 +102,33 @@ class Trainer:
         self.checkpoint_path = checkpoint_path
         self.metric_key = metric_key
         self.output_path = output_path
+        self.rank = rank
 
-        if self.output_path:
-            self.writer_path = os.path.join(self.output_path, "tensorboard")
-            self.save_path = os.path.join(self.output_path, "model")
-            if not os.path.exists(self.writer_path):
-                os.mkdir(self.writer_path)
-            if not os.path.exists(self.save_path):
-                os.mkdir(self.save_path)
+        if self.rank in [-1,0]:
+            if self.output_path:
+                self.writer_path = os.path.join(self.output_path, "tensorboard")
+                self.save_path = os.path.join(self.output_path, "model")
+                if not os.path.exists(self.writer_path):
+                    os.mkdir(self.writer_path)
+                if not os.path.exists(self.save_path):
+                    os.mkdir(self.save_path)
+            else:
+                self.writer_path = None
+                self.save_path = None
         else:
             self.writer_path = None
             self.save_path = None
 
-        self.model.to(self.device)
+        if self.rank == -1:
+            self.model.to(self.device)
+        else:
+            self.model = self.model.cuda(self.rank)
+            self.model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(self.model)
+            self.model = DDP(self.model,
+                             device_ids=[self.rank],
+                             output_device=self.rank,
+                             find_unused_parameters=False,
+                             broadcast_buffers=False)
 
         if self.fp16:
             try:
@@ -188,13 +205,20 @@ class Trainer:
         logger.info("Global step = %d", global_step)
 
         total_loss = 0.0
-        self.model.zero_grad()
-        for epoch in range(epochs_trained, self.n_epochs + 1):
 
-            epoch_loss = 0.0
+        if self.rank == -1:
+            self.model.zero_grad()
+        else:
+            self.model.module.zero_grad()
+
+        for epoch in range(epochs_trained, self.n_epochs + 1):
             logger.info("Train epoch = %d", epoch)
+            epoch_loss = 0.0
             self.model.train()
-            if self.use_tqdm:
+            if self.rank != -1:
+                self.train_sampler.set_epoch(epoch)
+
+            if self.use_tqdm and self.rank in [-1,0]:
                 progress = enumerate(tqdm(self.train_dataloader, desc="Iteration", leave=False), 1)
             else:
                 progress = enumerate(self.train_dataloader, 1)
@@ -206,10 +230,19 @@ class Trainer:
                     steps_trained_in_current_epoch -= 1
                     continue
 
-                loss = self.model.loss(batch, self.loss)
-                epoch_loss += loss.item()
-                total_loss += loss.item()
-                self.writer.add_scalar(tag='loss', scalar_value=loss, global_step=global_step)
+                move_dict_value_to_device(batch,device=self.device,rank=self.rank)
+                if self.rank == -1:
+                    loss = self.model.loss(batch, self.loss)
+                    epoch_loss += loss.item()
+                    total_loss += loss.item()
+                else:
+                    loss = self.model.module.loss(batch,self.loss)
+                    single_batch_loss = reduce_mean(loss, dist.get_world_size()).item()
+                    epoch_loss += single_batch_loss
+                    total_loss += single_batch_loss
+
+                if self.rank in [-1,0]:
+                    self.writer.add_scalar(tag='loss', scalar_value=loss, global_step=global_step)
 
                 # 梯度反传
                 if self.fp16:
@@ -222,6 +255,7 @@ class Trainer:
                         scaled_loss.backward()
                 else:
                     loss.backward()
+
 
                 # 参数更新
                 if isinstance(self.gradient_accumulation_steps,
@@ -244,7 +278,8 @@ class Trainer:
                     # If there is one global learning rate (which is the common case).
                     lr = next(iter(self.optimizer.param_groups))['lr']
                     logger.info('Global step: {}, Learning rate: {}'.format(global_step, lr))
-                    self.writer.add_scalar(tag='Learning rate', scalar_value=lr, global_step=global_step)
+                    if self.rank in [-1,0]:
+                        self.writer.add_scalar(tag='Learning rate', scalar_value=lr, global_step=global_step)
 
                 # 打印训练信息
                 if isinstance(self.print_every, int) and global_step % self.print_every == 0:
@@ -252,13 +287,14 @@ class Trainer:
                                       format(epoch, self.n_epochs, step, self.batch_count, loss.item()))
 
                 # 保存模型
-                if self.save_path and isinstance(self.save_steps, int) and global_step % self.save_steps == 0:
+                if self.save_path and isinstance(self.save_steps, int) and global_step % self.save_steps == 0 and self.rank in [-1,0]:
                     logger.info("Saving models step = %d", global_step)
                     output_dir = os.path.join(self.save_path, "checkpoint-{}".format(global_step))
                     if not os.path.exists(output_dir):
                         os.makedirs(output_dir)
                     logger.info("Saving models checkpoint to %s", output_dir)
-                    save_model(model=self.model, model_path=os.path.join(output_dir, "models.pt"))
+                    model = self.model if self.rank == -1 else self.model.module
+                    save_model(model=model, model_path=os.path.join(output_dir, "models.pt"))
                     # logger.info("Saving trainer arguments to %s", output_dir)
                     # save_json(vars(self), os.path.join(output_dir, "trainer.json"))
                     if self.optimizer:
@@ -269,21 +305,24 @@ class Trainer:
                         torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
 
                 # 验证模型
-                if self.dev_data and isinstance(self.validate_steps, int) and global_step % self.validate_steps == 0:
+                if self.dev_data and isinstance(self.validate_steps, int) and global_step % self.validate_steps == 0 and self.rank in [-1,0]:
                     logger.info("Evaluate step = %d", global_step)
-                    self.model.eval()
+                    model = self.model if self.rank == -1 else self.model.module
+                    model.eval()
                     if self.use_tqdm:
                         progress = enumerate(tqdm(self.dev_dataloader, desc="Evaluating", leave=False), 1)
                     else:
                         progress = enumerate(self.dev_dataloader, 1)
                     with torch.no_grad():
                         for step, batch in progress:
-                            self.model.evaluate(batch, self.metrics)
+                            move_dict_value_to_device(batch, device=self.device, rank=self.rank)
+                            model.evaluate(batch, self.metrics)
                     self.model.train()
                     evaluate_result = self.metrics.get_metric()
                     logger.info("Evaluate result = %s", str(evaluate_result))
-                    for key, value in evaluate_result.items():
-                        self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
+                    if self.rank in [-1,0]:
+                        for key, value in evaluate_result.items():
+                            self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
 
             logger.info("Epoch loss = %f", epoch_loss)
         logger.info("End training")

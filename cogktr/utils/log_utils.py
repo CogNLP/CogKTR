@@ -5,7 +5,7 @@ import datetime
 
 logger=logging.getLogger()
 
-def init_logger(log_file=None):
+def init_logger(log_file=None,rank=-1):
     """
     根据给定的log文件配置logger，日志信息同时输出至文件与命令行
     :param log_file: 日志输出位置
@@ -45,7 +45,8 @@ def init_logger(log_file=None):
             },
         },
     }
-    if log_file is None:
+    LOGGING_DICT['loggers']['']['level'] = 'INFO' if rank in [-1, 0] else 'WARN'
+    if log_file is None or rank not in [-1,0]:
         LOGGING_DICT['loggers']['']['handlers'] = ['stream']
         del LOGGING_DICT['handlers']['file']
     logging.config.dictConfig(LOGGING_DICT)

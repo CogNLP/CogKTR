@@ -4,16 +4,16 @@ import torch.optim as optim
 from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
-device,output_path = init_cogktr(
+device, output_path = init_cogktr(
     device_id=0,
     output_path="/data/hongbang/CogKTR/datapath/sequence_labeling/conll2003/experimental_result",
     folder_tag="simple_test",
 )
 
-reader = CONLL2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
+reader = Conll2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
-processor = CONLL2003Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+processor = Conll2003Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process(train_data)
 dev_dataset = processor.process(dev_data)
 test_dataset = processor.process(test_data)
@@ -49,6 +49,6 @@ trainer = Trainer(model,
                   metric_key=None,
                   fp16=False,
                   fp16_opt_level='O1',
-)
+                  )
 trainer.train()
 print("end")
