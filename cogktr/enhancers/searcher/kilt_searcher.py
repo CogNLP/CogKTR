@@ -33,7 +33,7 @@ def _get_pageid_from_api(title, client=None):
         json_data = r.json()
 
         if len(json_data["query"]["pages"]) > 1:
-            print("WARNING: more than one result returned from wikipedia api")
+            print("WARNING: more than one result returned from wikipedia_desc api")
 
         for _, v in json_data["query"]["pages"].items():
             pageid = v["pageid"]
@@ -69,10 +69,10 @@ def _get_title_from_wikipedia_url(url, client=None):
 
 class KnowledgeSource:
     def __init__(
-        self,
-        mongo_connection_string=None,
-        database="kilt",
-        collection="knowledgesource",
+            self,
+            mongo_connection_string=None,
+            database="kilt",
+            collection="knowledgesource",
     ):
         if not mongo_connection_string:
             mongo_connection_string = DEFAULT_MONGO_CONNECTION_STRING
@@ -118,6 +118,7 @@ class KnowledgeSource:
                     page = self.get_page_by_id(pageid)
 
         return page
+
 
 if __name__ == "__main__":
     from cogktr.enhancers.searcher.kilt_searcher import KnowledgeSource

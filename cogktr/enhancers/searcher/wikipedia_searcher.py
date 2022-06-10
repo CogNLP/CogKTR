@@ -61,6 +61,6 @@ class WikipediaSearcher(BaseSearcher):
 
 if __name__ == "__main__":
     searcher = WikipediaSearcher(tool="blink",
-                                 path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl")
+                                 path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
     search_dict = searcher.search(18978754)
     print("end")
