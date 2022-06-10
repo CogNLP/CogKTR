@@ -40,6 +40,16 @@ class DataTable:
         else:
             raise AttributeError("Please input int or str")
 
+    def __setitem__(self, key, value):
+        if isinstance(value,list) and key not in self.headers:
+            if len(self.headers) == 0 or len(value) == self.__len__():
+                self.headers.append(key)
+                self.datas[key] = value
+            else:
+                raise ValueError("Different data lengths cause errors!")
+        else:
+            raise ValueError("Calling __setitem__ in this way is not supported!")
+
     def add_header(self, header):
         if header not in self.headers:
             self.headers.append(header)
