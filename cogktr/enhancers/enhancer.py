@@ -155,7 +155,7 @@ class Enhancer:
         enhanced_dict = {}
 
         if not self.reprocess and os.path.exists(os.path.join(self.enhanced_data_path, self.save_file_name, dict_name)):
-            enhanced_dict = load_json(os.path.join(self.enhanced_data_path, dict_name))
+            enhanced_dict = load_json(os.path.join(self.enhanced_data_path, self.save_file_name, dict_name))
         else:
             print("Enhancing data...")
             if enhanced_key_2 is None:
