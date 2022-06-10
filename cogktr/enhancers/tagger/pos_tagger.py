@@ -32,7 +32,7 @@ class PosTagger(BaseTagger):
         for entity in flair_sentence.get_labels('pos'):
             label_list.append(entity.value)
 
-        tag_dict["tokens"] = token_list
+        tag_dict["words"] = token_list
         tag_dict["labels"] = label_list
 
         return tag_dict

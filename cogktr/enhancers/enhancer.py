@@ -14,6 +14,9 @@ from cogktr.utils.constant_utils import TABLE_DATA_TAGGER, TABLE_DATA_LINKER, TA
 
 class Enhancer:
     def __init__(self,
+                 datapath,
+                 save_file_name,
+                 enhanced_data_path,
                  return_pos=False,
                  return_ner=False,
                  return_spo=False,
@@ -21,9 +24,7 @@ class Enhancer:
                  return_event=False,
                  return_entity_desc=False,
                  return_entity_emb=False,
-                 reprocess=True,
-                 datapath=None,
-                 enhanced_data_path=None):
+                 reprocess=True, ):
         self.return_pos = return_pos
         self.return_ner = return_ner
         self.return_spo = return_spo
@@ -33,6 +34,7 @@ class Enhancer:
         self.return_entity_emb = return_entity_emb
         self.reprocess = reprocess
         self.datapath = datapath
+        self.save_file_name = save_file_name
         self.enhanced_data_path = enhanced_data_path
 
         self._init_config()
@@ -45,23 +47,23 @@ class Enhancer:
         self.tool_config["SpoTagger"] = None
         self.tool_config["SrlTagger"] = "allennlp"
         self.tool_config["EventTagger"] = None
-        self.tool_config["WikipediaLinker"] = "tagme"
+        self.tool_config["WikipediaLinker"] = "cogie"
         self.tool_config["WikipediaSearcher"] = "blink"
         self.tool_config["WikipediaEmbedder"] = "wikipedia2vec"
 
-        self.path_config = {}
-        if self.return_entity_desc:
-            self.path_config["WikipediaSearcher"] = os.path.join(self.datapath,
-                                                                 "knowledge_graph/wikipedia/raw_data/entity.jsonl")
-        if self.return_entity_emb:
-            if self.tool_config["WikipediaEmbedder"] == "wikipedia2vec":
-                self.path_config["WikipediaEmbedder"] = os.path.join(self.datapath,
-                                                                     "knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
-            if self.tool_config["WikipediaEmbedder"] == "cogkge":
-                self.path_config["WikipediaEmbedder"]["model"] = os.path.join(self.datapath,
-                                                                              "knowledge_graph/cogkge/raw_data/Model.pkl")
-                self.path_config["WikipediaEmbedder"]["vocab"] = os.path.join(self.datapath,
-                                                                              "knowledge_graph/cogkge/raw_data/vocab.pkl")
+        # self.path_config = {}
+        # if self.return_entity_desc:
+        #     self.path_config["WikipediaSearcher"] = os.path.join(self.datapath,
+        #                                                          "knowledge_graph/wikipedia_desc/entity.jsonl")
+        # if self.return_entity_emb:
+        #     if self.tool_config["WikipediaEmbedder"] == "wikipedia2vec":
+        #         self.path_config["WikipediaEmbedder"] = os.path.join(self.datapath,
+        #                                                              "knowledge_graph/wikipedia2vec/enwiki_20180420_win10_100d.pkl")
+        #     if self.tool_config["WikipediaEmbedder"] == "cogkge":
+        #         self.path_config["WikipediaEmbedder"]["model"] = os.path.join(self.datapath,
+        #                                                                       "knowledge_graph/cogkge/Model.pkl")
+        #         self.path_config["WikipediaEmbedder"]["vocab"] = os.path.join(self.datapath,
+        #                                                                       "knowledge_graph/cogkge/vocab.pkl")
 
     def _init_module(self):
         if self.return_pos:
@@ -74,15 +76,19 @@ class Enhancer:
             self.wikipedia_linker = WikipediaLinker(tool=self.tool_config["WikipediaLinker"])
         if self.return_entity_desc:
             self.wikipedia_searcher = WikipediaSearcher(tool=self.tool_config["WikipediaSearcher"],
-                                                        path=self.path_config["WikipediaSearcher"])
+                                                        path=os.path.join(self.datapath,
+                                                                          "knowledge_graph/wikipedia_desc/entity.jsonl"))
         if self.return_entity_emb:
             if self.tool_config["WikipediaEmbedder"] == "wikipedia2vec":
                 self.wikipedia_embedder = WikipediaEmbedder(tool=self.tool_config["WikipediaEmbedder"],
-                                                            path=self.path_config["WikipediaEmbedder"])
+                                                            path=os.path.join(self.datapath,
+                                                                              "knowledge_graph/wikipedia2vec/enwiki_20180420_win10_100d.pkl"))
             if self.tool_config["WikipediaEmbedder"] == "cogkge":
                 self.wikipedia_embedder = WikipediaEmbedder(tool=self.tool_config["WikipediaEmbedder"],
-                                                            path=self.path_config["WikipediaEmbedder"]["model"],
-                                                            vocab_path=self.path_config["WikipediaEmbedder"]["vocab"])
+                                                            path=os.path.join(self.datapath,
+                                                                              "knowledge_graph/cogkge/Model.pkl"),
+                                                            vocab_path=os.path.join(self.datapath,
+                                                                                    "knowledge_graph/cogkge/vocab.pkl"))
 
     def set_config(self,
                    PosTaggerTool=None,
@@ -92,9 +98,7 @@ class Enhancer:
                    EventTaggerTool=None,
                    WikipediaLinkerTool=None,
                    WikipediaSearcherTool=None,
-                   WikipediaEmbedderTool=None,
-                   WikipediaSearcherPath=None,
-                   WikipediaEmbedderPath=None):
+                   WikipediaEmbedderTool=None):
         if PosTaggerTool is not None:
             self.tool_config["PosTagger"] = PosTaggerTool
         if NerTaggerTool is not None:
@@ -111,14 +115,10 @@ class Enhancer:
             self.tool_config["WikipediaSearcher"] = WikipediaSearcherTool
         if WikipediaEmbedderTool is not None:
             self.tool_config["WikipediaEmbedder"] = WikipediaEmbedderTool
-        if WikipediaSearcherPath is not None:
-            self.path_config["WikipediaSearcher"] = WikipediaSearcherPath
-        if WikipediaEmbedderPath is not None:
-            self.path_config["WikipediaEmbedder"] = WikipediaEmbedderPath
 
     def get_knowledge(self, sentence):
         knowledge_dict = {}
-        link_list = []
+        link_dict = {}
         if self.return_pos:
             knowledge_dict["pos"] = self.pos_tagger.tag(sentence)
         if self.return_ner:
@@ -126,34 +126,36 @@ class Enhancer:
         if self.return_srl:
             knowledge_dict["srl"] = self.srl_tagger.tag(sentence)
         if self.return_entity_desc or self.return_entity_emb:
-            link_list = self.wikipedia_linker.link(sentence)
+            link_dict = self.wikipedia_linker.link(sentence)
         if self.return_entity_desc:
-            for i, entity in enumerate(link_list):
-                link_list[i]["desc"] = self.wikipedia_searcher.search(entity["id"])["desc"]
-        link_list_copy = copy.deepcopy(link_list)
+            for i, entity in enumerate(link_dict["spans"]):
+                link_dict["spans"][i]["desc"] = self.wikipedia_searcher.search(entity["id"])["desc"]
+        link_dict_copy = copy.deepcopy(link_dict)
         if self.return_entity_emb:
             unaligned_num = 0
-            for i, entity in enumerate(link_list_copy):
+            for i, entity in enumerate(link_dict_copy["spans"]):
                 list_point = i - unaligned_num
                 entity_embedding = self.wikipedia_embedder.embed(entity["title"])["entity_embedding"]
-                similar_entities = self.wikipedia_embedder.embed(entity["title"])["similar_entities"]
                 if entity_embedding == np.array(100).tolist():
                     # Delete unaligned entity title
-                    del link_list[list_point]
+                    del link_dict["spans"][list_point]
                     unaligned_num += 1
                 else:
-                    link_list[list_point]["entity_embedding"] = entity_embedding
-                    link_list[list_point]["similar_entities"] = similar_entities
+                    link_dict["spans"][list_point]["entity_embedding"] = entity_embedding
 
-        knowledge_dict["wikipedia"] = link_list
+        knowledge_dict["wikipedia_desc"] = link_dict["spans"]
 
         return knowledge_dict
 
     def _enhance(self, datable, enhanced_key_1="sentence", enhanced_key_2=None, dict_name=None):
+        if not os.path.exists(self.enhanced_data_path):
+            raise FileExistsError("{} doesn't exist".format(self.enhanced_data_path))
+        if not os.path.exists(os.path.join(self.enhanced_data_path, self.save_file_name)):
+            os.makedirs(os.path.join(self.enhanced_data_path, self.save_file_name))
         enhanced_dict = {}
 
-        if not self.reprocess and os.path.exists(os.path.join(self.enhanced_data_path, dict_name)):
-            enhanced_dict = load_json(os.path.join(self.enhanced_data_path, dict_name))
+        if not self.reprocess and os.path.exists(os.path.join(self.enhanced_data_path, self.save_file_name, dict_name)):
+            enhanced_dict = load_json(os.path.join(self.enhanced_data_path, self.save_file_name, dict_name))
         else:
             print("Enhancing data...")
             if enhanced_key_2 is None:
@@ -163,7 +165,7 @@ class Enhancer:
                 for sentence_1, sentence_2 in tqdm(zip(datable[enhanced_key_1], datable[enhanced_key_2])):
                     enhanced_dict[sentence_1] = self.get_knowledge(sentence_1)
                     enhanced_dict[sentence_2] = self.get_knowledge(sentence_2)
-            save_json(enhanced_dict, os.path.join(self.enhanced_data_path, dict_name))
+            save_json(enhanced_dict, os.path.join(self.enhanced_data_path, self.save_file_name, dict_name))
         return enhanced_dict
 
     def enhance_train(self, datable, enhanced_key_1="sentence", enhanced_key_2=None):
@@ -243,9 +245,10 @@ if __name__ == "__main__":
                         return_spo=True,
                         return_srl=True,
                         return_event=True,
-                        return_entity_desc=False,
+                        return_entity_desc=True,
                         return_entity_emb=True,
                         reprocess=True,
+                        save_file_name="base_enhance",
                         datapath="/data/mentianyi/code/CogKTR/datapath",
                         enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data")
 

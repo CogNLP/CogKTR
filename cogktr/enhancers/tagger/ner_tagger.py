@@ -34,7 +34,7 @@ class NerTagger(BaseTagger):
             for word in entity:
                 label_list[word.idx - 1] = entity.tag
 
-        tag_dict["tokens"] = token_list
+        tag_dict["words"] = token_list
         tag_dict["labels"] = label_list
 
         return tag_dict

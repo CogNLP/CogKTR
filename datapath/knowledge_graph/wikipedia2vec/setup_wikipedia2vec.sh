@@ -1,0 +1,2 @@
+wget http://210.75.240.138:8080/download/CogNLP_data/CogKTR_data/KNOWLEDGE_WIKIPEDIA2VEC.zip
+unzip KNOWLEDGE_WIKIPEDIA2VEC.zip
