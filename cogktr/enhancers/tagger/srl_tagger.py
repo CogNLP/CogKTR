@@ -29,7 +29,7 @@ class SrlTagger(BaseTagger):
         for item in tag_result["verbs"]:
             label_dict[item["verb"]] = item["tags"]
 
-        tag_dict["tokens"] = token_list
+        tag_dict["words"] = token_list
         tag_dict["labels"] = label_dict
 
         return tag_dict
