@@ -29,12 +29,11 @@ class WikipediaEmbedder(BaseEmbedder):
             self.node_lut.add_vocab(node_vocab)
             relation_lut = LookUpTable()
             relation_lut.add_vocab(relation_vocab)
-            model = TransE(entity_dict_len=len(self.node_lut),
-                           relation_dict_len=len(relation_lut),
-                           embedding_dim=100,
-                           p_norm=1)
-            model.load_state_dict(torch.load(path))
-            self.model = model.to("cuda:0")
+            self.model = TransE(entity_dict_len=len(self.node_lut),
+                                relation_dict_len=len(relation_lut),
+                                embedding_dim=100,
+                                p_norm=1)
+            self.model.load_state_dict(torch.load(path))
 
     def embed(self, title=None, id=None):
         embed_dict = {}
@@ -47,7 +46,6 @@ class WikipediaEmbedder(BaseEmbedder):
     def _wikipedia2vec_embed(self, title):
         embed_dict = {}
         embed_dict["entity_embedding"] = np.zeros(100).tolist()
-        embed_dict["similar_entities"] = []
         if self.return_entity_embedding:
             try:
                 embed_dict["entity_embedding"] = np.array(self.wiki2vec.get_entity_vector(title)).tolist()
@@ -74,7 +72,7 @@ class WikipediaEmbedder(BaseEmbedder):
         embed_dict["entity_embedding"] = np.zeros(100).tolist()
         try:
             embed_dict["entity_embedding"] = self.model.e_embedding(
-                torch.tensor(self.node_lut.vocab.word2idx[id]).to("cuda:0")).detach().cpu().numpy().tolist()
+                torch.tensor(self.node_lut.vocab.word2idx[id])).detach().numpy().tolist()
         except:
             pass
         return embed_dict
@@ -82,11 +80,11 @@ class WikipediaEmbedder(BaseEmbedder):
 
 if __name__ == "__main__":
     embedder_1 = WikipediaEmbedder(tool="wikipedia2vec",
-                                   path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
+                                   path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/enwiki_20180420_win10_100d.pkl")
     embedder_dict_1 = embedder_1.embed(title="Apple")
 
     embedder_2 = WikipediaEmbedder(tool="cogkge",
-                                   path="/data/mentianyi/code/CogKGE/dataset/WIKIPEDIA5M/experimental_output/TransE2022-06-04--19-20-22.14--500epochs/checkpoints/TransE_500epochs/Model.pkl",
-                                   vocab_path="/data/mentianyi/code/CogKGE/dataset/WIKIPEDIA5M/processed_data/vocab.pkl")
+                                   path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/cogkge/Model.pkl",
+                                   vocab_path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/cogkge/vocab.pkl")
     embedder_dict_2 = embedder_2.embed(id=18978754)
     print("end")

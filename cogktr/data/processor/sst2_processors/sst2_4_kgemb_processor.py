@@ -38,7 +38,7 @@ class Sst24KgembProcessor(BaseProcessor):
                 token = output.data['input_ids']
                 attention_mask = output.data['attention_mask']
                 offset_mapping = output.data['offset_mapping']
-                wikipedia = self.enhancer.get_knowledge(sentence)["wikipedia"]
+                wikipedia = self.enhancer.get_knowledge(sentence)["wikipedia_desc"]
                 entity_mask_list = []
                 entity_embedding_list = []
                 entity_mask = np.zeros((len(offset_mapping), 1))
@@ -76,7 +76,7 @@ class Sst24KgembProcessor(BaseProcessor):
         for sentence, label in tqdm(zip(data['sentence'], data['label']), total=len(data['sentence'])):
             token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
                                           max_length=self.max_token_len)
-            datable("wikipedia", self.enhancer.get_knowledge(sentence)["wikipedia"])
+            datable("wikipedia_desc", self.enhancer.get_knowledge(sentence)["wikipedia_desc"])
             datable("token", token)
             datable("label", self.vocab["label_vocab"].label2id(label))
         return DataTableSet(datable)
@@ -87,7 +87,7 @@ class Sst24KgembProcessor(BaseProcessor):
         for sentence in tqdm(zip(data['sentence']), total=len(data['sentence'])):
             token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
                                           max_length=self.max_token_len)
-            datable("wikipedia", self.enhancer.get_knowledge(sentence)["wikipedia"])
+            datable("wikipedia_desc", self.enhancer.get_knowledge(sentence)["wikipedia_desc"])
             datable("token", token)
         return DataTableSet(datable)
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     vocab = reader.read_vocab()
     enhancer = Enhancer(return_entity_ebd=True)
     enhancer.set_config(
-        WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia/raw_data/entity.jsonl",
+        WikipediaSearcherPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia_desc/raw_data/entity.jsonl",
         WikipediaEmbedderPath="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia2vec/raw_data/enwiki_20180420_win10_100d.pkl")
     processor = Sst24KgembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab, enhancer=enhancer)
     train_dataset = processor.process_train(train_data)

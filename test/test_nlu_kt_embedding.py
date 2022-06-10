@@ -6,7 +6,7 @@ from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
     device_id=4,
-    output_path="/data/mentianyi/CogKTR/datapath/text_classification/SST_2/experimental_result",
+    output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )
 
@@ -19,7 +19,7 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = KtembModel4TC(plm="bert-base-cased", vocab=vocab)
+model = BaseTextClassificationModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
