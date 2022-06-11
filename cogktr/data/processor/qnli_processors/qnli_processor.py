@@ -10,15 +10,25 @@ transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
 class QnliProcessor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab):
+    def __init__(self, plm, max_token_len, vocab,debug=False):
         super().__init__()
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
+        self.debug = debug
+
+    def debug_process(self,data):
+        if self.debug:
+            debug_data = DataTable()
+            for header in data.headers:
+                debug_data[header] = data[header][:100]
+            return debug_data
+        return data
 
     def process_train(self, data):
         datable = DataTable()
+        data = self.debug_process(data)
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
                                               total=len(data['sentence'])):
@@ -35,6 +45,7 @@ class QnliProcessor(BaseProcessor):
 
     def process_dev(self, data):
         datable = DataTable()
+        data = self.debug_process(data)
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
                                               total=len(data['sentence'])):
@@ -51,6 +62,7 @@ class QnliProcessor(BaseProcessor):
 
     def process_test(self, data):
         datable = DataTable()
+        data = self.debug_process(data)
         print("Processing data...")
         for sentence, question in tqdm(zip(data['sentence'], data['question']),
                                        total=len(data['sentence'])):
