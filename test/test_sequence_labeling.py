@@ -14,9 +14,9 @@ reader = Conll2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/seq
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 processor = Conll2003Processor(plm="bert-base-cased", max_token_len=256, max_label_len=256, vocab=vocab)
-train_dataset = processor.process(train_data)
-dev_dataset = processor.process(dev_data)
-test_dataset = processor.process(test_data)
+train_dataset = processor.process_train(train_data)
+dev_dataset = processor.process_dev(dev_data)
+test_dataset = processor.process_test(test_data)
 
 model = BaseSequenceLabelingModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")

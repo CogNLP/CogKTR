@@ -1,4 +1,3 @@
-from cogktr.data.reader.sst2_reader import Sst2Reader
 from cogktr.enhancers import Enhancer
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
@@ -143,6 +142,8 @@ class Sst2ForKgembProcessor(BaseProcessor):
 
 
 if __name__ == "__main__":
+    from cogktr.data.reader.sst2_reader import Sst2Reader
+
     reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()

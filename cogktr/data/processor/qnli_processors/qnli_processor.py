@@ -1,4 +1,3 @@
-from cogktr.data.reader.qnli_reader import QnliReader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizer
@@ -10,7 +9,7 @@ transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
 class QnliProcessor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab,debug=False):
+    def __init__(self, plm, max_token_len, vocab, debug=False):
         super().__init__()
         self.plm = plm
         self.max_token_len = max_token_len
@@ -18,7 +17,7 @@ class QnliProcessor(BaseProcessor):
         self.tokenizer = BertTokenizer.from_pretrained(plm)
         self.debug = debug
 
-    def debug_process(self,data):
+    def debug_process(self, data):
         if self.debug:
             debug_data = DataTable()
             for header in data.headers:
@@ -26,7 +25,7 @@ class QnliProcessor(BaseProcessor):
             return debug_data
         return data
 
-    def process_train(self, data):
+    def _process(self, data):
         datable = DataTable()
         data = self.debug_process(data)
         print("Processing data...")
@@ -43,22 +42,11 @@ class QnliProcessor(BaseProcessor):
             datable("label", self.vocab["label_vocab"].label2id(label))
         return DataTableSet(datable)
 
+    def process_train(self, data):
+        return self._process(data)
+
     def process_dev(self, data):
-        datable = DataTable()
-        data = self.debug_process(data)
-        print("Processing data...")
-        for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
-                                              total=len(data['sentence'])):
-            tokenized_data = self.tokenizer.encode_plus(text=sentence, text_pair=question,
-                                                        truncation='longest_first',
-                                                        padding="max_length",
-                                                        add_special_tokens=True,
-                                                        max_length=self.max_token_len)
-            datable("input_ids", tokenized_data["input_ids"])
-            datable("token_type_ids", tokenized_data["token_type_ids"])
-            datable("attention_mask", tokenized_data["attention_mask"])
-            datable("label", self.vocab["label_vocab"].label2id(label))
-        return DataTableSet(datable)
+        return self._process(data)
 
     def process_test(self, data):
         datable = DataTable()
@@ -78,9 +66,12 @@ class QnliProcessor(BaseProcessor):
 
 
 if __name__ == "__main__":
+    from cogktr.data.reader.qnli_reader import QnliReader
+
     reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
+
     processor = QnliProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)

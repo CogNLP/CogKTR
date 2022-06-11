@@ -5,9 +5,6 @@ class BaseProcessor:
     def _process(self, data):
         pass
 
-    def process(self, data):
-        pass
-
     def process_train(self, data):
         pass
 

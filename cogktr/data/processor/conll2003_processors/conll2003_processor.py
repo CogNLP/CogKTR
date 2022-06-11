@@ -1,4 +1,3 @@
-from cogktr.data.reader.conll2003_reader import Conll2003Reader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from tqdm import tqdm
@@ -18,7 +17,7 @@ class Conll2003Processor(BaseProcessor):
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
 
-    def process(self, data):
+    def _process(self, data):
         datable = DataTable()
         print("Processing data...")
         for words, ner_labels in tqdm(zip(data['sentence'], data['ner_labels']), total=len(data['sentence'])):
@@ -73,13 +72,25 @@ class Conll2003Processor(BaseProcessor):
 
         return DataTableSet(datable)
 
+    def process_train(self, data):
+        return self._process(data)
+
+    def process_dev(self, data):
+        return self._process(data)
+
+    def process_test(self, data):
+        return self._process(data)
+
 
 if __name__ == "__main__":
+    from cogktr.data.reader.conll2003_reader import Conll2003Reader
+
     reader = Conll2003Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2003/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
+
     processor = Conll2003Processor(plm="bert-base-cased", max_token_len=256, max_label_len=256, vocab=vocab)
-    train_dataset = processor.process(train_data)
-    dev_dataset = processor.process(dev_data)
-    test_dataset = processor.process(test_data)
+    train_dataset = processor.process_train(train_data)
+    dev_dataset = processor.process_dev(dev_data)
+    test_dataset = processor.process_test(test_data)
     print("end")
