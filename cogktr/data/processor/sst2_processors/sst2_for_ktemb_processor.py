@@ -32,8 +32,14 @@ class Sst2ForKtembProcessor(BaseProcessor):
             words_len = len(words)
             words.insert(0, '[CLS]')
             words.append('[SEP]')
-            for word in words:
+            offset = {}
+            for i, word in enumerate(words):
                 token = self.tokenizer.tokenize(word)
+                offset_start = len(input_tokens) if len(
+                    input_tokens) <= self.max_token_len - 1 else self.max_token_len - 1
+                offset_end = (len(input_tokens) + len(token)) if len(
+                    input_tokens) <= self.max_token_len - 1 else self.max_token_len - 1
+                offset[i] = (offset_start, offset_end)
                 input_tokens.extend(token)
                 for i in range(len(token)):
                     valid_masks.append(1 if i == 0 else 0)
@@ -61,7 +67,9 @@ class Sst2ForKtembProcessor(BaseProcessor):
                     entity_dict = {}
                     entity_dict["entity_token"] = entity_token
                     entity_dict["entity_mask"] = [0] * self.max_token_len
-                    for i in range(entity["start"] + 1, entity["end"] + 1):  # because add [CLS]
+                    offset_start = offset[entity["start"] + 1][0]
+                    offset_end = offset[entity["end"] + 1][1]
+                    for i in range(offset_start, offset_end):  # because add [CLS]
                         entity_dict["entity_mask"][i] = 1
                     entity_span_list.append(entity_dict)
             datable("input_ids", input_ids)
@@ -81,7 +89,7 @@ class Sst2ForKtembProcessor(BaseProcessor):
     def process_test(self, data, enhanced_dict=None):
         datable = DataTable()
         print("Processing data...")
-        for sentence in tqdm(zip(data['sentence']), total=len(data['sentence'])):
+        for sentence in tqdm(data['sentence'], total=len(data['sentence'])):
             words = enhanced_dict[sentence]["wikipedia"]["words"]
             input_tokens = []
             input_ids = []
@@ -92,8 +100,14 @@ class Sst2ForKtembProcessor(BaseProcessor):
             words_len = len(words)
             words.insert(0, '[CLS]')
             words.append('[SEP]')
-            for word in words:
+            offset = {}
+            for i, word in enumerate(words):
                 token = self.tokenizer.tokenize(word)
+                offset_start = len(input_tokens) if len(
+                    input_tokens) <= self.max_token_len - 1 else self.max_token_len - 1
+                offset_end = (len(input_tokens) + len(token)) if len(
+                    input_tokens) <= self.max_token_len - 1 else self.max_token_len - 1
+                offset[i] = (offset_start, offset_end)
                 input_tokens.extend(token)
                 for i in range(len(token)):
                     valid_masks.append(1 if i == 0 else 0)
@@ -121,7 +135,9 @@ class Sst2ForKtembProcessor(BaseProcessor):
                     entity_dict = {}
                     entity_dict["entity_token"] = entity_token
                     entity_dict["entity_mask"] = [0] * self.max_token_len
-                    for i in range(entity["start"] + 1, entity["end"] + 1):  # because add [CLS]
+                    offset_start = offset[entity["start"] + 1][0]
+                    offset_end = offset[entity["end"] + 1][1]
+                    for i in range(offset_start, offset_end):  # because add [CLS]
                         entity_dict["entity_mask"][i] = 1
                     entity_span_list.append(entity_dict)
             datable("input_ids", input_ids)
@@ -136,15 +152,17 @@ if __name__ == "__main__":
     reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
+
     enhancer = Enhancer(reprocess=False,
                         save_file_name="dev_enhance",
                         datapath="/data/mentianyi/code/CogKTR/datapath",
                         enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data")
-    # enhanced_train_dict = enhancer.enhance_train(train_data)
+    enhanced_train_dict = enhancer.enhance_train(train_data)
     enhanced_dev_dict = enhancer.enhance_dev(dev_data)
-    # enhanced_test_dict = enhancer.enhance_test(test_data)
+    enhanced_test_dict = enhancer.enhance_test(test_data)
+
     processor = Sst2ForKtembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
-    # train_dataset = processor.process_train(train_data)
+    train_dataset = processor.process_train(data=train_data, enhanced_dict=enhanced_train_dict)
     dev_dataset = processor.process_dev(data=dev_data, enhanced_dict=enhanced_dev_dict)
-    # test_dataset = processor.process_test(test_data)
+    test_dataset = processor.process_test(data=test_data, enhanced_dict=enhanced_test_dict)
     print("end")

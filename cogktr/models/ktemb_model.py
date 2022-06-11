@@ -47,15 +47,6 @@ class KtembModel(BaseModel):
         batch_size, max_token_len = input_ids.shape
         batch_device = input_ids.device
         inputs_embeds = self.word_embedding[input_ids]
-        valid_inputs_embeds = torch.zeros(batch_size, max_token_len, self.input_size, dtype=torch.float,
-                                          device=batch_device)
-        for i in range(batch_size):
-            pos = 0
-            for j in range(max_token_len):
-                if valid_masks[i][j].item() == 1:
-                    valid_inputs_embeds[i][pos] = inputs_embeds[i][j]
-                    pos += 1
-        inputs_embeds = valid_inputs_embeds
         for i, entity_span in enumerate(entity_span_list):
             for entity_dict in entity_span:
                 entity_token = torch.LongTensor(entity_dict["entity_token"]).to(batch_device)
