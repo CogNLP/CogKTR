@@ -20,7 +20,7 @@ class MLP(nn.Module):
 
 
 class KtembModel(BaseModel):
-    def __init__(self, vocab, plm,n_epochs):
+    def __init__(self, vocab, plm):
         super().__init__()
         self.vocab = vocab
         self.plm = plm
