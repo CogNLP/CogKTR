@@ -21,8 +21,8 @@ enhancer = Enhancer(reprocess=False,
 # enhanced_train_dict = enhancer.enhance_train(train_data)
 enhanced_dev_dict = enhancer.enhance_dev(dev_data)
 # enhanced_test_dict = enhancer.enhance_test(test_data)
-processor = Sst2ForKtembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 
+processor = Sst2ForKtembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(data=dev_data, enhanced_dict=enhanced_dev_dict)
 dev_dataset = processor.process_dev(data=dev_data, enhanced_dict=enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data)
