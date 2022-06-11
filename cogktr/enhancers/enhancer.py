@@ -143,7 +143,7 @@ class Enhancer:
                 else:
                     link_dict["spans"][list_point]["entity_embedding"] = entity_embedding
 
-        knowledge_dict["wikipedia_desc"] = link_dict["spans"]
+        knowledge_dict["wikipedia"] = link_dict
 
         return knowledge_dict
 

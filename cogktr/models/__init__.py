@@ -12,5 +12,5 @@ __all__ = [
     "BaseTextClassificationModel",
     "BaseSequenceLabelingModel",
     "KgembModel4TC",
-    "KtembModel4TC",
+    "KtembModel",
 ]

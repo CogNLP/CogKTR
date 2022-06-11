@@ -2,6 +2,9 @@ class BaseProcessor:
     def __init__(self):
         pass
 
+    def _process(self, data):
+        pass
+
     def process(self, data):
         pass
 

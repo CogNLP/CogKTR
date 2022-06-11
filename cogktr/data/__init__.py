@@ -10,7 +10,7 @@ __all__ = [
     "QnliProcessor",
     "Sst2Processor",
     "Sst24KgembProcessor",
-    "Sst24KtembProcessor",
+    "Sst2ForKtembProcessor",
     "StsbProcessor",
 
     # reader
