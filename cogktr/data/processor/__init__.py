@@ -18,7 +18,7 @@ __all__ = [
 
     # sst2processor
     "Sst2Processor",
-    "Sst24KgembProcessor",
+    "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
 
     # stsbprocessor

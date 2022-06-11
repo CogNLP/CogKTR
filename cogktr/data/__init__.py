@@ -9,7 +9,7 @@ __all__ = [
     "Conll2003Processor",
     "QnliProcessor",
     "Sst2Processor",
-    "Sst24KgembProcessor",
+    "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
     "StsbProcessor",
 

@@ -18,7 +18,7 @@ __all__ = [
     "Conll2003Processor",
     "QnliProcessor",
     "Sst2Processor",
-    "Sst24KgembProcessor",
+    "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
     "StsbProcessor",
     "BaseReader",
@@ -49,7 +49,7 @@ __all__ = [
     "BaseSentencePairRegressionModel",
     "BaseSequenceLabelingModel",
     "BaseTextClassificationModel",
-    "KgembModel4TC",
+    "KgembModel",
     "KtembModel",
 
     # modules

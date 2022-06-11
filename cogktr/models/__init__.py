@@ -11,6 +11,6 @@ __all__ = [
     "BaseSentencePairRegressionModel",
     "BaseTextClassificationModel",
     "BaseSequenceLabelingModel",
-    "KgembModel4TC",
+    "KgembModel",
     "KtembModel",
 ]

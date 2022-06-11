@@ -5,7 +5,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=5,
+    device_id=6,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )
@@ -15,17 +15,17 @@ train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
 enhancer = Enhancer(reprocess=False,
-                    save_file_name="dev_enhance",
+                    save_file_name="pre_enhanced_data",
                     datapath="/data/mentianyi/code/CogKTR/datapath",
                     enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data")
-# enhanced_train_dict = enhancer.enhance_train(train_data)
+enhanced_train_dict = enhancer.enhance_train(train_data)
 enhanced_dev_dict = enhancer.enhance_dev(dev_data)
-# enhanced_test_dict = enhancer.enhance_test(test_data)
+enhanced_test_dict = enhancer.enhance_test(test_data)
 
 processor = Sst2ForKtembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
-train_dataset = processor.process_train(data=dev_data, enhanced_dict=enhanced_dev_dict)
+train_dataset = processor.process_train(data=train_data, enhanced_dict=enhanced_train_dict)
 dev_dataset = processor.process_dev(data=dev_data, enhanced_dict=enhanced_dev_dict)
-# test_dataset = processor.process_test(test_data)
+test_dataset = processor.process_test(data=test_data, enhanced_dict=enhanced_test_dict)
 
 model = KtembModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
