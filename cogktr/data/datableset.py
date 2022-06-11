@@ -37,21 +37,26 @@ class DataTableSet(Dataset):
                         break
             else:
                 item.append(self.datable.datas[header][index])
-        return {key:value for key,value in zip(self.datable.headers,item)}
+        return {key: value for key, value in zip(self.datable.headers, item)}
         # return tuple(item)
 
     def __len__(self):
         return self.length
 
     def to_dict(self, batch):
-        batch=[list(item.values()) for item in batch]
+        batch = [list(item.values()) for item in batch]
         batch = list(map(list, zip(*batch)))
         data = collections.OrderedDict()
+        # TODO: check
         for i in range(len(batch)):
-            data[self.datable.headers[i]] = batch[i]
+            if isinstance(batch[i][0], torch.Tensor):
+                data[self.datable.headers[i]] = torch.stack(batch[i])
+            else:
+                data[self.datable.headers[i]] = batch[i]
         return data
 
     def to_list(self, batch):
-        batch=[list(item.values()) for item in batch]
+        batch = [list(item.values()) for item in batch]
+        # TODO: check
         batch = list(map(list, zip(*batch)))
         return batch
