@@ -44,6 +44,7 @@ class DataTableSet(Dataset):
         return self.length
 
     def to_dict(self, batch):
+        batch=[list(item.values()) for item in batch]
         batch = list(map(list, zip(*batch)))
         data = collections.OrderedDict()
         for i in range(len(batch)):
@@ -51,5 +52,6 @@ class DataTableSet(Dataset):
         return data
 
     def to_list(self, batch):
+        batch=[list(item.values()) for item in batch]
         batch = list(map(list, zip(*batch)))
         return batch
