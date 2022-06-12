@@ -1,5 +1,5 @@
-from decoder import *
-from encoder import *
+from .decoder import *
+from .encoder import *
 
 __all__ = [
     #decoder
