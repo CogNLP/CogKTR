@@ -53,6 +53,7 @@ __all__ = [
     "KtembModel",
 
     # modules
+    "DNN_MLP",
     "RNN_LSTM",
 
     # toolkits

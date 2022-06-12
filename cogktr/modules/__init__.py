@@ -5,5 +5,6 @@ __all__ = [
     #decoder
 
     #encoder
+    "DNN_MLP",
     "RNN_LSTM",
 ]
