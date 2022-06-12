@@ -162,7 +162,7 @@ class Enhancer:
                 for sentence_1 in tqdm(datable[enhanced_key_1]):
                     enhanced_dict[sentence_1] = self.get_knowledge(sentence_1)
             if enhanced_key_2 is not None:
-                for sentence_1, sentence_2 in tqdm(zip(datable[enhanced_key_1], datable[enhanced_key_2])):
+                for sentence_1, sentence_2 in tqdm(zip(datable[enhanced_key_1], datable[enhanced_key_2]),total=len(datable[enhanced_key_1])):
                     enhanced_dict[sentence_1] = self.get_knowledge(sentence_1)
                     enhanced_dict[sentence_2] = self.get_knowledge(sentence_2)
             save_json(enhanced_dict, os.path.join(self.enhanced_data_path, self.save_file_name, dict_name))
