@@ -3,7 +3,7 @@ from .dnn_mlp import *
 from .rnn_lstm import *
 
 __all__ = [
-    "TokenCNN",
+    "CNN_TokenCNN",
     "DNN_MLP",
     "RNN_LSTM",
 

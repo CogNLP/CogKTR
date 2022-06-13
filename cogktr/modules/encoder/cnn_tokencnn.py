@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 
 
-class TokenCNN(nn.Module):
+class CNN_TokenCNN(nn.Module):
 
     def __init__(self,
                  input_size,

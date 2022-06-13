@@ -5,7 +5,7 @@ __all__ = [
     # decoder
 
     # encoder
-    "TokenCNN",
+    "CNN_TokenCNN",
     "DNN_MLP",
     "RNN_LSTM",
 ]
