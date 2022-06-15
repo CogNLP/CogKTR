@@ -2,7 +2,7 @@ from cogktr.core.metric.base_metric import BaseMetric
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
-
+from sklearn.metrics import accuracy_score
 
 class BaseClassificationMetric(BaseMetric):
     def __init__(self, mode):
@@ -23,9 +23,11 @@ class BaseClassificationMetric(BaseMetric):
             P = precision_score(self.label_list, self.pre_list, average="binary")
             R = recall_score(self.label_list, self.pre_list, average="binary")
             F1 = f1_score(self.label_list, self.pre_list, average="binary")
+            Acc = accuracy_score(self.label_list,self.pre_list)
             evaluate_result = {"P": P,
                                "R": R,
                                "F1": F1,
+                               "Acc":Acc,
                                }
         if self.mode == "multi":
             micro_P = precision_score(self.label_list, self.pre_list, average="micro")
