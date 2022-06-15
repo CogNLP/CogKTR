@@ -20,55 +20,111 @@ class Conll2005SrlSubsetProcessor(BaseProcessor):
     def _process(self, data):
         datable = DataTable()
         print("Processing data...")
-        for words, ner_labels in tqdm(zip(data['sentence'], data['ner_labels']), total=len(data['sentence'])):
-            input_tokens = []
-            input_ids = []
-            attention_masks = []
-            segment_ids = []
-            valid_masks = []
-            label_ids = []
-            label_masks = []
+        for sentence_number, words, pos_tags, verb_indicator, dep_head, dep_label, tags, metadata in tqdm(
+                zip(data['sentence_id'], data['tokens'], data['pos_tags'], data['verb_indicator'],
+                    data['dep_head'], data['dep_label'], data['tags'], data['metadata']),
+                total=len(data['sentence_id'])):
 
-            words_len = len(words)
-            words.insert(0, '[CLS]')
-            words.append('[SEP]')
-            ner_labels.insert(0, 'O')
-            ner_labels.append('O')
+            dep_rel = [self.vocab["dep_label_vocab"].label2id(t.lower()) for t in dep_label]
+            dep_head = [int(x) for x in dep_head]
+            labels = tags[0]
+            verb_index = metadata['verb_index']
+
+            tokens = []
+            subword_token_len = []
+            word_indexs = []
+
+            index = 0
             for word in words:
                 token = self.tokenizer.tokenize(word)
-                input_tokens.extend(token)
-                for i in range(len(token)):
-                    valid_masks.append(1 if i == 0 else 0)
-            input_ids = self.tokenizer.convert_tokens_to_ids(input_tokens)
+                tokens += token
+                subword_token_len.append(len(token))
+                word_indexs.append(index)
+                index += len(token)
 
-            attention_masks = [1] * len(input_ids)
-            segment_ids = [0] * len(input_ids)
+            alignment = []
+            for i, l in zip(word_indexs, subword_token_len):
+                assert l > 0
+                aligned_subwords = []
+                for j in range(l):
+                    aligned_subwords.append(i + j)
+                alignment.append(aligned_subwords)
 
-            for label in ner_labels:
-                label_ids.append(self.vocab["ner_label_vocab"].label2id(label))
-            label_masks = [0] + [1] * (len(label_ids) - 2) + [0]
+            if verb_index:
+                verb_indicator = [0] * (sum(map(lambda x: len(x), alignment[:verb_index])) + 1) + \
+                                 [1] * len(alignment[verb_index]) + \
+                                 [0] * (sum(map(lambda x: len(x), alignment[verb_index + 1:])) + 1)
 
-            input_ids = input_ids[0:self.max_token_len]
-            attention_masks = attention_masks[0:self.max_token_len]
-            segment_ids = segment_ids[0:self.max_token_len]
-            valid_masks = valid_masks[0:self.max_token_len]
-            label_ids = label_ids[0:self.max_label_len]
-            label_masks = label_masks[0:self.max_label_len]
+            tokens = tokens + ['[SEP]']
+            segment_ids = [0] * len(tokens)
+            subword_token_len = subword_token_len + [1]
+            word_indexs.append(len(tokens) - 1)
 
-            input_ids += [0 for _ in range(self.max_token_len - len(input_ids))]
-            attention_masks += [0 for _ in range(self.max_token_len - len(attention_masks))]
-            segment_ids += [0 for _ in range(self.max_token_len - len(segment_ids))]
-            valid_masks += [0 for _ in range(self.max_token_len - len(valid_masks))]
-            label_ids += [-1 for _ in range(self.max_label_len - len(label_ids))]
-            label_masks += [0 for _ in range(self.max_label_len - len(label_masks))]
+            tokens = ['[CLS]'] + tokens
+            segment_ids = [0] + segment_ids
+            subword_token_len = [1] + subword_token_len
+            word_indexs = [0] + [i + 1 for i in word_indexs]
 
+            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
+            alignment = [[val + 1 for val in list_] for list_ in alignment]
+
+            align_sizes = [0 for _ in range(len(tokens))]
+            wp_rows = []
+            for word_piece_slice in alignment:
+                wp_rows.append(word_piece_slice)
+                for i in word_piece_slice:
+                    align_sizes[i] += 1
+            offset = 0
+            for i in range(len(tokens)):
+                if align_sizes[offset + i] == 0:
+                    align_sizes[offset + i] = len(words)
+                    for j in range(len(words)):
+                        wp_rows[j].append(offset + i)
+
+            wp_dep_head, wp_dep_rel = [], []
+            for i, (idx, slen) in enumerate(zip(word_indexs, subword_token_len)):
+                if i == 0 or i == len(subword_token_len) - 1:
+                    wp_dep_rel.append(self.vocab["dep_label_vocab"].label2id('special_rel'))
+                    wp_dep_head.append(idx + 1)
+                else:
+                    rel = dep_rel[i - 1]
+                    wp_dep_rel.append(rel)
+                    head = dep_head[i - 1]
+                    if head == 0:
+                        wp_dep_head.append(0)
+                    else:
+                        if head < max(word_indexs):
+                            new_pos = word_indexs[head - 1 + 1]
+                        else:
+                            new_pos = idx + 1
+                        wp_dep_head.append(new_pos + 1)
+
+                    for _ in range(1, slen):
+                        wp_dep_rel.append(self.vocab["dep_label_vocab"].label2id('subtokens'))
+                        wp_dep_head.append(idx + 1)
+
+            input_mask = [1] * len(input_ids)
+            padding_length = self.max_token_len - len(input_ids)
+            input_ids = input_ids + ([0] * padding_length)
+            input_mask = input_mask + ([0] * padding_length)
+
+            if verb_index:
+                segment_ids = verb_indicator
+            segment_ids = segment_ids + ([0] * padding_length)
+            verb_index = verb_index if verb_index else None
+
+            datable("sentence_number", sentence_number)
+            datable("words", words)
             datable("input_ids", input_ids)
-            datable("attention_masks", attention_masks)
+            datable("input_masks", input_mask)
             datable("segment_ids", segment_ids)
-            datable("valid_masks", valid_masks)
-            datable("label_ids", label_ids)
-            datable("label_masks", label_masks)
-            datable("words_len", words_len)
+            datable("dep_rel", dep_rel)
+            datable("dep_head", dep_head)
+            datable("wp_rows", wp_rows)
+            datable("align_sizes", align_sizes)
+            datable("tokens_len", len(tokens))
+            datable("labels", labels)
+            datable("verb_index", verb_index)
 
         return DataTableSet(datable)
 
@@ -90,7 +146,7 @@ if __name__ == "__main__":
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
-    processor = Conll2005SrlSubsetProcessor(plm="bert-base-cased", max_token_len=256, max_label_len=256, vocab=vocab)
+    processor = Conll2005SrlSubsetProcessor(plm="bert-base-cased", max_token_len=512, max_label_len=512, vocab=vocab)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)

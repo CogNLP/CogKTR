@@ -22,8 +22,9 @@ class Conll2005SrlSubsetReader(BaseReader):
         self.pos_label_vocab = Vocabulary()
         self.dep_label_vocab = Vocabulary()
         self.tag_label_vocab = Vocabulary()
-        self.tag_label_vocab.add_dict(CoNLL2005_SRL_LABEL_TO_ID)
         # TODO: add complete vocabulary
+        self.dep_label_vocab.label2id_dict = DEPREL_TO_ID
+        self.tag_label_vocab.add_dict(CoNLL2005_SRL_LABEL_TO_ID)
 
     def _read_data(self, path):
         datable = DataTable()
@@ -45,10 +46,10 @@ class Conll2005SrlSubsetReader(BaseReader):
             datable("tokens", tokens)
             datable("pos_tags", pos_tags)
             datable("verb_indicator", verb_indicator)
-            datable("dep_head ", dep_head)
+            datable("dep_head", dep_head)
             datable("dep_label", dep_label)
             datable("tags", tags)
-            datable(" metadata", metadata)
+            datable("metadata", metadata)
 
         return datable
 
