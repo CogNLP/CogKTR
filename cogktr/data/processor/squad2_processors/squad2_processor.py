@@ -13,8 +13,8 @@ transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
 class Squad2Processor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab):
-        super().__init__()
+    def __init__(self, plm, max_token_len, vocab, debug=False):
+        super().__init__(debug=debug)
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
@@ -23,10 +23,7 @@ class Squad2Processor(BaseProcessor):
     def _process(self, data):
         datable = DataTable()
         print("Processing data...")
-        # dict_data = {}
-        # for head in data.headers:
-        #     dict_data[head] = data[head][0:1000]
-        # data = dict_data
+        data = self.debug_process(data)
         for qas_id, is_impossible, \
             question_text, context_text, \
             answer_text, start_position, end_position, \
