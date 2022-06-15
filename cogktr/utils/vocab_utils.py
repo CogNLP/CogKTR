@@ -66,11 +66,11 @@ class Vocabulary():
 
 if __name__ == "__main__":
     vocab = Vocabulary()
-    # vocab.add("C")
-    # vocab.add("A")
-    # vocab.add("B")
-    # vocab.add("A")
-    # vocab.add_sequence(["C", "B", "D"])
+    vocab.add("C")
+    vocab.add("A")
+    vocab.add("B")
+    vocab.add("A")
+    vocab.add_sequence(["C", "B", "D"])
     vocab.add_dict({"<pad>": 0})
     vocab.add_dict({"A": 2})
     vocab.create()
