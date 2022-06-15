@@ -19,7 +19,6 @@ processor = Conll2005SrlSubsetProcessor(plm="bert-base-cased", max_token_len=512
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
-print("end")
 
 model = SyntaxJointFusionModel()
 metric = BaseClassificationMetric(mode="multi")
