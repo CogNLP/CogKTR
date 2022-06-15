@@ -23,6 +23,7 @@ __all__ = [
     "StsbProcessor",
     "BaseReader",
     "Conll2003Reader",
+    "Conll2005SrlSubsetReader",
     "QnliReader",
     "Squad2Reader",
     "Sst2Reader",
