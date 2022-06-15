@@ -4,6 +4,7 @@ from cogktr.data.datable import DataTable
 from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.download_utils import Downloader
 import json
+from cogktr.utils.constant.conll2005_srl_subset_constant.vocab import *
 
 
 class Conll2005SrlSubsetReader(BaseReader):
