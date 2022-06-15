@@ -53,6 +53,8 @@ __all__ = [
     "BaseTextClassificationModel",
     "KgembModel",
     "KtembModel",
+    "SyntaxJointFusionModel",
+    "SyntaxLateFusionModel",
 
     # modules
     "CNN_TokenCNN",
