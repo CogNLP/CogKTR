@@ -7,6 +7,7 @@ __all__ = [
     # processor
     "BaseProcessor",
     "Conll2003Processor",
+    "Conll2005SrlSubsetProcessor",
     "QnliProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",
@@ -16,6 +17,7 @@ __all__ = [
     # reader
     "BaseReader",
     "Conll2003Reader",
+    "Conll2005SrlSubsetReader",
     "QnliReader",
     "Squad2Reader",
     "Sst2Reader",

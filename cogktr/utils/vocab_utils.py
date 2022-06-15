@@ -17,6 +17,7 @@ class Vocabulary():
 
     def add_dict(self, defined_label2id_dict):
         # TODO:Resolve dictionary key value pair conflicts situation
+        # TODO:Resolve different names have same id
         for label, id in defined_label2id_dict.items():
             if label not in self.defined_label2id_dict:
                 self.defined_label2id_dict[label] = id
