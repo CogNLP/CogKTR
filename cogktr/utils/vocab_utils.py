@@ -17,6 +17,7 @@ class Vocabulary():
 
     def add_dict(self, defined_label2id_dict):
         # TODO:Resolve dictionary key value pair conflicts situation
+        # TODO:Resolve different names have same id
         for label, id in defined_label2id_dict.items():
             if label not in self.defined_label2id_dict:
                 self.defined_label2id_dict[label] = id
@@ -65,11 +66,11 @@ class Vocabulary():
 
 if __name__ == "__main__":
     vocab = Vocabulary()
-    vocab.add("C")
-    vocab.add("A")
-    vocab.add("B")
-    vocab.add("A")
-    vocab.add_sequence(["C", "B", "D"])
+    # vocab.add("C")
+    # vocab.add("A")
+    # vocab.add("B")
+    # vocab.add("A")
+    # vocab.add_sequence(["C", "B", "D"])
     vocab.add_dict({"<pad>": 0})
     vocab.add_dict({"A": 2})
     vocab.create()
