@@ -57,9 +57,6 @@ __all__ = [
     "SyntaxLateFusionModel",
 
     # modules
-    "CNN_TokenCNN",
-    "DNN_MLP",
-    "RNN_LSTM",
 
     # toolkits
 
