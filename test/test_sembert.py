@@ -9,9 +9,9 @@ from transformers import BertConfig
 from argparse import Namespace
 
 device, output_path = init_cogktr(
-    device_id=4,
+    device_id=3,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="sembert_with_tag",
+    folder_tag="word_new_model",
 )
 
 reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
@@ -28,7 +28,7 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence",enha
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence",enhanced_key_2="question")
 
 
-processor = QnliProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab,debug=False)
+processor = QnliProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=True)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
@@ -37,16 +37,14 @@ dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 tag_config = {
    "tag_vocab_size":len(processor.tag_tokenizer.ids_to_tags),
    "hidden_size":10,
-   "layer_num":1,
    "output_dim":10,
    "dropout_prob":0.1,
    "num_aspect":3
 }
 tag_config = Namespace(**tag_config)
-model = BertForSequenceClassificationTag.from_pretrained(
-    "bert-base-uncased",
-    cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
-    num_labels=2,
+model = BertForSequenceClassificationTag(
+    vocab=vocab,
+    plm="bert-base-uncased",
     tag_config=tag_config,
 )
 
@@ -54,13 +52,13 @@ model = BertForSequenceClassificationTag.from_pretrained(
 # model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(model.parameters(), lr=2e-5)
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=16,
+                  batch_size=64,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
