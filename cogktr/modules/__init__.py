@@ -8,4 +8,5 @@ __all__ = [
     "CNN_TokenCNN",
     "DNN_MLP",
     "RNN_LSTM",
+    "CNN_conv1d",
 ]
