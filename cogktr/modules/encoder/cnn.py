@@ -1,16 +1,17 @@
 import torch.nn as nn
+import torch.nn.functional as F
 
 class CNN_conv1d(nn.Module):
-    def __init__(self, config, filter_size):
+    def __init__(self,hidden_size,hidden_dropout_prob,filter_size):
         super(CNN_conv1d, self).__init__()
-        self.char_dim = config.hidden_size
+        self.char_dim = hidden_size
         self.filter_size = filter_size #max_word_length
         self.out_channels = self.char_dim
         self.char_cnn =nn.Conv1d(self.char_dim, self.char_dim,kernel_size=self.filter_size,
                      padding=0)
         self.relu = nn.ReLU()
-        #print("dropout:",str(config.hidden_dropout_prob))
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        #print("dropout:",str(hidden_dropout_prob))
+        self.dropout = nn.Dropout(hidden_dropout_prob)
 
     def forward(self, inputs, max_word_len):
         """
