@@ -51,6 +51,7 @@ class BaseReadingComprehensionModel(BaseModel):
     def evaluate(self, batch, metric_function):
         input_ids, attention_mask, token_type_ids, \
         start_positions, end_positions = self.get_batch(batch)
+        # print(start_positions,end_positions)
 
         start_logits, end_logits = self.forward(
             input_ids=input_ids,
@@ -59,19 +60,18 @@ class BaseReadingComprehensionModel(BaseModel):
         )
         start_positions_pred = torch.argmax(start_logits,dim=-1)
         end_positions_pred = torch.argmax(end_logits,dim=-1)
-
-        pred = torch.zeros_like(start_logits)  # (batch_size,max_token_length)
-        label = torch.zeros_like(start_logits)
-        for index in range(pred.size(0)):
-            start = start_positions_pred[index].item()
-            start_true = start_positions[index].item()
-            end = end_positions_pred[index].item()
-            end_true = end_positions[index].item()
-            # print("Predict:{}-{}  True:{}-{}".format(start,end,start_true,end_true))
-            pred[index,start:end+1] = 1
-            label[index,start_true:end_true+1] = 1
-
-        metric_function.evaluate(pred,label)
+        # pred = torch.zeros_like(start_logits)  # (batch_size,max_token_length)
+        # label = torch.zeros_like(start_logits)
+        # for index in range(pred.size(0)):
+        #     start = start_positions_pred[index].item()
+        #     start_true = start_positions[index].item()
+        #     end = end_positions_pred[index].item()
+        #     end_true = end_positions[index].item()
+        #     # print("Predict:{}-{}  True:{}-{}".format(start,end,start_true,end_true))
+        #     pred[index,start:end+1] = 1
+        #     label[index,start_true:end_true+1] = 1
+        metric_function.evaluate(start_positions_pred,end_positions_pred,start_positions,end_positions)
+        # metric_function.evaluate(pred,label)
         # print("Hello World!")
 
     def predict(self, token):
