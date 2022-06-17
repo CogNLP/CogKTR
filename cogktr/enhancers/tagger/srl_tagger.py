@@ -2,6 +2,7 @@ from cogktr.enhancers.tagger import BaseTagger
 from allennlp.predictors.predictor import Predictor
 import collections
 from cogktr.utils.constant.srl_constant.vocab import TAG_VOCAB
+from cogktr.utils.vocab_utils import Vocabulary
 
 class SrlTagger(BaseTagger):
     def __init__(self, tool):
@@ -44,9 +45,10 @@ class SrlTagger(BaseTagger):
 
 class TagTokenizer(object):
     def __init__(self):
-        self.tag_vocab = TAG_VOCAB
-        self.ids_to_tags = collections.OrderedDict(
-            [(ids, tag) for ids, tag in enumerate(TAG_VOCAB)])
+        # self.tag_vocab = TAG_VOCAB
+        self.tag_vocab = Vocabulary()
+        self.tag_vocab.add_sequence(TAG_VOCAB)
+        self.tag_vocab.create()
 
     def convert_tags_to_ids(self, tags):
         """Converts a sequence of tags into ids using the vocab."""
@@ -54,7 +56,7 @@ class TagTokenizer(object):
         for tag in tags:
             if tag not in TAG_VOCAB:
                 tag = 'O'
-            ids.append(TAG_VOCAB.index(tag))
+            ids.append(self.tag_vocab.label2id(tag))
 
         return ids
 
@@ -62,8 +64,32 @@ class TagTokenizer(object):
         """Converts a sequence of ids into tags using the vocab."""
         tags = []
         for i in ids:
-            tags.append(self.ids_to_tags[i])
+            tags.append(self.tag_vocab.id2label(i))
         return tags
+
+#
+# class TagTokenizer(object):
+#     def __init__(self):
+#         self.tag_vocab = TAG_VOCAB
+#         self.ids_to_tags = collections.OrderedDict(
+#             [(ids, tag) for ids, tag in enumerate(TAG_VOCAB)])
+#
+#     def convert_tags_to_ids(self, tags):
+#         """Converts a sequence of tags into ids using the vocab."""
+#         ids = []
+#         for tag in tags:
+#             if tag not in TAG_VOCAB:
+#                 tag = 'O'
+#             ids.append(TAG_VOCAB.index(tag))
+#
+#         return ids
+#
+#     def convert_ids_to_tags(self, ids):
+#         """Converts a sequence of ids into tags using the vocab."""
+#         tags = []
+#         for i in ids:
+#             tags.append(self.ids_to_tags[i])
+#         return tags
 
 
 
