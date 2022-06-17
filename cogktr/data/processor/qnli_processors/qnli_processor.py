@@ -144,7 +144,10 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhance
     assert len(input_mask) == max_token_length
     assert len(token_type_ids) == max_token_length
 
-    label_id = vocab["label_vocab"].label2id(label)
+    if vocab is not None and vocab["label_vocab"] is not None:
+        label_id = vocab["label_vocab"].label2id(label)
+    else:
+        label_id = None
 
     # construct tag features:
     # print("Start Debug!")
