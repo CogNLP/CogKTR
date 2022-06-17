@@ -15,6 +15,7 @@ class Sst2SembertProcessor(BaseProcessor):
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
         self.tag_tokenizer = TagTokenizer()
+        self.vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
 
     def _process(self, data,enhanced_data_dict=None):
         datable = DataTable()

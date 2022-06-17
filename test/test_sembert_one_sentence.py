@@ -37,7 +37,7 @@ dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 #
 #
 tag_config = {
-   "tag_vocab_size":len(processor.tag_tokenizer.ids_to_tags),
+   "tag_vocab_size":len(processor.tag_tokenizer.tag_vocab),
    "hidden_size":10,
    "output_dim":10,
    "dropout_prob":0.1,
