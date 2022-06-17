@@ -5,6 +5,7 @@ from tqdm import tqdm
 import transformers
 from cogktr.data.processor.base_processor import BaseProcessor
 from cogktr.enhancers.tagger.srl_tagger import SrlTagger,TagTokenizer
+from cogktr.utils.vocab_utils import Vocabulary
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -18,6 +19,12 @@ class QnliProcessor(BaseProcessor):
         self.tokenizer = BertTokenizer.from_pretrained(plm)
         self.debug = debug
         self.tag_tokenizer = TagTokenizer()
+        # tag_vocab = Vocabulary()
+        # tag_vocab.add_sequence(self.tag_tokenizer.tag_vocab)
+        # tag_vocab.create()
+        # self.vocab["tag_vocab"] = tag_vocab
+        self.vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
+
 
     def debug_process(self, data):
         if self.debug:
