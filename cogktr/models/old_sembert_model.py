@@ -1616,3 +1616,151 @@ class BertForQuestionAnswering(BertPreTrainedModel):
             return total_loss
         else:
             return start_logits, end_logits
+
+class BertForQuestionAnsertingTag(BertPreTrainedModel):
+    def __init__(self, config, num_labels=2, tag_config=None):
+        super(BertForQuestionAnsertingTag, self).__init__(config)
+        self.num_labels = num_labels
+        self.bert = BertModel(config)
+        self.filter_size = 3
+        self.cnn = CNN_conv1d(config, filter_size=self.filter_size)
+
+        self.activation = nn.Tanh()
+        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        if tag_config is not None:
+            hidden_size = config.hidden_size + tag_config.hidden_size
+            self.tag_model = TagEmebedding(tag_config)
+            self.dense = nn.Linear(tag_config.num_aspect * tag_config.hidden_size, tag_config.hidden_size)
+        else:
+            hidden_size = config.hidden_size
+        self.use_tag = True
+        if self.use_tag:
+            self.pool = nn.Linear(config.hidden_size + tag_config.hidden_size, config.hidden_size + tag_config.hidden_size)
+            self.classifier = nn.Linear(config.hidden_size + tag_config.hidden_size, num_labels)
+        else:
+            self.pool = nn.Linear(config.hidden_size, config.hidden_size)
+            self.classifier = nn.Linear(config.hidden_size, num_labels)
+        self.apply(self.init_bert_weights)
+
+    def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_end_idx=None, input_tag_ids=None):
+        current_device = input_ids.device
+        sequence_output, _ = self.bert(input_ids, token_type_ids, attention_mask, output_all_encoded_layers=False)
+        no_cuda = False
+        batch_size, sub_seq_len, dim = sequence_output.size()
+        # sequence_output = sequence_output.unsqueeze(1)
+        start_end_idx = start_end_idx  # batch * seq_len * (start, end)
+        max_seq_len = -1
+        max_word_len = self.filter_size
+        for se_idx in start_end_idx:
+            num_words = 0
+            for item in se_idx:
+                if item[0] != -1 and item[1] != -1:
+                    num_subs = item[1] - item[0] + 1
+                    if num_subs > max_word_len:
+                        max_word_len = num_subs
+                    num_words += 1
+            if num_words > max_seq_len:
+                max_seq_len = num_words
+        assert max_word_len >= self.filter_size
+        batch_start_end_ids = []
+        batch_id = 0
+        for batch in start_end_idx:
+            word_seqs = []
+            offset = batch_id * sub_seq_len
+            for item in batch:
+                if item[0] != -1 and item[1] != -1:
+                    subword_ids = list(range(offset + item[0] + 1, offset + item[1] + 2))  # 0用来做padding了
+                    while len(subword_ids) < max_word_len:
+                        subword_ids.append(0)
+                    word_seqs.append(subword_ids)
+            while (len(word_seqs) < max_seq_len):
+                word_seqs.append([0 for i in range(max_word_len)])
+            batch_start_end_ids.append(word_seqs)
+            batch_id += 1
+
+        batch_start_end_ids = torch.tensor(batch_start_end_ids)
+        batch_start_end_ids = batch_start_end_ids.view(-1)
+        sequence_output = sequence_output.view(-1, dim)
+        sequence_output = torch.cat([sequence_output.new_zeros((1, dim)), sequence_output], dim=0)
+        batch_start_end_ids = batch_start_end_ids.to(current_device)
+        cnn_bert = sequence_output.index_select(0, batch_start_end_ids)
+        cnn_bert = cnn_bert.view(batch_size, max_seq_len, max_word_len, dim)
+        cnn_bert = cnn_bert.to(current_device)
+
+        bert_output = self.cnn(cnn_bert, max_word_len)
+
+        if self.use_tag:
+            num_aspect = input_tag_ids.size(1)
+            input_tag_ids = input_tag_ids[:,:,:max_seq_len]
+            flat_input_tag_ids = input_tag_ids.view(-1, input_tag_ids.size(-1))
+            # print("flat_que_tag", flat_input_que_tag_ids.size())
+            tag_output = self.tag_model(flat_input_tag_ids, num_aspect)
+            # batch_size, que_len, num_aspect*tag_hidden_size
+            tag_output = tag_output.transpose(1, 2).contiguous().view(batch_size,
+                                                                      max_seq_len, -1)
+            tag_output = self.dense(tag_output)
+            sequence_output = torch.cat((bert_output, tag_output), 2)
+            # print("tag", tag_output.size())
+            # print("bert", bert_output.size())
+
+        else:
+            sequence_output = bert_output
+
+        sequence_output = sequence_output[0]
+        logits = self.classifier(sequence_output)
+        start_logits, end_logits = logits.split(1, dim=-1)
+        start_logits = start_logits.squeeze(-1).contiguous()
+        end_logits = end_logits.squeeze(-1).contiguous()
+        return start_logits,end_logits
+        #first_token_tensor = sequence_output[:, 0]
+        # first_token_tensor, pool_index = torch.max(sequence_output, dim=1)
+        #
+        # pooled_output = self.pool(first_token_tensor)
+        # pooled_output = self.activation(pooled_output)
+        # pooled_output = self.dropout(pooled_output)
+        # logits = self.classifier(pooled_output)
+
+
+    def loss(self,batch,loss_function):
+        input_ids, attention_mask, token_type_ids, input_tag_ids, start_end_idx, start_positions, end_positions = self.get_batch(batch)
+        # input_ids, attention_mask, token_type_ids, input_tag_ids, start_end_idx, labels = self.get_batch(batch)
+        start_logits,end_logits = self.forward(
+            input_ids=input_ids,
+            token_type_ids=token_type_ids,
+            attention_mask=attention_mask,
+            start_end_idx=start_end_idx,
+            input_tag_ids=input_tag_ids,
+        )
+
+        ignored_index = start_logits.size(1)
+        start_positions = start_positions.clamp(0, ignored_index)
+        end_positions = end_positions.clamp(0, ignored_index)
+
+        start_loss = loss_function(start_logits, start_positions)
+        end_loss = loss_function(end_logits, end_positions)
+        total_loss = (start_loss + end_loss) / 2
+        return total_loss
+
+    def evaluate(self, batch, metric_function):
+        input_ids, attention_mask, token_type_ids, input_tag_ids, start_end_idx, start_positions, end_positions = self.get_batch(batch)
+        start_logits, end_logits = self.forward(
+            input_ids=input_ids,
+            token_type_ids=token_type_ids,
+            attention_mask=attention_mask,
+            start_end_idx=start_end_idx,
+            input_tag_ids=input_tag_ids,
+        )
+        start_positions_pred = torch.argmax(start_logits,dim=-1)
+        end_positions_pred = torch.argmax(end_logits,dim=-1)
+        metric_function.evaluate(start_positions_pred, end_positions_pred, start_positions, end_positions)
+
+
+    def get_batch(self,batch):
+        input_ids = batch["input_ids"]
+        attention_mask = batch["input_mask"]
+        token_type_ids = batch["token_type_ids"]
+        input_tag_ids = batch["input_tag_ids"]
+        start_end_idx = batch["start_end_idx"]
+        start_positions = batch["start_position"]
+        end_positions = batch["end_position"]
+        return input_ids,attention_mask,token_type_ids,input_tag_ids,start_end_idx,start_positions,end_positions
