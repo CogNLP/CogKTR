@@ -126,6 +126,8 @@ class Conll2005SrlSubsetProcessor(BaseProcessor):
             datable("labels", labels)
             datable("verb_index", verb_index)
 
+            datable.not2torch.add("wp_rows")
+
         return DataTableSet(datable)
 
     def process_train(self, data):
