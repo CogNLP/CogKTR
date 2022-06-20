@@ -5,23 +5,23 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=5,
-    output_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2005_srl_subset/experimental_result",
+    device_id=4,
+    output_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0_subset/experimental_result/",
     folder_tag="simple_test",
 )
 
-reader = Conll2005SrlSubsetReader(
-    raw_data_path="/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2005_srl_subset/raw_data")
+reader = Squad2SubsetReader(
+    raw_data_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0_subset/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = Conll2005SrlSubsetProcessor(plm="bert-base-cased", max_token_len=512, max_label_len=512, vocab=vocab)
+processor = Squad2SubsetProcessor(plm="bert-base-cased", max_seq_length=384, max_query_length=64, doc_stride=128,
+                                  vocab=vocab)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
-test_dataset = processor.process_test(test_data)
 
-model = SyntaxJointFusionModel(vocab=vocab, plm="bert-base-cased")
-metric = BaseClassificationMetric(mode="multi")
+model = SgnetModel(plm="bert-base-cased", vocab=vocab)
+metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
@@ -51,6 +51,8 @@ trainer = Trainer(model,
                   metric_key=None,
                   fp16=False,
                   fp16_opt_level='O1',
+                  collate_fn=train_dataset.to_dict,
+                  dev_collate_fn=dev_dataset.to_dict,
                   )
 trainer.train()
 print("end")

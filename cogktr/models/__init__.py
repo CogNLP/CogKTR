@@ -4,8 +4,7 @@ from .base_text_classification_model import *
 from .base_sequence_labeling_model import *
 from .kgemb_model import *
 from .ktemb_model import *
-from .syntax_joint_fusion_model import *
-from .syntax_late_fusion_model import *
+from .sgnet_model import *
 
 __all__ = [
     "BaseModel",
@@ -15,6 +14,5 @@ __all__ = [
     "BaseSequenceLabelingModel",
     "KgembModel",
     "KtembModel",
-    "SyntaxJointFusionModel",
-    "SyntaxLateFusionModel",
+    "SgnetModel",
 ]

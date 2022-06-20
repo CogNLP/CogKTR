@@ -59,6 +59,13 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
+    def download_squad2_subset_raw_data(self, output_file):
+        dataset_list = ["squad_sample.json", "squad_span_sample.json"]
+        zip_name = "RAW_SQUAD2_SUBSET.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
 
 if __name__ == "__main__":
     downloader = Downloader()
@@ -68,3 +75,4 @@ if __name__ == "__main__":
     downloader.download_sst2_raw_data("/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
     downloader.download_stsb_raw_data("/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
     downloader.download_conll2005_srl_subset_raw_data("/data/mentianyi/code/CogKTR/datapath/sequence_labeling/conll2005_srl_subset/raw_data")
+    downloader.download_squad2_subset_raw_data("/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0_subset/raw_data")

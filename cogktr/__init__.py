@@ -18,6 +18,7 @@ __all__ = [
     "Conll2003Processor",
     "Conll2005SrlSubsetProcessor",
     "QnliProcessor",
+    "Squad2SubsetProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
@@ -27,6 +28,7 @@ __all__ = [
     "Conll2005SrlSubsetReader",
     "QnliReader",
     "Squad2Reader",
+    "Squad2SubsetReader",
     "Sst2Reader",
     "StsbReader",
     "DataTable",
@@ -53,8 +55,7 @@ __all__ = [
     "BaseTextClassificationModel",
     "KgembModel",
     "KtembModel",
-    "SyntaxJointFusionModel",
-    "SyntaxLateFusionModel",
+    "SgnetModel",
 
     # modules
     "CNN_TokenCNN",
