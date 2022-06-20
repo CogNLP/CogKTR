@@ -5,6 +5,7 @@ from tqdm import tqdm
 import transformers
 from cogktr.data.processor.base_processor import BaseProcessor
 from cogktr.enhancers.tagger.srl_tagger import SrlTagger,TagTokenizer
+from cogktr.utils.vocab_utils import Vocabulary
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -17,8 +18,13 @@ class QnliProcessor(BaseProcessor):
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
         self.debug = debug
-        self.srl_tagger = SrlTagger(tool="allennlp")
         self.tag_tokenizer = TagTokenizer()
+        # tag_vocab = Vocabulary()
+        # tag_vocab.add_sequence(self.tag_tokenizer.tag_vocab)
+        # tag_vocab.create()
+        # self.vocab["tag_vocab"] = tag_vocab
+        self.vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
+
 
     def debug_process(self, data):
         if self.debug:
@@ -34,7 +40,7 @@ class QnliProcessor(BaseProcessor):
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
                                               total=len(data['sentence'])):
-            dict_data = process_sembert(sentence,question,label,self.tokenizer,self.vocab,self.max_token_len,self.srl_tagger,enhanced_data_dict,self.tag_tokenizer)
+            dict_data = process_sembert(sentence,question,label,self.tokenizer,self.vocab,self.max_token_len,enhanced_data_dict,self.tag_tokenizer)
 
             datable("input_ids", dict_data["input_ids"])
             datable("input_mask", dict_data["input_mask"])
@@ -55,7 +61,7 @@ class QnliProcessor(BaseProcessor):
         return self._process(data,enhanced_data_dict)
 
 
-def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,tagger,enhanced_data_dict,tag_tokenizer):
+def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhanced_data_dict,tag_tokenizer):
 
     # text_a_tag_dict = tagger.tag(text_a)
     text_a_tag_dict = enhanced_data_dict[text_a]["srl"]
@@ -145,7 +151,10 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,tagger,
     assert len(input_mask) == max_token_length
     assert len(token_type_ids) == max_token_length
 
-    label_id = vocab["label_vocab"].label2id(label)
+    if vocab is not None and vocab["label_vocab"] is not None:
+        label_id = vocab["label_vocab"].label2id(label)
+    else:
+        label_id = None
 
     # construct tag features:
     # print("Start Debug!")

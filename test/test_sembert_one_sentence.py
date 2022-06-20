@@ -8,14 +8,15 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
 from transformers import BertConfig
 from argparse import Namespace
+from cogktr.data.processor.sst2_processors.sst2_sembert_processor import Sst2SembertProcessor
 
 device, output_path = init_cogktr(
-    device_id=4,
-    output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
+    device_id=2,
+    output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result/",
     folder_tag="old_sembert",
 )
 
-reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
@@ -23,20 +24,20 @@ enhancer = Enhancer(reprocess=False,
                     return_srl=True,
                     save_file_name="pre_enhanced_data",
                     datapath="/data/hongbang/CogKTR/datapath",
-                    enhanced_data_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/enhanced_data")
-enhanced_train_dict = enhancer.enhance_train(train_data,enhanced_key_1="sentence",enhanced_key_2="question")
-enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence",enhanced_key_2="question")
-enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence",enhanced_key_2="question")
+                    enhanced_data_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/enhanced_data")
+enhanced_train_dict = enhancer.enhance_train(train_data,enhanced_key_1="sentence")
+enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence")
+enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence")
 
-
-processor = QnliProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=False)
+#
+processor = Sst2SembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
-
-
+#
+#
 tag_config = {
-   "tag_vocab_size":len(vocab["tag_vocab"]),
+   "tag_vocab_size":len(processor.tag_tokenizer.tag_vocab),
    "hidden_size":10,
    "output_dim":10,
    "dropout_prob":0.1,
@@ -78,7 +79,7 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   # checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
-                  validate_steps=100,  # validation setting
+                  validate_steps=500,  # validation setting
                   save_steps=None,  # when to save model result
                   output_path=output_path,
                   grad_norm=1,
