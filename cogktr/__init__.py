@@ -55,7 +55,6 @@ __all__ = [
     "BaseTextClassificationModel",
     "KgembModel",
     "KtembModel",
-    "SgnetModel",
 
     # modules
 
