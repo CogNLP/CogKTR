@@ -130,9 +130,9 @@ if __name__ == "__main__":
     ks.get_num_pages()
 
     # get page by id
-    page = ks.get_page_by_id(27097632)
+    page = ks.get_page_by_id(174924)
 
-    desc = ks.get_page_by_id(27097632)["wikidata_info"]["description"]
+    desc = ks.get_page_by_id(174924)["wikidata_info"]["description"]
 
     # get pages by title
     # page = ks.get_page_by_title("Michael Jordan")

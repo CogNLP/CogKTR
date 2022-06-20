@@ -1,9 +1,14 @@
+# -*- encoding:utf-8 -*-
+from cogktr.utils.constant.kbert_constants.constants import *
+
 class Vocabulary():
     def __init__(self):
         self.label_set = set()
         self.defined_label2id_dict = dict()
         self.label2id_dict = {}
         self.id2label_dict = {}
+        self.word2id_dict = {}
+        self.id2word_list = []
 
     def __len__(self):
         return len(self.label_set)
@@ -44,6 +49,25 @@ class Vocabulary():
                 inserting_index += 1
         self.label2id_dict = dict(sorted(self.label2id_dict.items(), key=lambda x: x[1]))
         self.id2label_dict = dict(sorted(self.id2label_dict.items(), key=lambda x: x[0]))
+
+    def load(self, vocab_path, is_quiet=False):
+        with open(vocab_path, mode="r", encoding="utf-8") as reader:
+            for index, line in enumerate(reader):
+                try:
+                    w = line.strip().split()[0]
+                    self.word2id_dict[w] = index
+                    self.id2word_list.append(w)
+                except:
+                    self.word2id_dict["???" + str(index)] = index
+                    self.id2word_list.append("???" + str(index))
+                    if not is_quiet:
+                        print("Vocabulary file line " + str(index + 1) + " has bad format token")
+            assert len(self.word2id_dict) == len(self.id2word_list)
+        if not is_quiet:
+            print("Vocabulary Size: ", len(self.id2word_list))
+
+    def get(self, word):
+        return self.word2id_dict.get(word, UNK_ID)
 
     def label2id(self, word):
         return self.label2id_dict[word]
