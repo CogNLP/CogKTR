@@ -58,10 +58,6 @@ __all__ = [
     "SgnetModel",
 
     # modules
-    "CNN_TokenCNN",
-    "DNN_MLP",
-    "RNN_LSTM",
-    "CNN_conv1d",
 
     # toolkits
 
