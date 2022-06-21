@@ -26,16 +26,19 @@ class SyntaxTagger(BaseTagger):
         word_list = []
         deprel_label_list = []
         head_label_list = []
+        indexes_list = []
 
         tag_result = self.syntaxtagger(sentence)
         for word in tag_result.sentences[0].words:
             word_list.append(word.text)
             deprel_label_list.append(word.deprel)
             head_label_list.append(word.head)
+            indexes_list.append(word.id)
 
         tag_dict["words"] = word_list
         tag_dict["deprel_labels"] = deprel_label_list
         tag_dict["head_labels"] = head_label_list
+        tag_dict["indexes"] = indexes_list
         return tag_dict
 
 
