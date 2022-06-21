@@ -5,7 +5,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=4,
+    device_id=5,
     output_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/experimental_result",
     folder_tag="simple_test",
 )

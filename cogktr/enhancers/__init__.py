@@ -22,6 +22,7 @@ __all__ = [
     "NerTagger",
     "PosTagger",
     "SrlTagger",
+    "SyntaxTagger",
 
     # enhancer
     "Enhancer",

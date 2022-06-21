@@ -8,7 +8,7 @@ from cogktr.data.processor.base_processor import BaseProcessor
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class QnliProcessor(BaseProcessor):
+class QnliForSyntaxBertProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab):
         super().__init__()
         self.plm = plm
@@ -19,8 +19,11 @@ class QnliProcessor(BaseProcessor):
     def process_train(self, data):
         datable = DataTable()
         print("Processing data...")
+        xx=0
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
                                               total=len(data['sentence'])):
+            if xx>10:
+                break
             tokenized_data = self.tokenizer.encode_plus(text=sentence, text_pair=question,
                                                         truncation='longest_first',
                                                         padding="max_length",
@@ -38,8 +41,11 @@ class QnliProcessor(BaseProcessor):
     def process_test(self, data):
         datable = DataTable()
         print("Processing data...")
+        xx=0
         for sentence, question in tqdm(zip(data['sentence'], data['question']),
                                        total=len(data['sentence'])):
+            if xx>10:
+                break
             tokenized_data = self.tokenizer.encode_plus(text=sentence, text_pair=question,
                                                         truncation='longest_first',
                                                         padding="max_length",
@@ -58,7 +64,7 @@ if __name__ == "__main__":
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
-    processor = QnliProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
+    processor = QnliForSyntaxBertProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)

@@ -6,7 +6,7 @@ from cogktr.core.evaluator import Evaluator
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=4,
+    device_id=7,
     output_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
     folder_tag="test_dict_input",
 )
