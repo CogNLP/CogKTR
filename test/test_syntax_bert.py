@@ -14,13 +14,14 @@ reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_cla
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-enhancer = Enhancer(reprocess=False,
+enhancer = Enhancer(return_syntax=True,
+                    reprocess=True,
                     save_file_name="syntax_enhanced_data",
                     datapath="/data/mentianyi/code/CogKTR/datapath",
                     enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data")
-# enhanced_train_dict = enhancer.enhance_train(train_data)
+enhanced_train_dict = enhancer.enhance_train(train_data)
 enhanced_dev_dict = enhancer.enhance_dev(dev_data)
-# enhanced_test_dict = enhancer.enhance_test(test_data)
+enhanced_test_dict = enhancer.enhance_test(test_data)
 
 processor = Sst2ForSyntaxBertProcessor(plm="bert-base-cased", max_token_len=128, n_mask=2, vocab=vocab)
 train_dataset = processor.process_train(dev_data, enhanced_dict=enhanced_dev_dict)
