@@ -18,6 +18,7 @@ __all__ = [
     "Conll2003Processor",
     "Conll2005SrlSubsetProcessor",
     "QnliProcessor",
+    "QnliForSyntaxBertProcessor",
     "Squad2SubsetProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",

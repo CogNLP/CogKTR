@@ -5,7 +5,7 @@ import copy
 import os
 from tqdm import tqdm
 from cogktr.utils.io_utils import load_json, save_json
-from cogktr.enhancers.tagger import PosTagger, NerTagger, SrlTagger
+from cogktr.enhancers.tagger import PosTagger, NerTagger, SrlTagger, SyntaxTagger
 from cogktr.enhancers.linker import WikipediaLinker
 from cogktr.enhancers.searcher import WikipediaSearcher
 from cogktr.enhancers.embedder import WikipediaEmbedder
@@ -21,6 +21,7 @@ class Enhancer:
                  return_ner=False,
                  return_spo=False,
                  return_srl=False,
+                 return_syntax=False,
                  return_event=False,
                  return_entity_desc=False,
                  return_entity_emb=False,
@@ -29,6 +30,7 @@ class Enhancer:
         self.return_ner = return_ner
         self.return_spo = return_spo
         self.return_srl = return_srl
+        self.return_syntax = return_syntax
         self.return_event = return_event
         self.return_entity_desc = return_entity_desc
         self.return_entity_emb = return_entity_emb
@@ -46,24 +48,11 @@ class Enhancer:
         self.tool_config["NerTagger"] = "flair"
         self.tool_config["SpoTagger"] = None
         self.tool_config["SrlTagger"] = "allennlp"
+        self.tool_config["SyntaxTagger"] = "stanza"
         self.tool_config["EventTagger"] = None
         self.tool_config["WikipediaLinker"] = "cogie"
         self.tool_config["WikipediaSearcher"] = "blink"
         self.tool_config["WikipediaEmbedder"] = "wikipedia2vec"
-
-        # self.path_config = {}
-        # if self.return_entity_desc:
-        #     self.path_config["WikipediaSearcher"] = os.path.join(self.datapath,
-        #                                                          "knowledge_graph/wikipedia_desc/entity.jsonl")
-        # if self.return_entity_emb:
-        #     if self.tool_config["WikipediaEmbedder"] == "wikipedia2vec":
-        #         self.path_config["WikipediaEmbedder"] = os.path.join(self.datapath,
-        #                                                              "knowledge_graph/wikipedia2vec/enwiki_20180420_win10_100d.pkl")
-        #     if self.tool_config["WikipediaEmbedder"] == "cogkge":
-        #         self.path_config["WikipediaEmbedder"]["model"] = os.path.join(self.datapath,
-        #                                                                       "knowledge_graph/cogkge/Model.pkl")
-        #         self.path_config["WikipediaEmbedder"]["vocab"] = os.path.join(self.datapath,
-        #                                                                       "knowledge_graph/cogkge/vocab.pkl")
 
     def _init_module(self):
         if self.return_pos:
@@ -72,6 +61,8 @@ class Enhancer:
             self.ner_tagger = NerTagger(tool=self.tool_config["NerTagger"])
         if self.return_srl:
             self.srl_tagger = SrlTagger(tool=self.tool_config["SrlTagger"])
+        if self.return_syntax:
+            self.syntax_tagger = SyntaxTagger(tool=self.tool_config["SyntaxTagger"])
         if self.return_entity_desc or self.return_entity_emb:
             self.wikipedia_linker = WikipediaLinker(tool=self.tool_config["WikipediaLinker"])
         if self.return_entity_desc:
@@ -95,6 +86,7 @@ class Enhancer:
                    NerTaggerTool=None,
                    SpoTaggerTool=None,
                    SrlTaggerTool=None,
+                   SyntaxTaggerTool=None,
                    EventTaggerTool=None,
                    WikipediaLinkerTool=None,
                    WikipediaSearcherTool=None,
@@ -107,6 +99,8 @@ class Enhancer:
             self.tool_config["SpoTagger"] = SpoTaggerTool
         if SrlTaggerTool is not None:
             self.tool_config["SrlTagger"] = SrlTaggerTool
+        if SyntaxTaggerTool is not None:
+            self.tool_config["SyntaxTagger"] = SyntaxTaggerTool
         if EventTaggerTool is not None:
             self.tool_config["EventTagger"] = EventTaggerTool
         if WikipediaLinkerTool is not None:
@@ -125,6 +119,8 @@ class Enhancer:
             knowledge_dict["ner"] = self.ner_tagger.tag(sentence)
         if self.return_srl:
             knowledge_dict["srl"] = self.srl_tagger.tag(sentence)
+        if self.return_syntax:
+            knowledge_dict["syntax"] = self.syntax_tagger.tag(sentence)
         if self.return_entity_desc or self.return_entity_emb:
             link_dict = self.wikipedia_linker.link(sentence)
         if self.return_entity_desc:
@@ -162,7 +158,8 @@ class Enhancer:
                 for sentence_1 in tqdm(datable[enhanced_key_1]):
                     enhanced_dict[sentence_1] = self.get_knowledge(sentence_1)
             if enhanced_key_2 is not None:
-                for sentence_1, sentence_2 in tqdm(zip(datable[enhanced_key_1], datable[enhanced_key_2]),total=len(datable[enhanced_key_1])):
+                for sentence_1, sentence_2 in tqdm(zip(datable[enhanced_key_1], datable[enhanced_key_2]),
+                                                   total=len(datable[enhanced_key_1])):
                     enhanced_dict[sentence_1] = self.get_knowledge(sentence_1)
                     enhanced_dict[sentence_2] = self.get_knowledge(sentence_2)
             save_json(enhanced_dict, os.path.join(self.enhanced_data_path, self.save_file_name, dict_name))
@@ -244,6 +241,7 @@ if __name__ == "__main__":
                         return_ner=True,
                         return_spo=True,
                         return_srl=True,
+                        return_syntax=True,
                         return_event=True,
                         return_entity_desc=True,
                         return_entity_emb=True,

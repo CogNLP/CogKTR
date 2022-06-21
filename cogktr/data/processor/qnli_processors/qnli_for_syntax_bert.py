@@ -16,13 +16,13 @@ class QnliForSyntaxBertProcessor(BaseProcessor):
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
 
-    def process_train(self, data):
+    def process_train(self, data, enhanced_dict=None):
         datable = DataTable()
         print("Processing data...")
-        xx=0
+        xx = 0
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
                                               total=len(data['sentence'])):
-            if xx>10:
+            if xx > 10:
                 break
             tokenized_data = self.tokenizer.encode_plus(text=sentence, text_pair=question,
                                                         truncation='longest_first',
@@ -35,16 +35,16 @@ class QnliForSyntaxBertProcessor(BaseProcessor):
             datable("label", self.vocab["label_vocab"].label2id(label))
         return DataTableSet(datable)
 
-    def process_dev(self, data):
+    def process_dev(self, data, enhanced_dict=None):
         return self._process(data)
 
-    def process_test(self, data):
+    def process_test(self, data, enhanced_dict=None):
         datable = DataTable()
         print("Processing data...")
-        xx=0
+        xx = 0
         for sentence, question in tqdm(zip(data['sentence'], data['question']),
                                        total=len(data['sentence'])):
-            if xx>10:
+            if xx > 10:
                 break
             tokenized_data = self.tokenizer.encode_plus(text=sentence, text_pair=question,
                                                         truncation='longest_first',

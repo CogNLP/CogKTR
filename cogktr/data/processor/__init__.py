@@ -18,6 +18,7 @@ __all__ = [
 
     # qnliprocessor
     "QnliProcessor",
+    "QnliForSyntaxBertProcessor",
 
     # squad2processor
 
