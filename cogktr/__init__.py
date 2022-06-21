@@ -18,11 +18,11 @@ __all__ = [
     "Conll2003Processor",
     "Conll2005SrlSubsetProcessor",
     "QnliProcessor",
-    "QnliForSyntaxBertProcessor",
     "Squad2SubsetProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
+    "Sst2ForSyntaxBertProcessor",
     "StsbProcessor",
     "BaseReader",
     "Conll2003Reader",
@@ -57,6 +57,7 @@ __all__ = [
     "BaseTextClassificationModel",
     "KgembModel",
     "KtembModel",
+    "SyntaxAttentionModel",
 
     # modules
 
