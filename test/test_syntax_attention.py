@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
-from transformers import AdamW
 
 device, output_path = init_cogktr(
     device_id=3,
@@ -31,7 +30,7 @@ test_dataset = processor.process_test(test_data, enhanced_dict=enhanced_test_dic
 model = SyntaxAttentionModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
-optimizer = AdamW(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,
                   train_dataset,
