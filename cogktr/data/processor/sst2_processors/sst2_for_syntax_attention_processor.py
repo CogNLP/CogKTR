@@ -10,7 +10,7 @@ import copy
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class Sst2ForSyntaxBertProcessor(BaseProcessor):
+class Sst2ForSyntaxAttentionProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, n_mask, vocab):
         super().__init__()
         self.plm = plm
