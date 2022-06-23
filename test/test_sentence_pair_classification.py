@@ -8,7 +8,7 @@ from cogktr.utils.general_utils import init_cogktr,EarlyStopping
 device, output_path = init_cogktr(
     device_id=3,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="test_dict_input",
+    folder_tag="new_early_stop",
 )
 
 reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
@@ -23,17 +23,18 @@ model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
-early_stopping = EarlyStopping(patience=2,min_delta=0.01,metric_name="F1")
+early_stopping = EarlyStopping(mode="max",patience=2,threshold=0.05,threshold_mode="rel",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
-                  n_epochs=20,
+                  n_epochs=100,
                   batch_size=32,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
                   metrics=metric,
+                  early_stopping=early_stopping,
                   train_sampler=None,
                   dev_sampler=None,
                   drop_last=False,

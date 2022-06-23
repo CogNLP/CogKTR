@@ -33,38 +33,51 @@ def reduce_mean(tensor, nprocs):
 
 
 class EarlyStopping:
-    """
-    Early stopping to stop the training when the loss does not improve after
-    certain epochs.
-    """
-
-    def __init__(self, patience=5, min_delta=0, metric_name=None):
-        """
-        :param patience: how many epochs to wait before stopping when loss is
-               not improving
-        :param min_delta: minimum difference between new loss and old loss for
-               new loss to be considered as an improvement
-        """
+    def __init__(self,mode="min",patience=4,threshold=1e-4,threshold_mode="rel",metric_name=None):
+        if mode not in ["min","max"]:
+            assert ValueError("Argument mode must be min or max but got {}".format(mode))
+        if threshold_mode not in ["rel","abs"]:
+            assert ValueError("Argument threshold_mode must be rel or abs but got {}".format(threshold_mode))
+        if threshold_mode == 'rel' and (threshold < 0 or threshold > 1):
+            assert ValueError("Threshold must be in [0,1] in rel threshold mode but got {}.".format(threshold))
+        self.mode = mode
         self.patience = patience
-        self.min_delta = min_delta
+        self.threshold = threshold
+        self.threshold_mode = threshold_mode
+
         self.counter = 0
-        self.best_loss = None
+        self.best_value = None
         self.early_stop = False
         self.metric_name = metric_name
 
-    def __call__(self, val_loss):
-        if self.best_loss == None:
-            self.best_loss = val_loss
-        elif self.best_loss - val_loss > self.min_delta:
-            self.best_loss = val_loss
-            # reset counter if validation loss improves
+    def __call__(self, value):
+        if self.best_value == None:
+            self.best_value = value
+            return
+
+        if self.is_better(value,self.best_value):
+            self.best_value = value
             self.counter = 0
-        elif self.best_loss - val_loss < self.min_delta:
+        else:
             self.counter += 1
-            # print(f"INFO: Early stopping counter {self.counter} of {self.patience}")
             if self.counter >= self.patience:
-                # print('INFO: Early stopping')
                 self.early_stop = True
+
+
+    def is_better(self,value,best_value):
+        if self.mode == 'min' and self.threshold_mode == 'rel':
+            rel_epsilon = 1. - self.threshold
+            return value < best_value * rel_epsilon
+
+        elif self.mode == 'min' and self.threshold_mode == 'abs':
+            return value < best_value - self.threshold
+
+        elif self.mode == 'max' and self.threshold_mode == 'rel':
+            rel_epsilon = self.threshold + 1.
+            return value > best_value * rel_epsilon
+
+        else:  # mode == 'max' and epsilon_mode == 'abs':
+            return value > best_value + self.threshold
 
 
 def init_cogktr(

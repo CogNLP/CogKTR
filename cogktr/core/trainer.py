@@ -217,7 +217,7 @@ class Trainer:
 
         for epoch in range(epochs_trained, self.n_epochs + 1):
             if self.early_stop:
-                logger.info("Break at epoch {}".format(epoch))
+                logger.info("Break at epoch {} and global step {}".format(epoch,global_step))
                 break
             logger.info("Train epoch = %d", epoch)
             epoch_loss = 0.0
@@ -332,8 +332,8 @@ class Trainer:
                         self.early_stopping(evaluate_result[self.early_stopping.metric_name])
                         if self.early_stopping.early_stop:
                             self.early_stop = True
-                            logger.info("Early Stop with patience={} and min_delta={} on metric {}.".format(
-                                self.early_stopping.patience,self.early_stopping.min_delta,self.early_stopping.metric_name
+                            logger.info("Early Stop with patience={} and threshold={} on metric {}.".format(
+                                self.early_stopping.patience,self.early_stopping.threshold,self.early_stopping.metric_name
                             ))
                             break
                     logger.info("Evaluate result = %s", str(evaluate_result))
