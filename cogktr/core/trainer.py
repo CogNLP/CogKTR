@@ -326,6 +326,11 @@ class Trainer:
                             model.evaluate(batch, self.metrics)
                     self.model.train()
                     evaluate_result = self.metrics.get_metric()
+                    logger.info("Evaluate result = %s", str(evaluate_result))
+                    if self.rank in [-1,0]:
+                        for key, value in evaluate_result.items():
+                            self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
+
                     if self.early_stopping:
                         if not self.early_stopping.metric_name:
                             self.early_stopping.metric_name = evaluate_result.keys()[0]
@@ -336,10 +341,6 @@ class Trainer:
                                 self.early_stopping.patience,self.early_stopping.threshold,self.early_stopping.metric_name
                             ))
                             break
-                    logger.info("Evaluate result = %s", str(evaluate_result))
-                    if self.rank in [-1,0]:
-                        for key, value in evaluate_result.items():
-                            self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
 
             logger.info("Epoch loss = %f", epoch_loss)
         logger.info("End training")
