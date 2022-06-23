@@ -1706,7 +1706,7 @@ class BertForQuestionAnsertingTag(BertPreTrainedModel):
         else:
             sequence_output = bert_output
 
-        sequence_output = sequence_output[0]
+        # sequence_output = sequence_output[0]
         logits = self.classifier(sequence_output)
         start_logits, end_logits = logits.split(1, dim=-1)
         start_logits = start_logits.squeeze(-1).contiguous()

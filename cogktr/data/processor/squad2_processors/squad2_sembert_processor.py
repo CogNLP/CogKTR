@@ -22,7 +22,8 @@ class Squad2SembertProcessor(BaseProcessor):
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
         self.tag_tokenizer = TagTokenizer()
-        self.vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
+        vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
+        self.vocab = vocab
 
     def _process(self, data,enhanced_data_dict=None):
         datable = DataTable()
@@ -37,15 +38,15 @@ class Squad2SembertProcessor(BaseProcessor):
                             data["answer_text"], data["start_position"],
                             data["end_position"], data["doc_tokens"],
                             data["title"], ), total=len(data["qas_id"])):
-            dict_data = process_sembert(question_text, context_text, None, self.tokenizer, self.vocab, self.max_token_len,
+            dict_data = process_sembert(question_text, context_text, None, self.tokenizer, self.vocab, self.max_token_len,None,
                             enhanced_data_dict,self.tag_tokenizer)
             datable("input_ids", dict_data["input_ids"])
             datable("input_mask", dict_data["input_mask"])
             datable("token_type_ids", dict_data["token_type_ids"])
             datable("input_tag_ids", dict_data["input_tag_ids"])
             datable("start_end_idx", dict_data["start_end_idx"])
-            datable("start_position", dict_data["start_position"])
-            datable("end_position", dict_data["end_position"])
+            datable("start_position", start_position)
+            datable("end_position", end_position)
         return DataTableSet(datable)
 
     def process_train(self, data, enhanced_data_dict=None):

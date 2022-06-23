@@ -83,7 +83,7 @@ class Squad2Reader(BaseReader):
         return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
 
     def read_vocab(self):
-        return None
+        return {}
 
 def _is_whitespace(c):
     if c == " " or c == "\t" or c == "\r" or c == "\n" or ord(c) == 0x202F:
