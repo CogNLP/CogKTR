@@ -4,6 +4,7 @@ import torch.optim as optim
 from cogktr import *
 from cogktr.core.evaluator import Evaluator
 from cogktr.utils.general_utils import init_cogktr
+from cogktr.data.processor.qnli_processors.qnli_sembert_processor import QnliSembertProcessor
 # from cogktr.models.sembert_model import BertForSequenceClassificationTag
 from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
 from transformers import BertConfig
@@ -29,7 +30,7 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence",enha
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence",enhanced_key_2="question")
 
 
-processor = QnliProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=False)
+processor = QnliSembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=True)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)

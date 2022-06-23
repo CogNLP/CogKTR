@@ -8,7 +8,7 @@ from cogktr.data.processor.base_processor import BaseProcessor
 from argparse import Namespace
 from cogktr.utils.log_utils import logger
 from tqdm import tqdm
-from ..qnli_processors.qnli_processor import process_sembert
+from ..qnli_processors import process_sembert
 from cogktr.enhancers.tagger.srl_tagger import SrlTagger,TagTokenizer
 
 transformers.logging.set_verbosity_error()  # set transformers logging level

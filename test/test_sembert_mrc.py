@@ -28,7 +28,7 @@ enhancer = Enhancer(reprocess=False,
                     enhanced_data_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/enhanced_data")
 enhanced_train_dict = enhancer.enhance_train(train_data,enhanced_key_1="question_text",enhanced_key_2="context_text")
 enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="question_text",enhanced_key_2="context_text")
-enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="question_text",enhanced_key_2="context_text")
+# enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="question_text",enhanced_key_2="context_text")
 
 #
 # processor = Squad2SembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=False)
