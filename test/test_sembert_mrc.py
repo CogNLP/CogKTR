@@ -11,11 +11,12 @@ from argparse import Namespace
 from cogktr.core.metric.base_reading_comprehension_metric import BaseMRCMetric
 from cogktr.data.processor.squad2_processors.squad2_sembert_processor import Squad2SembertProcessor
 from cogktr.models.old_sembert_model import BertForQuestionAnsertingTag
+from cogktr.utils.general_utils import EarlyStopping
 
 device, output_path = init_cogktr(
-    device_id=2,
+    device_id=4,
     output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
-    folder_tag="old_sembert",
+    folder_tag="mrc",
 )
 
 reader = Squad2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
@@ -32,10 +33,11 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="question_text"
 # enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="question_text",enhanced_key_2="context_text")
 
 #
-processor = Squad2SembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=True)
+processor = Squad2SembertProcessor(plm="bert-base-uncased", max_token_len=512, vocab=vocab,debug=True)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mode="abs",metric_name="EM")
 
 
 tag_config = {
@@ -48,7 +50,7 @@ tag_config = {
 tag_config = Namespace(**tag_config)
 model = BertForQuestionAnsertingTag.from_pretrained(
     "bert-base-uncased",
-    cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
+    # cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
     num_labels=2,
     tag_config=tag_config,
 )
@@ -73,6 +75,7 @@ trainer = Trainer(model,
                   optimizer=optimizer,
                   scheduler=None,
                   metrics=metric,
+                  early_stopping=early_stopping,
                   train_sampler=None,
                   dev_sampler=None,
                   drop_last=False,
@@ -80,8 +83,8 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  # checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
-                  validate_steps=100,  # validation setting
+                  # checkpoint_path="/data/hongbang/CogKTR/dastapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
+                  validate_steps=2,  # validation setting
                   save_steps=None,  # when to save model result
                   output_path=output_path,
                   grad_norm=1,

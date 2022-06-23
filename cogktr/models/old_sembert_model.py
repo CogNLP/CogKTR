@@ -1735,7 +1735,7 @@ class BertForQuestionAnsertingTag(BertPreTrainedModel):
         ignored_index = start_logits.size(1)
         start_positions = start_positions.clamp(0, ignored_index)
         end_positions = end_positions.clamp(0, ignored_index)
-
+        loss_function.ignore_index = ignored_index
         start_loss = loss_function(start_logits, start_positions)
         end_loss = loss_function(end_logits, end_positions)
         total_loss = (start_loss + end_loss) / 2
