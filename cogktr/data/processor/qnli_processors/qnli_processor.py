@@ -35,7 +35,20 @@ class QnliProcessor(BaseProcessor):
 
     def process_dev(self, data):
         data = self.debug_process(data)
-        return self._process(data)
+        datable = DataTable()
+        print("Processing data...")
+        for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
+                                              total=len(data['sentence'])):
+            tokenized_data = self.tokenizer.encode_plus(text=sentence, text_pair=question,
+                                                        truncation='longest_first',
+                                                        padding="max_length",
+                                                        add_special_tokens=True,
+                                                        max_length=self.max_token_len)
+            datable("input_ids", tokenized_data["input_ids"])
+            datable("token_type_ids", tokenized_data["token_type_ids"])
+            datable("attention_mask", tokenized_data["attention_mask"])
+            datable("label", self.vocab["label_vocab"].label2id(label))
+        return DataTableSet(datable)
 
     def process_test(self, data):
         data = self.debug_process(data)

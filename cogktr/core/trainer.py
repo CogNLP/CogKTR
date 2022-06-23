@@ -25,6 +25,7 @@ class Trainer:
             optimizer=None,
             scheduler=None,
             metrics=None,
+            early_stopping=None,
             train_sampler=None,
             dev_sampler=None,
             drop_last=False,
@@ -58,6 +59,7 @@ class Trainer:
         :param optimizer:优化器
         :param scheduler:调整学习率
         :param metrics:评价指标
+        :param early_stopping:早停设置
         :param train_sampler:训练集采样器
         :param dev_sampler:验证集采样器
         :param drop_last:丢掉最后一个
@@ -86,6 +88,8 @@ class Trainer:
         self.gradient_accumulation_steps = gradient_accumulation_steps
 
         self.metrics = metrics
+        self.early_stopping = early_stopping
+        self.early_stop = False
         self.scheduler = scheduler
         self.batch_size = batch_size
         self.dev_batch_size = dev_batch_size if dev_batch_size is not None else batch_size
@@ -212,6 +216,9 @@ class Trainer:
             self.model.module.zero_grad()
 
         for epoch in range(epochs_trained, self.n_epochs + 1):
+            if self.early_stop:
+                logger.info("Break at epoch {}".format(epoch))
+                break
             logger.info("Train epoch = %d", epoch)
             epoch_loss = 0.0
             self.model.train()
@@ -319,6 +326,16 @@ class Trainer:
                             model.evaluate(batch, self.metrics)
                     self.model.train()
                     evaluate_result = self.metrics.get_metric()
+                    if self.early_stopping:
+                        if not self.early_stopping.metric_name:
+                            self.early_stopping.metric_name = evaluate_result.keys()[0]
+                        self.early_stopping(evaluate_result[self.early_stopping.metric_name])
+                        if self.early_stopping.early_stop:
+                            self.early_stop = True
+                            logger.info("Early Stop with patience={} and min_delta={} on metric {}.".format(
+                                self.early_stopping.patience,self.early_stopping.min_delta,self.early_stopping.metric_name
+                            ))
+                            break
                     logger.info("Evaluate result = %s", str(evaluate_result))
                     if self.rank in [-1,0]:
                         for key, value in evaluate_result.items():
