@@ -17,7 +17,7 @@ class BaseProcessor:
         pass
 
     def debug_process(self, data):
-        if self.debug:
+        if self.debug and len(data) >= 100:
             debug_data = DataTable()
             for header in data.headers:
                 debug_data[header] = data[header][:100]

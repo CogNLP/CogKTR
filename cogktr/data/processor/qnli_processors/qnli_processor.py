@@ -9,14 +9,15 @@ transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
 class QnliProcessor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab):
-        super().__init__()
+    def __init__(self, plm, max_token_len, vocab, debug=False):
+        super().__init__(debug)
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
 
     def process_train(self, data):
+        data = self.debug_process(data)
         datable = DataTable()
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
@@ -33,9 +34,11 @@ class QnliProcessor(BaseProcessor):
         return DataTableSet(datable)
 
     def process_dev(self, data):
+        data = self.debug_process(data)
         return self._process(data)
 
     def process_test(self, data):
+        data = self.debug_process(data)
         datable = DataTable()
         print("Processing data...")
         for sentence, question in tqdm(zip(data['sentence'], data['question']),
