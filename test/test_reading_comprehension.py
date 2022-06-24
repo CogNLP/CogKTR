@@ -17,24 +17,26 @@ reader = Squad2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/readin
 train_data, dev_data, _ = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = Squad2Processor(plm="bert-base-cased", max_token_len=256, vocab=vocab,debug=False)
+processor = Squad2Processor(plm="bert-base-cased", max_token_len=512, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 
 model = BaseReadingComprehensionModel(plm="bert-base-cased",vocab=vocab)
 metric = BaseMRCMetric()
-loss = nn.CrossEntropyLoss(ignore_index=256)
+loss = nn.CrossEntropyLoss(ignore_index=512)
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mode="abs",metric_name="EM")
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=64,
+                  batch_size=32,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
                   metrics=metric,
+                  early_stopping=early_stopping,
                   train_sampler=None,
                   dev_sampler=None,
                   drop_last=False,

@@ -41,6 +41,8 @@ done
 
 for i in $(seq 1 "$num"); do
   wait ${pids[${i-1}]}
+  lr=${lrs[i-1]}
+  device=${devices[i-1]}
   echo "Finished process ${pids[${i-1}]} lr=${lr} on device ${device}!"
 done
 

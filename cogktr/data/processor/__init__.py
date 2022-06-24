@@ -5,6 +5,7 @@ from cogktr.data.processor.qnli_processors import *
 from cogktr.data.processor.squad2_subset_processors import *
 from cogktr.data.processor.sst2_processors import *
 from cogktr.data.processor.stsb_processors import *
+from cogktr.data.processor.squad2_processors import *
 
 __all__ = [
     # baseprocessor
@@ -18,8 +19,11 @@ __all__ = [
 
     # qnliprocessor
     "QnliProcessor",
+    "QnliSembertProcessor",
 
     # squad2processor
+    "Squad2Processor",
+    "Squad2SembertProcessor",
 
     # squad2subsetprocessor
     "Squad2SubsetProcessor",
@@ -29,6 +33,7 @@ __all__ = [
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
     "Sst2ForSyntaxAttentionProcessor",
+    "Sst2SembertProcessor",
 
     # stsbprocessor
     "StsbProcessor",
