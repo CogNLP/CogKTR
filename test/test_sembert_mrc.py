@@ -33,7 +33,7 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="question_text"
 # enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="question_text",enhanced_key_2="context_text")
 
 #
-processor = Squad2SembertProcessor(plm="bert-base-uncased", max_token_len=512, vocab=vocab,debug=True)
+processor = Squad2SembertProcessor(plm="bert-base-uncased", max_token_len=512, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
@@ -70,7 +70,7 @@ trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=64,
+                  batch_size=32,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,

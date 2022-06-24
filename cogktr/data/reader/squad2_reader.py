@@ -62,6 +62,7 @@ class Squad2Reader(BaseReader):
                         end_position = char_to_word_offset[
                             min(start_position_character + len(answer_text) - 1, len(char_to_word_offset) - 1)
                         ]
+                    start_position_character = 0 if is_impossible else start_position_character
                     datable("qas_id",qas_id)
                     datable("is_impossible",is_impossible)
                     datable("question_text",question_text)
@@ -71,6 +72,7 @@ class Squad2Reader(BaseReader):
                     datable("end_position",end_position)
                     datable("doc_tokens",doc_tokens)
                     datable("title",title)
+                    datable("start_position_character",start_position_character)
         return datable
 
     def _read_dev(self, path):

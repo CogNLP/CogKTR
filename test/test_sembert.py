@@ -11,7 +11,7 @@ from transformers import BertConfig
 from argparse import Namespace
 
 device, output_path = init_cogktr(
-    device_id=4,
+    device_id=3,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
     folder_tag="old_sembert",
 )
@@ -30,11 +30,11 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence",enha
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence",enhanced_key_2="question")
 
 
-processor = QnliSembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=True)
+processor = QnliSembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
-
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mode="abs",metric_name="F1")
 
 tag_config = {
    "tag_vocab_size":len(vocab["tag_vocab"]),
@@ -79,7 +79,7 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   # checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
-                  validate_steps=100,  # validation setting
+                  validate_steps=500,  # validation setting
                   save_steps=None,  # when to save model result
                   output_path=output_path,
                   grad_norm=1,
