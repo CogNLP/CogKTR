@@ -9,11 +9,15 @@ __all__ = [
     "Conll2003Processor",
     "Conll2005SrlSubsetProcessor",
     "QnliProcessor",
+    "QnliSembertProcessor",
+    "Squad2Processor",
+    "Squad2SembertProcessor",
     "Squad2SubsetProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
     "Sst2ForSyntaxAttentionProcessor",
+    "Sst2SembertProcessor",
     "StsbProcessor",
 
     # reader
