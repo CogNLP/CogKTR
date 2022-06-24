@@ -1,6 +1,7 @@
 from .loss import *
 from .metric import *
 from .trainer import *
+from .evaluator import *
 
 __all__ = [
     # loss
@@ -11,6 +12,7 @@ __all__ = [
     "BaseRegressionMetric",
 
     # evaluator
+    "Evaluator",
 
     # predictor
 

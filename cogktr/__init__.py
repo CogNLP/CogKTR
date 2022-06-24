@@ -12,6 +12,7 @@ __all__ = [
     "BaseClassificationMetric",
     "BaseRegressionMetric",
     "Trainer",
+    "Evaluator",
 
     # data
     "BaseProcessor",
@@ -73,6 +74,10 @@ __all__ = [
     "TABLE_DATA_SEARCHER",
     "TABLE_DATA_EMBEDDER",
     "Downloader",
+    "move_dict_value_to_device",
+    "reduce_mean",
+    "EarlyStopping",
+    "init_cogktr",
     "load_json",
     "save_json",
     "load_model",
