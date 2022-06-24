@@ -21,47 +21,7 @@ class MultisegchnsentibertReader(BaseReader):
         self.test_path = os.path.join(raw_data_path, self.test_file)
         self.label_vocab = Vocabulary()
 
-    def _read_train(self, path):
-        datable = DataTable()
-        with open(path, encoding='utf-8') as file:
-            lines = csv.reader(file, delimiter="\t")
-            for i, line in enumerate(lines):
-                if i == 0:
-                    continue
-                sentence = json.loads(line[0])
-                thulac_word_length = json.loads(line[1])
-                nlpir_word_length = json.loads(line[2])
-                hanlp_word_length = json.loads(line[3])
-                label = json.loads(line[4])
-                datable("sentence", sentence)
-                datable("thulac_word_length", thulac_word_length)
-                datable("nlpir_word_length", nlpir_word_length)
-                datable("hanlp_word_length", hanlp_word_length)
-                datable("label", label)
-                self.label_vocab.add(label)
-        return datable
-
-    def _read_dev(self, path):
-        datable = DataTable()
-        with open(path, encoding='utf-8') as file:
-            lines = csv.reader(file, delimiter="\t")
-            for i, line in enumerate(lines):
-                if i == 0:
-                    continue
-                sentence = json.loads(line[0])
-                thulac_word_length = json.loads(line[1])
-                nlpir_word_length = json.loads(line[2])
-                hanlp_word_length = json.loads(line[3])
-                label = json.loads(line[4])
-                datable("sentence", sentence)
-                datable("thulac_word_length", thulac_word_length)
-                datable("nlpir_word_length", nlpir_word_length)
-                datable("hanlp_word_length", hanlp_word_length)
-                datable("label", label)
-                self.label_vocab.add(label)
-        return datable
-
-    def _read_test(self, path):
+    def _read_data(self, path):
         datable = DataTable()
         with open(path, encoding='utf-8') as file:
             lines = csv.reader(file, delimiter="\t")
@@ -82,7 +42,7 @@ class MultisegchnsentibertReader(BaseReader):
         return datable
 
     def read_all(self):
-        return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
+        return self._read_data(self.train_path), self._read_data(self.dev_path), self._read_data(self.test_path)
 
     def read_vocab(self):
         self.label_vocab.create()
