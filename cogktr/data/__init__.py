@@ -24,6 +24,7 @@ __all__ = [
     "BaseReader",
     "Conll2003Reader",
     "Conll2005SrlSubsetReader",
+    "MultisegchnsentibertReader",
     "QnliReader",
     "Squad2Reader",
     "Squad2SubsetReader",
