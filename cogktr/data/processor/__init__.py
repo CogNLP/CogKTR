@@ -1,6 +1,7 @@
 from .base_processor import *
 from cogktr.data.processor.conll2003_processors import *
 from cogktr.data.processor.conll2005_srl_subset_processors import *
+from cogktr.data.processor.multisegchnsentibert_processors import *
 from cogktr.data.processor.qnli_processors import *
 from cogktr.data.processor.squad2_subset_processors import *
 from cogktr.data.processor.sst2_processors import *
@@ -16,6 +17,9 @@ __all__ = [
 
     # conll2005srisubsetprocessor
     "Conll2005SrlSubsetProcessor",
+
+    # multisegchnsentibertprocessor
+    "MultisegchnsentibertProcessor",
 
     # qnliprocessor
     "QnliProcessor",

@@ -8,6 +8,7 @@ __all__ = [
     "BaseProcessor",
     "Conll2003Processor",
     "Conll2005SrlSubsetProcessor",
+    "MultisegchnsentibertProcessor",
     "QnliProcessor",
     "QnliSembertProcessor",
     "Squad2Processor",
