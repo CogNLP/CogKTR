@@ -19,7 +19,7 @@ class Sst2Reader(BaseReader):
         self.test_path = os.path.join(raw_data_path, self.test_file)
         self.label_vocab = Vocabulary()
 
-    def _read_train(self, path):
+    def _read_data(self, path):
         datable = DataTable()
         with open(path) as file:
             lines = file.readlines()
@@ -32,18 +32,11 @@ class Sst2Reader(BaseReader):
             self.label_vocab.add(label)
         return datable
 
+    def _read_train(self, path):
+        return self._read_data(path)
+
     def _read_dev(self, path):
-        datable = DataTable()
-        with open(path) as file:
-            lines = file.readlines()
-        header = lines[0]
-        contents = lines[1:]
-        for line in contents:
-            sentence, label = line.strip().split("\t")
-            datable("sentence", sentence)
-            datable("label", label)
-            self.label_vocab.add(label)
-        return datable
+        return self._read_data(path)
 
     def _read_test(self, path):
         datable = DataTable()
