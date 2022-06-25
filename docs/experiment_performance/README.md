@@ -2,9 +2,9 @@
 
 ## 1.Text Classification
 
-| Knowledge | model | SST-2<br />P |<br />R|<br />F1|<br />Acc|<br />Config|
+| Knowledge | model | SST-2_dev<br />config |<br />P|<br />R|<br />F1|<br />Acc|
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| None | BERT-base | 内容 | 内容 | 内容 | 内容 | 内容 |
+| None | BERT-base-cased | 内容 | 0.8950 | 0.9414 | 0.9176 | 0.9139 |
 | Linguistic | HLG | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Linguistic | Syntax_Attention | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 |
