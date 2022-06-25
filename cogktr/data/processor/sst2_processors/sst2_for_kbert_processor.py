@@ -13,13 +13,13 @@ from cogktr.data.datableset import DataTableSet
 from transformers import BertTokenizer
 
 class KnowledgeGraph(object):
-    def __init__(self, spo_file_paths, predicate=False):
+    def __init__(self, spo_file_paths, predicate=True):
         self.predicate = predicate
         self.spo_file_paths = spo_file_paths
         self.lookup_table = self._create_lookup_table()
         # self.segment_vocab = list(self.lookup_table.keys()) + NEVER_SPLIT_TAG
         # self.tokenizer = pkuseg.pkuseg(model_name="default", postag=False, user_dict=self.segment_vocab)
-        self.tokenizer = BertTokenizer.from_pretrained("bert-base-cased")
+        self.tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
         self.special_tags = set(NEVER_SPLIT_TAG)
 
     def _create_lookup_table(self):
@@ -145,51 +145,36 @@ class KnowledgeGraph(object):
         return know_sent_batch, position_batch, visible_matrix_batch, seg_batch
 
 class Sst2ForKbertProcessor(BaseProcessor):
-    def __init__(self):
+    def __init__(self, plm, spo_file_paths, max_token_len):
         super().__init__()
-        # self.plm = plm
-        # self.max_token_len = max_token_len
-        # self.vocab = vocab
-        # self.tokenizer = BertTokenizer.from_pretrained(plm)
+        self.plm = plm
+        self.tokenizer = BertTokenizer.from_pretrained(plm)
+        self.kg = KnowledgeGraph(spo_file_paths=spo_file_paths, predicate=True)
+        self.max_token_len = max_token_len
 
-    def _process(self, params):
+    def _process(self, dataset):
 
-        data, kg, vocab, seq_length = params
-        sentences = data.datas["sentence"]
+        sentences = dataset.datas["sentence"]
 
         sentences_num = len(sentences)
         datable = DataTable()
-        token_ids_list = []
-        label_list = []
-        mask_list = []
-        pos_list = []
-        vm_list = []
 
         for sentence_id, sentence in enumerate(sentences):
             if sentence_id % 10000 == 0:
                 print("Progress of process: {}/{}".format(sentence_id, sentences_num))
                 sys.stdout.flush()
             try:
-                label = data.datas["label"][sentence_id]
+                label = dataset.datas["label"][sentence_id]
                 text = CLS_TOKEN + sentence
 
-                tokens, pos, vm, _ = kg.add_knowledge_with_vm([text], add_pad=True, max_length=seq_length)
+                tokens, pos, vm, _ = self.kg.add_knowledge_with_vm([text], add_pad=True, max_length=self.max_token_len)
                 tokens = tokens[0]
                 pos = pos[0]
-                vm = vm[0].astype("bool")
+                vm = vm[0]
 
-                token_ids = [vocab.get(t) for t in tokens]
-                # token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length",
-                #                               add_special_tokens=True,
-                #                               max_length=self.max_token_len)
+                token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
                 mask = [1 if t != PAD_TOKEN else 0 for t in tokens]
 
-                # token_ids_list.append(token_ids)
-                # # token_ids_list.append(token)
-                # label_list.append(label)
-                # mask_list.append(mask)
-                # pos_list.append(pos)
-                # vm_list.append(vm)
                 datable("token_ids", token_ids)
                 datable("label", label)
                 datable("mask", mask)
@@ -198,40 +183,64 @@ class Sst2ForKbertProcessor(BaseProcessor):
             except:
                 print("Error line: ", sentence_id)
 
-        # datable("token_ids", token_ids_list)
-        # datable("label", label_list)
-        # datable("mask", mask_list)
-        # datable("pos", pos_list)
-        # datable("vm", vm_list)
-        return DataTableSet(datable), datable
+        return DataTableSet(datable)
 
-    def process_train(self, params):
-        return self._process(params)
+    def process_train(self, train_data):
+        return self._process(train_data)
 
-    def process_dev(self, params):
-        return self._process(params)
+    def process_dev(self, dev_data):
+        return self._process(dev_data)
+
+    def process_test(self, test_data):
+        sentences = test_data.datas["sentence"]
+
+        sentences_num = len(sentences)
+        datable = DataTable()
+
+        for sentence_id, sentence in enumerate(sentences):
+            if sentence_id % 10000 == 0:
+                print("Progress of process: {}/{}".format(sentence_id, sentences_num))
+                sys.stdout.flush()
+            try:
+                text = CLS_TOKEN + sentence
+
+                tokens, pos, vm, _ = self.kg.add_knowledge_with_vm([text], add_pad=True, max_length=self.max_token_len)
+                tokens = tokens[0]
+                pos = pos[0]
+                vm = vm[0]
+
+                token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
+                mask = [1 if t != PAD_TOKEN else 0 for t in tokens]
+
+                datable("token_ids", token_ids)
+                datable("mask", mask)
+                datable("pos", pos)
+                datable("vm", vm)
+            except:
+                print("Error line: ", sentence_id)
+
+        return DataTableSet(datable)
 
 if __name__ == "__main__":
     from cogktr.data.reader.sst2_reader import Sst2Reader
 
-    # Load vocabulary.
-    vocab_path = "/home/chenyuheng/zhouyuyang/CogKTR/cogktr/utils/constant/kbert_constants/vocab.txt"
-    vocab = Vocabulary()
-    vocab.load(vocab_path)
-
     reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
 
-    kg = KnowledgeGraph(spo_file_paths=["/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikidata/wikidata.spo"],
-                        predicate=True)
+    # kg = KnowledgeGraph(spo_file_paths=["/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikidata/wikidata.spo"],
+    #                     predicate=True)
     # know_sent_batch, position_batch, visible_matrix_batch, seg_batch = kg.add_knowledge_with_vm(sent_batch=["hide new secretions from the parental units",
     #                                      "contains no wit , only labored gags",
     #                                      "that loves its characters and communicates something rather beautiful about human nature",
     #                                      "for those moviegoers who complain that ` they do n't make movies like they used to anymore",
     #                                      "equals the original and in some ways even betters it"])
     # know_sent_batch, position_batch, visible_matrix_batch, seg_batch = kg.add_knowledge_with_vm(
-    #     sent_batch=["[CLS]hide new secretions from the parental units"])
-    processor = Sst2ForKbertProcessor()
-    train_dataset, train_datable = processor.process_train([train_data, kg, vocab, 256])
+    #     sent_batch=["Tim Cook is visiting Beijing now."])
+    processor = Sst2ForKbertProcessor(plm="bert-base-uncased", \
+                                      spo_file_paths=["/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikidata/wikidata.spo"], \
+                                      max_token_len=256)
+    train_dataset = processor.process_train(train_data)
+    dev_dataset = processor.process_dev(dev_data)
+    test_dataset = processor.process_test(test_data)
     print("end")
 
