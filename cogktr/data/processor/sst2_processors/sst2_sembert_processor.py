@@ -24,7 +24,7 @@ class Sst2SembertProcessor(BaseProcessor):
         for sentence, label in tqdm(zip(data['sentence'], data['label']),
                                               total=len(data['sentence'])):
             dict_data = process_sembert(
-                sentence,None,label,self.tokenizer,self.vocab,self.max_token_len,enhanced_data_dict,self.tag_tokenizer
+                sentence,None,label,self.tokenizer,self.vocab,self.max_token_len,None,enhanced_data_dict,self.tag_tokenizer
             )
             # dict_data = process_sembert(
             #     sentence,None,label,self.tokenizer,self.vocab,self.max_token_len,,enhanced_data_dict,self.tag_tokenizer

@@ -6,9 +6,8 @@ from cogktr.core.evaluator import Evaluator
 from cogktr.utils.general_utils import init_cogktr
 # from cogktr.models.sembert_model import BertForSequenceClassificationTag
 from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
-from transformers import BertConfig
 from argparse import Namespace
-from cogktr.data.processor.sst2_processors.sst2_sembert_processor import Sst2SembertProcessor
+from cogktr.models.sembert_model import SembertForSequenceClassification
 
 device, output_path = init_cogktr(
     device_id=2,
@@ -44,13 +43,18 @@ tag_config = {
    "num_aspect":3
 }
 tag_config = Namespace(**tag_config)
-model = BertForSequenceClassificationTag.from_pretrained(
-    "bert-base-uncased",
-    cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
-    num_labels=2,
-    tag_config=tag_config,
+model = SembertForSequenceClassification(
+    vocab=vocab,
+    plm="bert-base-uncased",
+    tag_config=tag_config
 )
-# model = BertForSequenceClassificationTag(
+# model = BertForSequenceClassificationTag.from_pretrained(
+#     "bert-base-uncased",
+#     cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
+#     num_labels=2,
+#     tag_config=tag_config,
+# )
+# # model = BertForSequenceClassificationTag(
 #     vocab=vocab,
 #     plm="bert-base-uncased",
 #     tag_config=tag_config,
