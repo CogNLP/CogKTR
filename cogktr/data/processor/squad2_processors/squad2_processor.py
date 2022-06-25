@@ -8,6 +8,7 @@ from cogktr.data.processor.base_processor import BaseProcessor
 from argparse import Namespace
 from cogktr.utils.log_utils import logger
 from tqdm import tqdm
+import collections
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -47,15 +48,24 @@ class Squad2Processor(BaseProcessor):
                 "title": title,
             }
             example = Namespace(**example)
-            result = process_bert(example,
+            results = new_process_bert(example,
                                   tokenizer=self.tokenizer,
                                   max_seq_length=self.max_token_len,
                                   doc_stride=128,
                                   max_query_length=64,
-                                  padding_strategy="max_length",
                                   is_training=True)
-            for key, value in result.items():
-                datable(key, value)
+            for result in results:
+                for key,value in result.items():
+                    datable(key,value)
+            # result = process_bert(example,
+            #                       tokenizer=self.tokenizer,
+            #                       max_seq_length=self.max_token_len,
+            #                       doc_stride=128,
+            #                       max_query_length=64,
+            #                       padding_strategy="max_length",
+            #                       is_training=True)
+            # for key, value in result.items():
+            #     datable(key, value)
 
         return DataTableSet(datable)
 
@@ -67,6 +77,121 @@ class Squad2Processor(BaseProcessor):
 
     def process_test(self, data):
         return self._process(data)
+
+def new_process_bert(example, tokenizer, max_seq_length, doc_stride, max_query_length, is_training):
+    query_tokens = tokenizer.tokenize(example.question_text)
+
+    if len(query_tokens) > max_query_length:
+        query_tokens = query_tokens[0:max_query_length]
+
+    tok_to_orig_index = []
+    orig_to_tok_index = []
+    all_doc_tokens = []
+    for (i, token) in enumerate(example.doc_tokens):
+        orig_to_tok_index.append(len(all_doc_tokens))
+        sub_tokens = tokenizer.tokenize(token)
+        for sub_token in sub_tokens:
+            tok_to_orig_index.append(i)
+            all_doc_tokens.append(sub_token)
+
+    tok_start_position = None
+    tok_end_position = None
+    if is_training and example.is_impossible:
+        tok_start_position = -1
+        tok_end_position = -1
+    if is_training and not example.is_impossible:
+        tok_start_position = orig_to_tok_index[example.start_position]
+        if example.end_position < len(example.doc_tokens) - 1:
+            tok_end_position = orig_to_tok_index[example.end_position + 1] - 1
+        else:
+            tok_end_position = len(all_doc_tokens) - 1
+        (tok_start_position, tok_end_position) = _improve_answer_span(
+            all_doc_tokens, tok_start_position, tok_end_position, tokenizer,
+            example.answer_text)
+
+    # The -3 accounts for [CLS], [SEP] and [SEP]
+    max_tokens_for_doc = max_seq_length - len(query_tokens) - 3
+
+    _DocSpan = collections.namedtuple(
+        "DocSpan", ["start", "length"])
+    doc_spans = []
+    start_offset = 0
+    while start_offset < len(all_doc_tokens):
+        length = len(all_doc_tokens) - start_offset
+        if length > max_tokens_for_doc:
+            length = max_tokens_for_doc
+        doc_spans.append(_DocSpan(start=start_offset, length=length))
+        if start_offset + length == len(all_doc_tokens):
+            break
+        start_offset += min(length, doc_stride)
+
+    results = []
+    for (doc_span_index, doc_span) in enumerate(doc_spans):
+        tokens = []
+        token_to_orig_map = {}
+        token_is_max_context = {}
+        segment_ids = []
+        tokens.append("[CLS]")
+        segment_ids.append(0)
+        for token in query_tokens:
+            tokens.append(token)
+            segment_ids.append(0)
+        tokens.append("[SEP]")
+        segment_ids.append(0)
+
+        for i in range(doc_span.length):
+            split_token_index = doc_span.start + i
+            token_to_orig_map[len(tokens)] = tok_to_orig_index[split_token_index]
+
+            is_max_context = _check_is_max_context(doc_spans, doc_span_index,
+                                                   split_token_index)
+            token_is_max_context[len(tokens)] = is_max_context
+            tokens.append(all_doc_tokens[split_token_index])
+            segment_ids.append(1)
+        tokens.append("[SEP]")
+        segment_ids.append(1)
+
+        input_ids = tokenizer.convert_tokens_to_ids(tokens)
+        input_mask = [1] * len(input_ids)
+
+        while len(input_ids) < max_seq_length:
+            input_ids.append(0)
+            input_mask.append(0)
+            segment_ids.append(0)
+
+        assert len(input_ids) == max_seq_length
+        assert len(input_mask) == max_seq_length
+        assert len(segment_ids) == max_seq_length
+
+        start_position = None
+        end_position = None
+        if is_training and not example.is_impossible:
+            doc_start = doc_span.start
+            doc_end = doc_span.start + doc_span.length - 1
+            out_of_span = False
+            if not (tok_start_position >= doc_start and
+                    tok_end_position <= doc_end):
+                out_of_span = True
+            if out_of_span:
+                start_position = 0
+                end_position = 0
+            else:
+                doc_offset = len(query_tokens) + 2
+                start_position = tok_start_position - doc_start + doc_offset
+                end_position = tok_end_position - doc_start + doc_offset
+        if is_training and example.is_impossible:
+            start_position = 0
+            end_position = 0
+
+        results.append({
+            "input_ids": input_ids,
+            "attention_mask": input_mask,
+            "token_type_ids": segment_ids,
+            "start_position": start_position,
+            "end_position": end_position,
+        })
+
+    return results
 
 
 def process_bert(example, tokenizer, max_seq_length, doc_stride, max_query_length, padding_strategy, is_training):
@@ -172,6 +297,24 @@ def _improve_answer_span(doc_tokens, input_start, input_end, tokenizer, orig_ans
 
     return (input_start, input_end)
 
+def _check_is_max_context(doc_spans, cur_span_index, position):
+    """Check if this is the 'max context' doc span for the token."""
+    best_score = None
+    best_span_index = None
+    for (span_index, doc_span) in enumerate(doc_spans):
+        end = doc_span.start + doc_span.length - 1
+        if position < doc_span.start:
+            continue
+        if position > end:
+            continue
+        num_left_context = position - doc_span.start
+        num_right_context = end - position
+        score = min(num_left_context, num_right_context) + 0.01 * doc_span.length
+        if best_score is None or score > best_score:
+            best_score = score
+            best_span_index = span_index
+
+    return cur_span_index == best_span_index
 
 if __name__ == "__main__":
     from cogktr.data.reader.squad2_reader import Squad2Reader
