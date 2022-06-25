@@ -23,7 +23,7 @@ class BaseSentencePairClassificationModel(BaseModel):
         return loss
 
     def forward(self, input_ids, token_type_ids, attention_mask):
-        x = self.bert(input_ids, token_type_ids, attention_mask).pooler_output
+        x = self.bert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask).pooler_output
         x = self.linear(x)
         return x
 
@@ -63,7 +63,7 @@ class BaseSentencePairRegressionModel(BaseModel):
         return loss
 
     def forward(self, input_ids, token_type_ids, attention_mask):
-        x = self.bert(input_ids, token_type_ids, attention_mask).pooler_output
+        x = self.bert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask).pooler_output
         x = self.linear(x)
         return x
 

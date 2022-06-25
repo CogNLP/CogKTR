@@ -1,4 +1,4 @@
-# CUDA_VISIBLE_DEVICES="2,3,4,5"  python -m torch.distributed.launch --nproc_per_node 4 test_sentence_pair_classification.py
+# CUDA_VISIBLE_DEVICES="2,3,4,5"  python -m torch.distributed.launch --nproc_per_node 4 test_base_sentence_pair_classification.py
 
 import os
 import torch.distributed as dist

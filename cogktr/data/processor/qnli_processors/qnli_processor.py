@@ -17,7 +17,6 @@ class QnliProcessor(BaseProcessor):
         self.tokenizer = BertTokenizer.from_pretrained(plm)
 
     def process_train(self, data):
-        data = self.debug_process(data)
         datable = DataTable()
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
@@ -34,7 +33,6 @@ class QnliProcessor(BaseProcessor):
         return DataTableSet(datable)
 
     def process_dev(self, data):
-        data = self.debug_process(data)
         datable = DataTable()
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
@@ -51,7 +49,6 @@ class QnliProcessor(BaseProcessor):
         return DataTableSet(datable)
 
     def process_test(self, data):
-        data = self.debug_process(data)
         datable = DataTable()
         print("Processing data...")
         for sentence, question in tqdm(zip(data['sentence'], data['question']),

@@ -1,26 +1,26 @@
-import torch
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=5,
-    output_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/experimental_result",
+    device_id=3,
+    output_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
     folder_tag="simple_test",
 )
 
-reader = StsbReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
+reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
-processor = StsbProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+
+processor = QnliProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = BaseSentencePairRegressionModel(plm="bert-base-cased")
-metric = BaseRegressionMetric()
-loss = nn.MSELoss()
+model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
+metric = BaseClassificationMetric(mode="binary")
+loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,

@@ -2,9 +2,9 @@
 
 ## 1.Text Classification
 
-| Knowledge | model | SST-2_dev<br />config |<br />P|<br />R|<br />F1|<br />Acc|
+| Knowledge | Model | SST-2-dev<br />Config |<br />P|<br />R|<br />F1|<br />Acc|
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| None | BERT-base | 内容 | 0.8950 | 0.9414 | 0.9176 | 0.9139 |
+| None | BERT-Base-Cased | 内容 | 0.8950 | 0.9414 | 0.9176 | 0.9139 |
 | Linguistic | HLG | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Linguistic | Syntax_Attention | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 |
@@ -12,20 +12,27 @@
 | Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 | World | KT-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
 | World | KG-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
-| World | KT-Att | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Atten | 内容 | 内容 | 内容 | 内容 | 内容 |
 | World | K-BERT | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 
 ## 2.Sentence Pair
 
-| 内容 | 内容 | 内容 | 内容 |
-| ------ | ------ | ------ | ------ |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
+| Knowledge | Model | QNLI-dev<br />Config |<br />P|<br />R|<br />F1|<br />Acc|
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| None | BERT-Base-Cased | 内容 | 0.9069 | 0.9036 | 0.9052 | 0.9044 |
+| Linguistic | HLG | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Linguistic | Syntax_Attention | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KG-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Atten | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | K-BERT | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 
 ## 3.Sequence Labeling
 
