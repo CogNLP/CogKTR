@@ -1,7 +1,5 @@
 # Experiment Performance
 
-***
-
 ## 1.Text Classification
 
 | Knowledge | model | SST-2<br />P |<br />R|<br />F1|<br />Acc|<br />Config|
