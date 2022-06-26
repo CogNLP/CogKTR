@@ -10,7 +10,7 @@
 | Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 | Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
-| World | KT-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Emb | 内容 | 0.9191 | 0.9211 | 0.9201 | 0.9185 |
 | World | KG-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
 | World | KT-Atten | 内容 | 内容 | 内容 | 内容 | 内容 |
 | World | K-BERT | 内容 | 内容 | 内容 | 内容 | 内容 |
