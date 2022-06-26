@@ -18,50 +18,31 @@ class KBertForSequenceClassification(BaseModel):
 
     def loss(self, batch, loss_function):
         input_ids, attention_mask, position_ids, labels = self.get_batch(batch)
-        # pred = self.forward(input_ids=torch.cuda.LongTensor(input_ids),
-        #                     attention_mask=torch.cuda.FloatTensor(attention_mask),
-        #                     position_ids=torch.cuda.LongTensor(position_ids))
-        # pred = self.forward(input_ids=torch.LongTensor(input_ids),
-        #                     attention_mask=torch.FloatTensor(attention_mask),
-        #                     position_ids=torch.LongTensor(position_ids))
         inputs_embeds = self.word_embedding[input_ids]
         pred = self.forward(inputs_embeds=inputs_embeds,
-                            attention_mask=torch.FloatTensor(attention_mask),
+                            attention_mask=torch.cuda.FloatTensor(attention_mask),
                             position_ids=position_ids)
-        loss = loss_function(pred, torch.LongTensor(labels))
+        loss = loss_function(pred, torch.cuda.LongTensor(labels))
         return loss
 
     def forward(self, inputs_embeds, attention_mask, position_ids):
-        # x = self.bert.forward(input_ids=torch.cuda.LongTensor(input_ids),
-        #                     attention_mask=torch.cuda.FloatTensor(attention_mask),
-        #                     position_ids=torch.cuda.LongTensor(position_ids)).pooler_output
-        # x = self.bert.forward(input_ids=torch.LongTensor(input_ids),
-        #                       attention_mask=torch.FloatTensor(attention_mask),
-        #                       position_ids=torch.LongTensor(position_ids)).pooler_output
-        # inputs_embeds = self.word_embedding[input_ids]
         x = self.bert.forward(inputs_embeds=inputs_embeds,
-                              attention_mask=torch.FloatTensor(attention_mask),
+                              attention_mask=torch.cuda.FloatTensor(attention_mask),
                               position_ids=position_ids).pooler_output
         x = self.linear(x)
         return x
 
     def evaluate(self, batch, metric_function):
         input_ids, attention_mask, position_ids, labels = self.get_batch(batch)
-        # pred = self.forward(input_ids = torch.cuda.LongTensor(input_ids),
-        #                     attention_mask = torch.cuda.FloatTensor(attention_mask),
-        #                     position_ids = torch.cuda.LongTensor(position_ids))
-        # pred = self.forward(input_ids=torch.LongTensor(input_ids),
-        #                     attention_mask=torch.FloatTensor(attention_mask),
-        #                     position_ids=torch.LongTensor(position_ids))
         inputs_embeds = self.word_embedding[input_ids]
         pred = self.predict(inputs_embeds=inputs_embeds,
-                            attention_mask=torch.FloatTensor(attention_mask),
+                            attention_mask=torch.cuda.FloatTensor(attention_mask),
                             position_ids=position_ids)
-        metric_function.evaluate(pred, torch.LongTensor(labels))
+        metric_function.evaluate(pred, torch.cuda.LongTensor(labels))
 
     def predict(self, inputs_embeds, attention_mask, position_ids):
         pred = self.forward(inputs_embeds=inputs_embeds,
-                            attention_mask=torch.FloatTensor(attention_mask),
+                            attention_mask=torch.cuda.FloatTensor(attention_mask),
                             position_ids=position_ids)
         pred = F.softmax(pred, dim=1)
         pred = torch.max(pred, dim=1)[1]
