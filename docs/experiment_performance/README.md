@@ -19,20 +19,20 @@
 
 ## 2.Sentence Pair
 
-| Knowledge | Model | QNLI-dev<br />Config |<br />P|<br />R|<br />F1|<br />Acc|
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| None | BERT-Base-Cased | 内容 | 0.9069 | 0.9036 | 0.9052 | 0.9044 |
-| Linguistic | HLG | 内容 | 内容 | 内容 | 内容 | 内容 |
-| Linguistic | Syntax_Attention | 内容 | 内容 | 内容 | 内容 | 内容 |
-| Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 |
-| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
-| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
-| World | KT-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
-| World | KG-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
-| World | KT-Atten | 内容 | 内容 | 内容 | 内容 | 内容 |
-| World | K-BERT | 内容 | 内容 | 内容 | 内容 | 内容 |
-| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
-| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Knowledge | Model | QNLI-dev<br />Config |<br />P|<br />R|<br />F1|<br />Acc| STSB-dev<br />Config |<br />r2|<br />mse|<br />mae|<br />pear|
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| None | BERT-Base-Cased | 内容 | 0.9069 | 0.9036 | 0.9052 | 0.9044 | 内容 | 0.7178 | 0.5329 |0.5696 | 0.8907 |
+| Linguistic | HLG | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Linguistic | Syntax_Attention | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Emb | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KG-Emb | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Atten | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | K-BERT | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 
 ## 3.Sequence Labeling
 
