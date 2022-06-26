@@ -36,13 +36,20 @@
 
 ## 3.Sequence Labeling
 
-| 内容 | 内容 | 内容 | 内容 |
-| ------ | ------ | ------ | ------ |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
-| 内容 | 内容 | 内容 | 内容 |
+| Knowledge | Model | CONLL2003-dev<br />Config |<br />P|<br />R|<br />F1|<br />Acc|
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| None | BERT-Base-Cased | 内容 | 0.9371 | 0.9459 | 0.9415 | 0.8895 |
+| Linguistic | HLG | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Linguistic | Syntax_Attention | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Linguistic | SemBERT | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Commonsense | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KG-Emb | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | KT-Atten | 内容 | 内容 | 内容 | 内容 | 内容 |
+| World | K-BERT | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
+| Domain | 内容 | 内容 | 内容 | 内容 | 内容 | 内容 |
 
 ## 4.Reading Comprehension
 

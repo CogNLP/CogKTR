@@ -33,7 +33,7 @@ __all__ = [
     "Squad2SubsetProcessor",
 
     # sst2processor
-    "Sst2ForBaseTextClassificationProcessor",
+    "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
     "Sst2ForSyntaxAttentionProcessor",

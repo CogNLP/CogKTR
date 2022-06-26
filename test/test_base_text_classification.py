@@ -13,7 +13,7 @@ reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_cla
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = Sst2ForBaseTextClassificationProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+processor = Sst2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)

@@ -9,7 +9,7 @@ from cogktr.models.base_reading_comprehension_model import BaseReadingComprehens
 
 device,output_path = init_cogktr(
     device_id=2,
-    output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
+    output_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
     folder_tag="mrc_metric",
 )
 

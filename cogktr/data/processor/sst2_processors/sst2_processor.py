@@ -8,7 +8,7 @@ from cogktr.data.processor.base_processor import BaseProcessor
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class Sst2ForBaseTextClassificationProcessor(BaseProcessor):
+class Sst2Processor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab):
         super().__init__()
         self.plm = plm
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
-    processor = Sst2ForBaseTextClassificationProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+    processor = Sst2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)

@@ -14,7 +14,7 @@ __all__ = [
     "Squad2Processor",
     "Squad2SembertProcessor",
     "Squad2SubsetProcessor",
-    "Sst2ForBaseTextClassificationProcessor",
+    "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
     "Sst2ForSyntaxAttentionProcessor",

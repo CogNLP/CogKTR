@@ -2,6 +2,7 @@ from cogktr.core.metric.base_metric import BaseMetric
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score
+from scipy.stats import pearsonr
 
 
 class BaseRegressionMetric(BaseMetric):
@@ -20,9 +21,11 @@ class BaseRegressionMetric(BaseMetric):
         r2 = r2_score(self.pre_list, self.label_list)
         mse = mean_squared_error(self.pre_list, self.label_list)
         mae = mean_absolute_error(self.pre_list, self.label_list)
+        pear=pearsonr(self.pre_list,self.label_list)[0]
         evaluate_result = {"r2": r2,
                            "mse": mse,
                            "mae": mae,
+                           "pear":pear,
                            }
         if reset:
             self.pre_list = list()

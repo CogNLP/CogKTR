@@ -1,6 +1,8 @@
 from ..datable import DataTable
+
+
 class BaseProcessor:
-    def __init__(self,debug=False):
+    def __init__(self, debug=False):
         self.debug = debug
         pass
 
@@ -14,6 +16,18 @@ class BaseProcessor:
         pass
 
     def process_test(self, data):
+        pass
+
+    def _collate(self, batch):
+        pass
+
+    def train_collate(self, batch):
+        pass
+
+    def dev_collate(self, batch):
+        pass
+
+    def test_collate(self, batch):
         pass
 
     def debug_process(self, data):
