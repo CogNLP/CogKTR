@@ -164,7 +164,7 @@ class Sst2ForKbertProcessor(BaseProcessor):
                 print("Progress of process: {}/{}".format(sentence_id, sentences_num))
                 sys.stdout.flush()
             try:
-                label = dataset.datas["label"][sentence_id]
+                label = int(dataset.datas["label"][sentence_id])
                 text = CLS_TOKEN + sentence
 
                 tokens, pos, vm, _ = self.kg.add_knowledge_with_vm([text], add_pad=True, max_length=self.max_token_len)
@@ -236,8 +236,8 @@ if __name__ == "__main__":
     #                                      "equals the original and in some ways even betters it"])
     # know_sent_batch, position_batch, visible_matrix_batch, seg_batch = kg.add_knowledge_with_vm(
     #     sent_batch=["Tim Cook is visiting Beijing now."])
-    processor = Sst2ForKbertProcessor(plm="bert-base-uncased", \
-                                      spo_file_paths=["/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikidata/wikidata.spo"], \
+    processor = Sst2ForKbertProcessor(plm="bert-base-uncased",
+                                      spo_file_paths=["/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikidata/wikidata.spo"],
                                       max_token_len=256)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
