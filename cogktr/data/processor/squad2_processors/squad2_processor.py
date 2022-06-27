@@ -72,15 +72,8 @@ class Squad2Processor(BaseProcessor):
             # datable.add_not2torch("qas_id")
             datable("example",example)
             datable.add_not2torch("example")
-            # result = process_bert(example,
-            #                       tokenizer=self.tokenizer,
-            #                       max_seq_length=self.max_token_len,
-            #                       doc_stride=128,
-            #                       max_query_length=64,
-            #                       padding_strategy="max_length",
-            #                       is_training=True)
-            # for key, value in result.items():
-            #     datable(key, value)
+            datable.add_not2torch("additional_info")
+
 
         return DataTableSet(datable)
 
@@ -253,13 +246,18 @@ def new_process_bert(example, tokenizer, max_seq_length, doc_stride, max_query_l
         if is_training and example.is_impossible:
             start_position = 0
             end_position = 0
-
+        additional_info = Namespace(**{
+            "token_to_orig_map": token_to_orig_map,
+            "token_is_max_context": token_is_max_context,
+            "tokens": tokens,
+        })
         results.append({
             "input_ids": input_ids,
             "attention_mask": input_mask,
             "token_type_ids": segment_ids,
             "start_position": start_position,
             "end_position": end_position,
+            "additional_info":additional_info,
         })
 
     return results
