@@ -68,13 +68,11 @@ class Squad2Processor(BaseProcessor):
             for result in results:
                 for key,value in result.items():
                     datable(key,value)
-            # datable("qas_id",qas_id)
-            # datable.add_not2torch("qas_id")
-            datable("example",example)
-            datable.add_not2torch("example")
-            datable.add_not2torch("additional_info")
-
-
+                datable("example",example)
+            # if len(datable["input_ids"]) != len(datable["example"]):
+            #     print("????")
+        datable.add_not2torch("example")
+        datable.add_not2torch("additional_info")
         return DataTableSet(datable)
 
     def process_train(self, data):
