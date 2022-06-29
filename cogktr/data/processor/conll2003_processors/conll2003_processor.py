@@ -23,7 +23,7 @@ class Conll2003Processor(BaseProcessor):
         for words, ner_labels in tqdm(zip(data['sentence'], data['ner_labels']), total=len(data['sentence'])):
             input_tokens = []
             input_ids = []
-            attention_masks = []
+            attention_mask = []
             segment_ids = []
             valid_masks = []
             label_ids = []
@@ -41,7 +41,7 @@ class Conll2003Processor(BaseProcessor):
                     valid_masks.append(1 if i == 0 else 0)
             input_ids = self.tokenizer.convert_tokens_to_ids(input_tokens)
 
-            attention_masks = [1] * len(input_ids)
+            attention_mask = [1] * len(input_ids)
             segment_ids = [0] * len(input_ids)
 
             for label in ner_labels:
@@ -49,22 +49,22 @@ class Conll2003Processor(BaseProcessor):
             label_masks = [0] + [1] * (len(label_ids) - 2) + [0]
 
             input_ids = input_ids[0:self.max_token_len]
-            attention_masks = attention_masks[0:self.max_token_len]
+            attention_mask = attention_mask[0:self.max_token_len]
             segment_ids = segment_ids[0:self.max_token_len]
             valid_masks = valid_masks[0:self.max_token_len]
             label_ids = label_ids[0:self.max_label_len]
             label_masks = label_masks[0:self.max_label_len]
 
             input_ids += [0 for _ in range(self.max_token_len - len(input_ids))]
-            attention_masks += [0 for _ in range(self.max_token_len - len(attention_masks))]
+            attention_mask += [0 for _ in range(self.max_token_len - len(attention_mask))]
             segment_ids += [0 for _ in range(self.max_token_len - len(segment_ids))]
             valid_masks += [0 for _ in range(self.max_token_len - len(valid_masks))]
             label_ids += [-1 for _ in range(self.max_label_len - len(label_ids))]
             label_masks += [0 for _ in range(self.max_label_len - len(label_masks))]
 
             datable("input_ids", input_ids)
-            datable("attention_masks", attention_masks)
-            datable("segment_ids", segment_ids)
+            datable("attention_mask", attention_mask)
+            datable("token_type_ids", segment_ids)
             datable("valid_masks", valid_masks)
             datable("label_ids", label_ids)
             datable("label_masks", label_masks)

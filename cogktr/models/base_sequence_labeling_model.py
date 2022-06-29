@@ -1,6 +1,5 @@
 from cogktr.models.base_model import BaseModel
 import torch.nn as nn
-from transformers import BertModel
 import torch.nn.functional as F
 import torch
 
@@ -31,26 +30,25 @@ class BaseSequenceLabelingModel(BaseModel):
         self.vocab = vocab
         self.plm = plm
 
-        self.bert = BertModel.from_pretrained(plm)
-        self.input_size = 768
+        self.input_size = self.plm.hidden_dim
         self.classes_num = len(vocab["ner_label_vocab"])
         self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 
     def loss(self, batch, loss_function):
-        input_ids, attention_masks, segment_ids, valid_masks, label_ids, label_masks, words_len = self.get_batch(batch)
-        pred = self.forward(input_ids=input_ids,
-                            attention_masks=attention_masks,
-                            segment_ids=segment_ids,
-                            valid_masks=valid_masks)
+        pred = self.forward(batch)
+        label_masks = batch["label_masks"]
+        label_ids = batch["label_ids"]
         active_loss = label_masks.view(-1) == 1
         active_pred = pred.view(-1, len(self.vocab["ner_label_vocab"]))[active_loss]
         active_labels = label_ids.view(-1)[active_loss]
         loss = loss_function(active_pred, active_labels)
         return loss
 
-    def forward(self, input_ids, attention_masks, segment_ids, valid_masks):
+    def forward(self, batch):
+        input_ids = batch["input_ids"]
+        valid_masks = batch["valid_masks"]
         current_device = input_ids.device
-        x = self.bert(input_ids=input_ids, attention_mask=attention_masks, token_type_ids=segment_ids).last_hidden_state
+        x = self.plm(batch).last_hidden_state
         batch_size, max_token_len, embedding_dim = x.shape
         valid_x = torch.zeros(batch_size, max_token_len, embedding_dim, dtype=torch.float, device=current_device)
         for i in range(batch_size):
@@ -63,12 +61,9 @@ class BaseSequenceLabelingModel(BaseModel):
         return valid_x
 
     def evaluate(self, batch, metric_function):
-        input_ids, attention_masks, segment_ids, valid_masks, label_ids, label_masks, words_len = self.get_batch(batch)
-        pred_list = self.predict(input_ids=input_ids,
-                                 attention_masks=attention_masks,
-                                 segment_ids=segment_ids,
-                                 valid_masks=valid_masks,
-                                 words_len=words_len)
+        label_ids=batch["label_ids"]
+        words_len=batch["words_len"]
+        pred_list = self.predict(batch)
         label_ids_list = label_ids.tolist()
         for i, item in enumerate(label_ids_list):
             label_ids_list[i] = [self.vocab["ner_label_vocab"].id2label(id) for id in item[1:words_len[i] + 1]]
@@ -92,24 +87,12 @@ class BaseSequenceLabelingModel(BaseModel):
         label_eval = torch.tensor(label_eval)
         metric_function.evaluate(pred_eval, label_eval)
 
-    def predict(self, input_ids, attention_masks, segment_ids, valid_masks, words_len):
-        pred = self.forward(input_ids=input_ids,
-                            attention_masks=attention_masks,
-                            segment_ids=segment_ids,
-                            valid_masks=valid_masks)
+    def predict(self, batch):
+        words_len=batch["words_len"]
+        pred = self.forward(batch)
         pred = F.softmax(pred, dim=2)
         pred = torch.max(pred, dim=2)[1]
         pred_list = pred.tolist()
         for i, item in enumerate(pred_list):
             pred_list[i] = [self.vocab["ner_label_vocab"].id2label(id) for id in item[1:words_len[i] + 1]]
         return pred_list
-
-    def get_batch(self, batch):
-        input_ids = batch["input_ids"]
-        attention_masks = batch["attention_masks"]
-        segment_ids = batch["segment_ids"]
-        valid_masks = batch["valid_masks"]
-        label_ids = batch["label_ids"]
-        label_masks = batch["label_masks"]
-        words_len = batch["words_len"]
-        return input_ids, attention_masks, segment_ids, valid_masks, label_ids, label_masks, words_len
