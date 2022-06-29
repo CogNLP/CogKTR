@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
+from transformers import BertModel
 
 device, output_path = init_cogktr(
     device_id=3,
@@ -18,7 +19,8 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = BaseTextClassificationModel(plm="bert-base-cased", vocab=vocab)
+plm = BertModel.from_pretrained("bert-base-cased")
+model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)

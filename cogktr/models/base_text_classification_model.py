@@ -1,6 +1,5 @@
 from cogktr.models.base_model import BaseModel
 import torch.nn as nn
-from transformers import BertModel
 import torch.nn.functional as F
 import torch
 
@@ -11,35 +10,26 @@ class BaseTextClassificationModel(BaseModel):
         self.vocab = vocab
         self.plm = plm
 
-        self.bert = BertModel.from_pretrained(plm)
-        # TODO: auto select input size
-        self.input_size = 768
+        self.input_size = self.plm.embeddings.position_embeddings.embedding_dim
         self.classes_num = len(vocab["label_vocab"])
         self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 
     def loss(self, batch, loss_function):
-        token, label = self.get_batch(batch)
-        pred = self.forward(token=token)
-        loss = loss_function(pred, label)
+        pred = self.forward(batch)
+        loss = loss_function(pred, batch["label"])
         return loss
 
-    def forward(self, token):
-        x = self.bert(token).pooler_output
+    def forward(self, batch):
+        x = self.plm(batch).pooler_output
         x = self.linear(x)
         return x
 
     def evaluate(self, batch, metric_function):
-        token, label = self.get_batch(batch)
-        pred = self.predict(token)
-        metric_function.evaluate(pred, label)
+        pred = self.predict(batch)
+        metric_function.evaluate(pred, batch["label"])
 
-    def predict(self, token):
-        pred = self.forward(token)
+    def predict(self, batch):
+        pred = self.forward(batch)
         pred = F.softmax(pred, dim=1)
         pred = torch.max(pred, dim=1)[1]
         return pred
-
-    def get_batch(self, batch):
-        token = batch["token"]
-        label = batch["label"]
-        return token, label
