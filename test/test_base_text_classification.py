@@ -2,10 +2,9 @@ import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
-from transformers import BertModel
 
 device, output_path = init_cogktr(
-    device_id=3,
+    device_id=8,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )
@@ -19,7 +18,7 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = BertModel.from_pretrained("bert-base-cased")
+plm = PlmBertModel(pretrained_model_name="bert-base-cased")
 model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()

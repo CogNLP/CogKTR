@@ -10,7 +10,7 @@ class BaseTextClassificationModel(BaseModel):
         self.vocab = vocab
         self.plm = plm
 
-        self.input_size = self.plm.embeddings.position_embeddings.embedding_dim
+        self.input_size = self.plm.hidden_dim
         self.classes_num = len(vocab["label_vocab"])
         self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 

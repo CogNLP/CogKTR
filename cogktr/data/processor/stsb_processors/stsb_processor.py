@@ -29,7 +29,7 @@ class StsbProcessor(BaseProcessor):
             datable("input_ids", tokenized_data["input_ids"])
             datable("token_type_ids", tokenized_data["token_type_ids"])
             datable("attention_mask", tokenized_data["attention_mask"])
-            datable("score", float(score))
+            datable("label", float(score))
         return DataTableSet(datable)
 
     def process_train(self, data):

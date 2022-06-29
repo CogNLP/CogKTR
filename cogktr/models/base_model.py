@@ -8,14 +8,11 @@ class BaseModel(nn.Module):
     def loss(self, batch, loss_function):
         pass
 
-    def forward(self, *args):
+    def forward(self, batch):
         pass
 
     def evaluate(self, batch, metric_function):
         pass
 
-    def predict(self, *args):
-        pass
-
-    def get_batch(self, batch):
+    def predict(self, batch):
         pass

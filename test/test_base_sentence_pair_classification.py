@@ -4,7 +4,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=3,
+    device_id=1,
     output_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
     folder_tag="simple_test",
 )
@@ -18,7 +18,8 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
+plm = PlmBertModel(pretrained_model_name="bert-base-cased")
+model = BaseSentencePairClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)

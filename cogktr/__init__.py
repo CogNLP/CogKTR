@@ -68,6 +68,7 @@ __all__ = [
     "SyntaxAttentionModel",
 
     # modules
+    "PlmBertModel",
 
     # toolkits
 
