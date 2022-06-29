@@ -10,52 +10,58 @@ from cogktr.utils.log_utils import logger
 import re
 import string
 import numpy as np
+import torch
 
 class BaseMRCMetric(BaseMetric):
     def __init__(self):
         super(BaseMRCMetric, self).__init__()
-        self.start_logits_list = list()
-        self.end_logits_list = list()
-        self.example_list = list()
-        self.feature_list = list()
+        self.qas_id2info = defaultdict(list)
+        self.qas_id2example = {}
         self.n_best_size = 20
         self.max_answer_length = 30
 
     def evaluate(self,start_logits,end_logits,batch):
-        self.start_logits_list = self.start_logits_list + start_logits.cpu().numpy().tolist()
-        self.end_logits_list = self.end_logits_list + start_logits.cpu().numpy().tolist()
-        feature_list = []
-        for i in range(len(batch["example"])):
+        start_logits = start_logits.cpu().numpy().tolist()
+        end_logits = end_logits.cpu().numpy().tolist()
+
+        for i,example in enumerate(batch["example"]):
             feature1 = {
                 key:value[i].cpu().tolist() for key,value in batch.items() if key != "example" and key != "additional_info"
             }
             feature2 = vars(batch["additional_info"][i])
-            feature_list.append(Namespace(**feature1,**feature2))
-        self.feature_list = self.feature_list + feature_list
-        self.example_list = self.example_list + batch["example"]
+            self.qas_id2info[example.qas_id].append({
+                "start_logits":start_logits[i],
+                "end_logits":end_logits[i],
+                "feature":Namespace(**feature1,**feature2),
+            })
+            self.qas_id2example[example.qas_id] = example
+
 
     def get_metric(self, reset=True):
-        print("!")
-        qas_id2features = defaultdict(list)
-        qas_id2example = defaultdict(list)
+        # print("!")
+        # qas_id2features = defaultdict(list)
+        # qas_id2example = defaultdict(list)
         qas_id2em_score = dict()
         qas_id2f1_score = dict()
-        for index,feature in enumerate(self.feature_list):
-            qas_id2features[self.example_list[index].qas_id].append(self.feature_list[index])
-            qas_id2example[self.example_list[index].qas_id] = self.example_list[index]
+        # for index,feature in enumerate(self.feature_list):
+        #     qas_id2features[self.example_list[index].qas_id].append(self.feature_list[index])
+        #     qas_id2example[self.example_list[index].qas_id] = self.example_list[index]
 
         Prediction =collections.namedtuple(
             "prediction",["text","start_logit","end_logit"]
         )
-        for index,(qas_id,example) in enumerate(qas_id2example.items()):
-            features = qas_id2features[qas_id]
+        for index,(qas_id,example) in enumerate(self.qas_id2example.items()):
+            # info = self.qas_id2info[qas_id]
+            infos = self.qas_id2info[qas_id]
             score_null = 1000000
             null_start_logit = 0
             null_end_logit = 0
             seen_predictions = {}
             n_best  =[]
-            for (feature_index, feature) in enumerate(features):
-                start_logits,end_logits = self.start_logits_list[feature_index],self.end_logits_list[feature_index]
+            for (info_index, info) in enumerate(infos):
+                start_logits = info["start_logits"]
+                end_logits = info["end_logits"]
+                feature = info["feature"]
                 start_indexes = _get_best_indexes(start_logits, self.n_best_size)
                 end_indexes = _get_best_indexes(end_logits, self.n_best_size)
                 feature_null_score = start_logits[0] + end_logits[0]
@@ -112,6 +118,8 @@ class BaseMRCMetric(BaseMetric):
             n_best = n_best if len(n_best) < self.n_best_size else n_best[:self.n_best_size]
             pred_text = n_best[0].text
             gold_text = example.answer_text
+            simple_start, simple_end = np.argmax(np.array(start_logits)), np.argmax(np.array(end_logits))
+            label_start, label_end = feature.start_position,feature.end_position
             em_score = compute_exact(gold_text,pred_text)
             f1_score = compute_f1(gold_text,pred_text)
             qas_id2em_score[qas_id] = em_score
@@ -122,10 +130,8 @@ class BaseMRCMetric(BaseMetric):
             "F1":np.mean(np.array([list(qas_id2f1_score.values())])),
         }
         if reset:
-            self.start_logits_list = list()
-            self.end_logits_list = list()
-            self.example_list = list()
-            self.feature_list = list()
+            self.qas_id2info = defaultdict(list)
+            self.qas_id2example = {}
         return eval_result
 
 

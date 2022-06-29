@@ -61,7 +61,9 @@ class BaseReadingComprehensionModel(BaseModel):
         metric_function.evaluate(
             start_logits,end_logits,batch
         )
-
+        # start_positions_pred = torch.argmax(start_logits,dim=-1)
+        # end_positions_pred = torch.argmax(end_logits,dim=-1)
+        #
         # metric_function.evaluate(start_positions_pred,end_positions_pred,start_positions,end_positions)
 
 

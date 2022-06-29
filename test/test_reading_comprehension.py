@@ -10,14 +10,14 @@ from cogktr.models.base_reading_comprehension_model import BaseReadingComprehens
 device,output_path = init_cogktr(
     device_id=4,
     output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
-    folder_tag="new_mrc_metric",
+    folder_tag="debug_mrc_metric",
 )
 
 reader = Squad2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
 train_data, dev_data, _ = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = Squad2Processor(plm="bert-base-cased", max_token_len=512, vocab=vocab,debug=False)
+processor = Squad2Processor(plm="bert-base-cased", max_token_len=512, vocab=vocab,debug=True)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 
@@ -29,8 +29,8 @@ early_stopping = EarlyStopping(mode="max",patience=8,threshold=0.01,threshold_mo
 
 trainer = Trainer(model,
                   train_dataset,
-                  dev_data=dev_dataset,
-                  n_epochs=20,
+                  dev_data=train_dataset,
+                  n_epochs=200,
                   batch_size=16,
                   loss=loss,
                   optimizer=optimizer,
@@ -44,7 +44,7 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=500,
+                  validate_steps=50,
                   save_steps=None,
                   output_path=output_path,
                   grad_norm=1,
