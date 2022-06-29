@@ -27,42 +27,47 @@ class Squad2Reader(BaseReader):
             paragraphs = line["paragraphs"]
             for paragraph in paragraphs:
                 context_text = paragraph["context"]
+
+                doc_tokens = []
+                char_to_word_offset = []
+                prev_is_whitespace = True
+
+                # Split on whitespace so that different tokens may be attributed to their original position.
+                for c in context_text:
+                    if _is_whitespace(c):
+                        prev_is_whitespace = True
+                    else:
+                        if prev_is_whitespace:
+                            doc_tokens.append(c)
+                        else:
+                            doc_tokens[-1] += c
+                        prev_is_whitespace = False
+                    char_to_word_offset.append(len(doc_tokens) - 1)
+
                 for qa in paragraph["qas"]:
                     qas_id = qa["id"]
                     question_text = qa["question"]
-                    start_position_character = None
-                    answer_text = None
+                    is_impossible = qa.get("is_impossible", False)
+
+                    # if (len(qa["answers"]) != 1) and (not is_impossible):
+                    #     raise ValueError(
+                    #         "For training, each question should have exactly 1 answer.")
 
                     is_impossible = qa.get("is_impossible", False)
                     if not is_impossible:
                         answer = qa["answers"][0]
                         answer_text = answer["text"]
                         start_position_character = answer["answer_start"]
-
-                    start_position,end_position = 0,0
-
-                    doc_tokens = []
-                    char_to_word_offset = []
-                    prev_is_whitespace = True
-
-                    # Split on whitespace so that different tokens may be attributed to their original position.
-                    for c in context_text:
-                        if _is_whitespace(c):
-                            prev_is_whitespace = True
-                        else:
-                            if prev_is_whitespace:
-                                doc_tokens.append(c)
-                            else:
-                                doc_tokens[-1] += c
-                            prev_is_whitespace = False
-                        char_to_word_offset.append(len(doc_tokens) - 1)
-
-                    if start_position_character is not None and not is_impossible:
                         start_position = char_to_word_offset[start_position_character]
                         end_position = char_to_word_offset[
                             min(start_position_character + len(answer_text) - 1, len(char_to_word_offset) - 1)
                         ]
-                    start_position_character = 0 if is_impossible else start_position_character
+                        # actual_text = " ".join(doc_tokens[start_position:(end_position + 1)])
+                        # assert actual_text == answer_text
+                    else:
+                        start_position = -1
+                        end_position = -1
+                        answer_text = ""
                     datable("qas_id",qas_id)
                     datable("is_impossible",is_impossible)
                     datable("question_text",question_text)
@@ -72,7 +77,6 @@ class Squad2Reader(BaseReader):
                     datable("end_position",end_position)
                     datable("doc_tokens",doc_tokens)
                     datable("title",title)
-                    datable("start_position_character",start_position_character)
         return datable
 
     def _read_dev(self, path):
