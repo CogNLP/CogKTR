@@ -25,7 +25,7 @@ model = BaseReadingComprehensionModel(plm="bert-base-cased",vocab=vocab)
 metric = BaseMRCMetric()
 loss = nn.CrossEntropyLoss(ignore_index=512)
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
-early_stopping = EarlyStopping(mode="max",patience=8,threshold=0.01,threshold_mode="abs",metric_name="EM")
+early_stopping = EarlyStopping(mode="max",patience=8,threshold=0.01,threshold_mode="abs",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,

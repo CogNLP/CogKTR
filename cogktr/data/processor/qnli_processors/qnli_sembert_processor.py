@@ -4,7 +4,8 @@ from transformers import BertTokenizer
 from tqdm import tqdm
 import transformers
 from cogktr.data.processor.base_processor import BaseProcessor
-from cogktr.enhancers.tagger.srl_tagger import SrlTagger,TagTokenizer
+from cogktr.utils.constant.srl_constant.vocab import TAG_VOCAB
+from cogktr.utils.vocab_utils import Vocabulary
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -17,9 +18,10 @@ class QnliSembertProcessor(BaseProcessor):
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
         self.debug = debug
-        self.srl_tagger = SrlTagger(tool="allennlp")
-        self.tag_tokenizer = TagTokenizer()
-        self.vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
+        tag_vocab = Vocabulary()
+        tag_vocab.add_sequence(TAG_VOCAB)
+        tag_vocab.create()
+        self.vocab["tag_vocab"] = tag_vocab
 
     def debug_process(self, data):
         if self.debug:
@@ -35,7 +37,7 @@ class QnliSembertProcessor(BaseProcessor):
         print("Processing data...")
         for sentence, question, label in tqdm(zip(data['sentence'], data['question'], data['label']),
                                               total=len(data['sentence'])):
-            dict_data = process_sembert(sentence,question,label,self.tokenizer,self.vocab,self.max_token_len,self.srl_tagger,enhanced_data_dict,self.tag_tokenizer)
+            dict_data = process_sembert(sentence,question,label,self.tokenizer,self.vocab,self.max_token_len,enhanced_data_dict)
 
             datable("input_ids", dict_data["input_ids"])
             datable("input_mask", dict_data["input_mask"])
@@ -56,7 +58,7 @@ class QnliSembertProcessor(BaseProcessor):
         return self._process(data,enhanced_data_dict)
 
 
-def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,tagger,enhanced_data_dict,tag_tokenizer):
+def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhanced_data_dict):
 
     # text_a_tag_dict = tagger.tag(text_a)
     text_a_tag_dict = enhanced_data_dict[text_a]["srl"]
@@ -88,7 +90,7 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,tagger,
         if len(tokens_a + tokens_b) > max_token_length - 3:
             print("Too Long!", len(tokens_a + tokens_b), len(tokens_a), len(tokens_b))
 
-        # 这里是不是应该到减去3？好像还是减去2？
+        # 这里是不是应该到减去3？好像还是减去2？ 确实是3
         _truncate_seq_pair(tokens_a,tokens_b,tok_to_orig_index_a,tok_to_orig_index_b,max_token_length - 3)
 
     else:
@@ -151,21 +153,17 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,tagger,
     else:
         label_id = None
 
-    # construct tag features:
-    # print("Start Debug!")
-
-
     # aspect padding
     input_tag_ids = []
     sent_tags_list_a = list(text_a_tag_dict["labels"].values())
     if len(sent_tags_list_a) == 0:
         sent_tags_list_a = ["O"] * len(text_a_tag_dict["words"])
-    tag_ids_list_a = convert_tags_to_ids(sent_tags_list_a,tag_tokenizer)
+    tag_ids_list_a = convert_tags_to_ids(sent_tags_list_a,vocab)
     if text_b:
         sent_tags_list_b = list(text_b_tag_dict["labels"].values())
         if len(sent_tags_list_b) == 0:
             sent_tags_list_b = ["O"] * len(text_b_tag_dict["words"])
-        tag_ids_list_b = convert_tags_to_ids(sent_tags_list_b,tag_tokenizer)
+        tag_ids_list_b = convert_tags_to_ids(sent_tags_list_b,vocab)
         input_que_tag_ids = []
         for idx, query_tag_ids in enumerate(tag_ids_list_a):
             query_tag_ids = [1] + query_tag_ids[:len_seq_a - 2] + [2]  # CLS and SEP
@@ -219,7 +217,7 @@ def _truncate_seq_pair(tokens_a, tokens_b, tok_to_orig_index_a, tok_to_orig_inde
             tok_to_orig_index_b.pop()
 
 
-def convert_tags_to_ids(sent_tags_list,tag_tokenizer,max_num_aspect=3):
+def convert_tags_to_ids(sent_tags_list,vocab,max_num_aspect=3):
     # padding to max_num_aspect
     if len(sent_tags_list) > max_num_aspect:
         sent_tags_list = sent_tags_list[:max_num_aspect]
@@ -229,10 +227,18 @@ def convert_tags_to_ids(sent_tags_list,tag_tokenizer,max_num_aspect=3):
 
     sent_tag_ids_list = []
     for sent_tags in sent_tags_list:
-        sent_tag_ids = tag_tokenizer.convert_tags_to_ids(sent_tags)
+        sent_tag_ids = tokenizer_covert_tags_to_ids(sent_tags,vocab)
         sent_tag_ids_list.append(sent_tag_ids)
     return sent_tag_ids_list
 
+def tokenizer_covert_tags_to_ids(tags,vocab):
+    """Converts a sequence of tags into ids using the vocab."""
+    ids = []
+    for tag in tags:
+        if tag not in vocab["tag_vocab"].label_set:
+            tag = 'O'
+        ids.append(vocab["tag_vocab"].label2id(tag))
+    return ids
 
 def choose_tag_set(tag_sets):
     cnt_tag = 0

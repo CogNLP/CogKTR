@@ -4,8 +4,9 @@ from transformers import BertTokenizer
 from tqdm import tqdm
 import transformers
 from cogktr.data.processor.base_processor import BaseProcessor
-from cogktr.enhancers.tagger.srl_tagger import SrlTagger,TagTokenizer
 from ..qnli_processors import process_sembert
+from cogktr.utils.constant.srl_constant.vocab import TAG_VOCAB
+from cogktr.utils.vocab_utils import Vocabulary
 
 class Sst2SembertProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab,debug=False):
@@ -14,8 +15,10 @@ class Sst2SembertProcessor(BaseProcessor):
         self.max_token_len = max_token_len
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
-        self.tag_tokenizer = TagTokenizer()
-        self.vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
+        tag_vocab = Vocabulary()
+        tag_vocab.add_sequence(TAG_VOCAB)
+        tag_vocab.create()
+        self.vocab["tag_vocab"] = tag_vocab
 
     def _process(self, data,enhanced_data_dict=None):
         datable = DataTable()
@@ -23,13 +26,7 @@ class Sst2SembertProcessor(BaseProcessor):
         print("Processing data...")
         for sentence, label in tqdm(zip(data['sentence'], data['label']),
                                               total=len(data['sentence'])):
-            dict_data = process_sembert(
-                sentence,None,label,self.tokenizer,self.vocab,self.max_token_len,None,enhanced_data_dict,self.tag_tokenizer
-            )
-            # dict_data = process_sembert(
-            #     sentence,None,label,self.tokenizer,self.vocab,self.max_token_len,,enhanced_data_dict,self.tag_tokenizer
-            # )
-
+            dict_data =process_sembert(sentence,None,label,self.tokenizer,self.vocab,self.max_token_len,enhanced_data_dict)
             datable("input_ids", dict_data["input_ids"])
             datable("input_mask", dict_data["input_mask"])
             datable("token_type_ids", dict_data["token_type_ids"])
