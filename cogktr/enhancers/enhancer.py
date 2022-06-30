@@ -5,7 +5,7 @@ import copy
 import os
 from tqdm import tqdm
 from cogktr.utils.io_utils import load_json, save_json
-from cogktr.enhancers.tagger import PosTagger, NerTagger, SrlTagger, SyntaxTagger
+from cogktr.enhancers.tagger import NerTagger, SrlTagger, SyntaxTagger
 from cogktr.enhancers.linker import WikipediaLinker
 from cogktr.enhancers.searcher import WikipediaSearcher
 from cogktr.enhancers.embedder import WikipediaEmbedder

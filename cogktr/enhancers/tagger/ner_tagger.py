@@ -1,6 +1,6 @@
 from cogktr.enhancers.tagger import BaseTagger
-from flair.models import SequenceTagger
 from flair.data import Sentence
+from flair.models import SequenceTagger
 
 
 class NerTagger(BaseTagger):
@@ -21,12 +21,17 @@ class NerTagger(BaseTagger):
         return tag_dict
 
     def _flair_tag(self, sentence):
+        flair_sentence=None
+        if isinstance(sentence, str):
+            flair_sentence = Sentence(sentence, use_tokenizer=True)
+        if isinstance(sentence, list):
+            flair_sentence = Sentence(sentence, use_tokenizer=False)
+
         tag_dict = {}
         token_list = []
         label_list = []
-        flair_sentence = Sentence(sentence)
-        self.nertagger.predict(flair_sentence)
 
+        self.nertagger.predict(flair_sentence)
         for item in flair_sentence.tokens:
             token_list.append(item.form)
             label_list.append("O")
@@ -35,12 +40,14 @@ class NerTagger(BaseTagger):
                 label_list[word.idx - 1] = entity.tag
 
         tag_dict["words"] = token_list
-        tag_dict["labels"] = label_list
-
+        tag_dict["ner_labels"] = label_list
         return tag_dict
 
 
 if __name__ == "__main__":
     tagger = NerTagger(tool="flair")
-    tagger_dict = tagger.tag("Bert likes reading in the Sesame Street Library.")
+    tagger_dict_1 = tagger.tag(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
+    tagger_dict_2 = tagger.tag("Bert likes reading in the Sesame Street Library.")
+    print(tagger_dict_1)
+    print(tagger_dict_2)
     print("end")
