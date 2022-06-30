@@ -5,9 +5,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 from cogktr.utils.constant.kbert_constants.constants import *
 from cogktr.data.processor.sst2_processors.sst2_for_kbert_processor import *
-from cogktr.models.kbert_model import KBertModelBuilder
-from cogktr.modules.layers.optimizers import BertAdam
-from cogktr.models.kbert_model_1 import KBertForSequenceClassification
+from cogktr.models.kbert_model import KBertForSequenceClassification
 
 # initiate
 device, output_path = init_cogktr(
