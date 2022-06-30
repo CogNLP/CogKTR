@@ -2,9 +2,9 @@
 cd ~
 mkdir mongodb
 cd mongodb/
-curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.7.tgz
-tar xvf mongodb-linux-x86_64-3.4.7.tgz
-mv mongodb-linux-x86_64-3.4.7 mongodb
+curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.9.tgz
+tar xvf mongodb-linux-x86_64-ubuntu2004-5.0.9.tgz
+mv mongodb-linux-x86_64-ubuntu2004-5.0.9 mongodb
 cd mongodb
 echo $PATH
 export PATH=$PATH:~/mongodb/mongodb/bin
