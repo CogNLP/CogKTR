@@ -72,10 +72,6 @@ __all__ = [
     # toolkits
 
     # utils
-    "TABLE_DATA_TAGGER",
-    "TABLE_DATA_LINKER",
-    "TABLE_DATA_SEARCHER",
-    "TABLE_DATA_EMBEDDER",
     "Downloader",
     "move_dict_value_to_device",
     "reduce_mean",
