@@ -11,7 +11,7 @@ class SyntaxTagger(BaseTagger):
         self.tool = tool
         self.knowledge_type = "syntaxtagger"
         if self.tool == "stanza":
-            stanza.download(lang='en', processors='tokenize,mwt,pos,lemma,depparse')
+            # stanza.download(lang='en', processors='tokenize,mwt,pos,lemma,depparse')
             self.syntaxtagger = stanza.Pipeline(lang='en',
                                                 processors='tokenize,mwt,pos,lemma,depparse',
                                                 tokenize_pretokenized=True)
