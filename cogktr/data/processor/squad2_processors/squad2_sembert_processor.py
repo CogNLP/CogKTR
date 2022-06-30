@@ -9,7 +9,8 @@ from argparse import Namespace
 from cogktr.utils.log_utils import logger
 from tqdm import tqdm
 from ..qnli_processors import process_sembert
-from cogktr.enhancers.tagger.srl_tagger import SrlTagger,TagTokenizer
+from cogktr.utils.constant.srl_constant.vocab import TAG_VOCAB
+from cogktr.utils.vocab_utils import Vocabulary
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -21,9 +22,10 @@ class Squad2SembertProcessor(BaseProcessor):
         self.max_token_len = max_token_len
         self.vocab = vocab
         self.tokenizer = BertTokenizer.from_pretrained(plm)
-        self.tag_tokenizer = TagTokenizer()
-        vocab["tag_vocab"] = self.tag_tokenizer.tag_vocab
-        self.vocab = vocab
+        tag_vocab = Vocabulary()
+        tag_vocab.add_sequence(TAG_VOCAB)
+        tag_vocab.create()
+        self.vocab["tag_vocab"] = tag_vocab
 
     def _process(self, data,enhanced_data_dict=None):
         datable = DataTable()
@@ -38,8 +40,7 @@ class Squad2SembertProcessor(BaseProcessor):
                             data["answer_text"], data["start_position"],
                             data["end_position"], data["doc_tokens"],
                             data["title"], ), total=len(data["qas_id"])):
-            dict_data = process_sembert(question_text, context_text, None, self.tokenizer, self.vocab, self.max_token_len,None,
-                            enhanced_data_dict,self.tag_tokenizer)
+            dict_data = process_sembert(question_text, context_text, None,self.tokenizer,self.vocab,self.max_token_len,enhanced_data_dict)
             datable("input_ids", dict_data["input_ids"])
             datable("input_mask", dict_data["input_mask"])
             datable("token_type_ids", dict_data["token_type_ids"])

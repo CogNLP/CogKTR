@@ -10,7 +10,7 @@ from argparse import Namespace
 from cogktr.models.sembert_model import SembertForSequenceClassification
 
 device, output_path = init_cogktr(
-    device_id=2,
+    device_id=3,
     output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result/",
     folder_tag="old_sembert",
 )
@@ -36,7 +36,7 @@ dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 #
 #
 tag_config = {
-   "tag_vocab_size":len(processor.tag_tokenizer.tag_vocab),
+   "tag_vocab_size":len(vocab["tag_vocab"]),
    "hidden_size":10,
    "output_dim":10,
    "dropout_prob":0.1,
