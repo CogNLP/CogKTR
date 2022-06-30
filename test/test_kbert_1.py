@@ -11,11 +11,11 @@ from cogktr.models.kbert_model_1 import KBertForSequenceClassification
 
 # initiate
 device, output_path = init_cogktr(
-    device_id=3,
+    device_id=0,
     output_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )
-device = torch.device("cpu")
+# device = torch.device("cpu")
 
 # Load the data
 reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
