@@ -1,25 +1,25 @@
 {
     "syntax": {
-        "path": ".cogktr/syntax/",
+        "path": "syntax/",
         "tool": "stanza"
     },
     "wordnet": {
-        "path": ".cogktr/wordnet"
+        "path": "wordnet"
     },
     "srl": {
-        "path": ".cogktr/srl"
+        "path": "srl"
     },
     "ner": {
-        "path": ".cogktr/ner/",
+        "path": "ner/",
         "tool": "flair"
     },
     "conceptnet": {
-        "path": ".cogktr/conceptnet"
+        "path": "conceptnet"
     },
     "wikipeida": {
-        "path": ".cogktr/wikipeida"
+        "path": "wikipeida"
     },
     "medicine": {
-        "path": ".cogktr/medicine"
+        "path": "medicine"
     }
 }

@@ -7,6 +7,7 @@ from cogktr.enhancers.tagger import NerTagger, SrlTagger, SyntaxTagger
 class NewEnhancer:
     def __init__(self,
                  config_path,
+                 knowledge_graph_path,
                  save_file_name,
                  enhanced_data_path,
                  load_syntax=False,
@@ -18,6 +19,7 @@ class NewEnhancer:
                  load_medicine=False,
                  reprocess=False):
         self.config_path = config_path
+        self.knowledge_graph_path=knowledge_graph_path
         self.save_file_name = save_file_name
         self.enhanced_data_path = enhanced_data_path
         self.load_syntax = load_syntax
@@ -29,7 +31,8 @@ class NewEnhancer:
         self.load_medicine = load_medicine
         self.reprocess = reprocess
 
-        self.root_path = os.getenv("HOME")
+        # self.root_path = os.getenv("HOME")
+        self.root_path=knowledge_graph_path
         self.config = load_json(config_path)
         self.syntax_path = os.path.join(self.root_path, self.config["syntax"]["path"])
         self.syntax_tool = self.config["syntax"]["tool"]
@@ -221,6 +224,7 @@ if __name__ == "__main__":
     vocab = reader.read_vocab()
 
     enhancer = NewEnhancer(config_path="/data/mentianyi/code/CogKTR/cogktr/utils/config/enhancer_config.json",
+                           knowledge_graph_path="/data/mentianyi/code/CogKTR/cogktr/datapath/knowledge_graph",
                            save_file_name="pre_enhanced_data",
                            enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data",
                            load_syntax=True,
