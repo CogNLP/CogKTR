@@ -1,23 +1,30 @@
 from cogktr.enhancers.tagger import BaseTagger
 from flair.data import Sentence
 from flair.models import SequenceTagger
+from cogie.toolkit.ner.ner_toolkit import NerToolkit
+from cogie.toolkit.tokenize.tokenize_toolkit import TokenizeToolkit
 
 
 class NerTagger(BaseTagger):
     def __init__(self, tool):
         super().__init__()
-        if tool not in ["flair"]:
+        if tool not in ["flair","cogie"]:
             raise ValueError("{} in NerTagger is not supported!".format(tool))
 
         self.tool = tool
         self.knowledge_type = "nertagger"
         if self.tool == "flair":
             self.nertagger = SequenceTagger.load('ner')
+        elif self.tool == "cogie":
+            self.tokenizer_toolkit = TokenizeToolkit()
+            self.ner_toolkit = NerToolkit(corpus="conll2003")
 
     def tag(self, sentence):
         tag_dict = {}
         if self.tool == "flair":
             tag_dict = self._flair_tag(sentence)
+        elif self.tool == "cogie":
+            tag_dict = self._cogie_tag(sentence)
         return tag_dict
 
     def _flair_tag(self, sentence):
@@ -44,8 +51,21 @@ class NerTagger(BaseTagger):
         return tag_dict
 
 
+    def _cogie_tag(self,sentence):
+        if isinstance(sentence,str):
+            words = self.tokenizer_toolkit.run(sentence)
+        elif isinstance(sentence,list):
+            words = sentence
+        else:
+            raise ValueError("Sentence must be str or a list of words!")
+
+        ner_result = self.ner_toolkit.run(words)
+        return ner_result
+
+
+
 if __name__ == "__main__":
-    tagger = NerTagger(tool="flair")
+    tagger = NerTagger(tool="cogie")
     tagger_dict_1 = tagger.tag(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
     tagger_dict_2 = tagger.tag("Bert likes reading in the Sesame Street Library.")
     print(tagger_dict_1)
