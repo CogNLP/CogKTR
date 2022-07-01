@@ -30,7 +30,13 @@ class WikipediaLinker(BaseLinker):
         return link_list
 
     def _cogie_link(self, sentence):
-        words = self.tokenize_toolkit.run(sentence)
+        if isinstance(sentence,str):
+            words = self.tokenize_toolkit.run(sentence)
+        elif isinstance(sentence,list):
+            words = sentence
+        else:
+            raise ValueError("Sentence must be str or a list of words!")
+
         ner_result = self.ner_toolkit.run(words)
         el_result = self.el_toolkit.run(ner_result)
         link_dict = {}
@@ -72,5 +78,5 @@ if __name__ == "__main__":
     # link_list_1 = linker_1.link("Bert likes reading in the Sesame Street Library.")
 
     linker_2 = WikipediaLinker(tool="cogie")
-    link_list_2 = linker_2.link("Bert likes reading in the Sesame Street Library.")
+    link_list_2 = linker_2.link(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
     print("end")
