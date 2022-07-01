@@ -17,7 +17,11 @@
         "path": "conceptnet"
     },
     "wikipeida": {
-        "path": "wikipeida"
+        "path": "wikipeida",
+        "wikipedia_linker_tool": "tagme",
+        "wikipedia_searcher_tool": "blink",
+        "wikipedia_embedder_tool": "wikipedia2vec"
+
     },
     "medicine": {
         "path": "medicine"

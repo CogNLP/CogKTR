@@ -38,11 +38,14 @@ class NewEnhancer:
         self.syntax_tool = self.config["syntax"]["tool"]
         self.ner_path = os.path.join(self.root_path, self.config["ner"]["path"])
         self.ner_tool = self.config["ner"]["tool"]
+        self.wikipedia_linker_tool = self.config["wikipedia"]["wikipedia_linker_tool"]
 
         if self.load_syntax:
             self.syntax_tagger = SyntaxTagger(tool=self.syntax_tool)
         if self.load_ner:
             self.ner_tagger = NerTagger(tool=self.ner_tool)
+        if self.load_wikipedia:
+            self.wikipedia_linker = WikipediaLinker(tool=self.wikipedia_linker_tool)
 
         print("end")
 
@@ -53,7 +56,7 @@ class NewEnhancer:
                          return_srl=False,
                          return_ner=False,
                          return_conceptnet=False,
-                         return_wikipeida=False,
+                         return_wikipedia=False,
                          return_medicine=False):
         enhanced_dict = {}
         enhanced_dict[sentence] = {}
@@ -219,14 +222,14 @@ class NewEnhancer:
 if __name__ == "__main__":
     from cogktr import *
 
-    reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+    reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
-    enhancer = NewEnhancer(config_path="/data/mentianyi/code/CogKTR/cogktr/utils/config/enhancer_config.json",
-                           knowledge_graph_path="/data/mentianyi/code/CogKTR/cogktr/datapath/knowledge_graph",
+    enhancer = NewEnhancer(config_path="/home/chenyuheng/zhouyuyang/CogKTR/cogktr/utils/config/enhancer_config.json",
+                           knowledge_graph_path="/home/chenyuheng/zhouyuyang/CogKTR/cogktr/datapath/knowledge_graph",
                            save_file_name="pre_enhanced_data",
-                           enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data",
+                           enhanced_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/enhanced_data",
                            load_syntax=True,
                            load_ner=True,
                            reprocess=True)

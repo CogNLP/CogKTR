@@ -41,8 +41,9 @@ class WikidataSearcher(BaseSearcher):
                     predicate_name = triple['property1nameLabel']['value']
                     objection_id = triple['value1']['value']
                     objection_name = triple['value1Label']['value']
-                    triple_list.append([subjection_id, subjection_name, predicate_id,
-                                        predicate_name, objection_id, objection_name])
+                    triple_list.append({"subjection_id": subjection_id, "subjection_name": subjection_name,
+                                        "predicate_id": predicate_id, "predicate_name": predicate_name,
+                                        "objection_id": objection_id, "objection_name": objection_name})
                 return triple_list
             except:
                 print("Error in wikidata_id: {}".format(wikidata_id))
@@ -77,16 +78,17 @@ class WikidataSearcher(BaseSearcher):
                     predicate2_name = triple['property2nameLabel']['value']
                     objection2_id = triple['value2']['value']
                     objection2_name = triple['value2Label']['value']
-                    triple_list.append([subjection_id, subjection_name, predicate1_id,
-                                        predicate1_name, objection1_id, objection1_name,
-                                        predicate2_id, predicate2_name, objection2_id, objection2_name])
+                    triple_list.append({"subjection_id": subjection_id, "subjection_name": subjection_name,
+                                        "predicate1_id": predicate1_id, "predicate1_name": predicate1_name,
+                                        "objection1_id": objection1_id, "objection1_name": objection1_name,
+                                        "predicate2_id": predicate2_id, "predicate2_name": predicate2_name,
+                                        "objection2_id": objection2_id, "objection2_name": objection2_name})
                 return triple_list
             except:
                 print("Error in wikidata_id: {}".format(wikidata_id))
 
         else:
             raise Exception("Step_num should not be more than 2.")
-
 
 if __name__ == "__main__":
     g1 = WikidataSearcher()
