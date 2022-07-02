@@ -1,5 +1,5 @@
 import time
-from cogktr.enhancers.searcher.kilt_searcher import KnowledgeSource
+from cogktr.enhancers.searcher.kilt_searcher import KiltSearcher
 from cogktr.enhancers.searcher import BaseSearcher
 from qwikidata.sparql import (get_subclasses_of_item,
                               return_sparql_query_results)
@@ -9,9 +9,9 @@ class WikidataSearcher(BaseSearcher):
 
     def __init__(self):
         super().__init__()
-        self.ks = KnowledgeSource()
+        self.ks = KiltSearcher()
 
-    def search_for_entity(self, wikipedia_id, step_num, result_num=2):
+    def search(self, wikipedia_id, step_num=1, result_num=2):
 
         # get wikidata_id
         wikidata_id = self.ks.get_page_by_id(wikipedia_id)["wikidata_info"]["wikidata_id"]
@@ -92,5 +92,5 @@ class WikidataSearcher(BaseSearcher):
 
 if __name__ == "__main__":
     g1 = WikidataSearcher()
-    result1 = g1.search_for_entity(wikipedia_id=18978754, step_num=1, result_num=2)
+    result1 = g1.search(wikipedia_id=18978754, step_num=1, result_num=2)
     print("end")
