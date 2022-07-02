@@ -48,7 +48,7 @@ class WikidataSearcher(BaseSearcher):
             except:
                 print("Error in wikidata_id: {}".format(wikidata_id))
 
-        if step_num == 2:
+        elif step_num == 2:
             sparql_query = """
             SELECT DISTINCT ?label ?property1 ?property1nameLabel ?value1 ?value1Label ?property2 ?property2nameLabel ?value2 ?value2Label
                 WHERE {
