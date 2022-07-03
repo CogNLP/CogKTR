@@ -29,6 +29,7 @@ __all__ = [
     "Sst2SembertProcessor",
     "StsbProcessor",
     "BaseReader",
+    "Commonsenseqa_Qagnn_Reader",
     "Conll2003Reader",
     "MultisegchnsentibertReader",
     "QnliReader",

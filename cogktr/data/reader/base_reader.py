@@ -19,3 +19,6 @@ class BaseReader:
 
     def read_vocab(self):
         pass
+
+    def read_addition(self):
+        pass

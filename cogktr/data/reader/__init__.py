@@ -1,4 +1,5 @@
 from .base_reader import *
+from .commonsenseqa_qagnn_reader import *
 from .conll2003_reader import *
 from .multisegchnsentibert_reader import *
 from .qnli_reader import *
@@ -8,6 +9,7 @@ from .stsb_reader import *
 
 __all__ = [
     "BaseReader",
+    "Commonsenseqa_Qagnn_Reader",
     "Conll2003Reader",
     "MultisegchnsentibertReader",
     "QnliReader",
