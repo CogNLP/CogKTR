@@ -1,7 +1,5 @@
-from cogktr.data.processor.sst2_processors import SST2Processor
 from cogktr.enhancers.linker.wikipedia_linker import WikipediaLinker
 from cogktr.enhancers.searcher.wikipedia_searcher import WikipediaSearcher
-from cogktr.data.reader.sst2_reader import SST2Reader
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from tqdm import tqdm
