@@ -9,7 +9,7 @@ from .stsb_reader import *
 
 __all__ = [
     "BaseReader",
-    "Commonsenseqa_Qagnn_Reader",
+    "CommonsenseqaQagnnReader",
     "Conll2003Reader",
     "MultisegchnsentibertReader",
     "QnliReader",

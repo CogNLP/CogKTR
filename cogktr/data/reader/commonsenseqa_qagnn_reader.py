@@ -7,7 +7,7 @@ import numpy as np
 import json
 
 
-class Commonsenseqa_Qagnn_Reader(BaseReader):
+class CommonsenseqaQagnnReader(BaseReader):
     def __init__(self, raw_data_path):
         super().__init__()
         self.raw_data_path = raw_data_path
