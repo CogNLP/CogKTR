@@ -88,7 +88,7 @@ class CommonsenseqaQagnnReader(BaseReader):
 
 
 if __name__ == "__main__":
-    reader = Commonsenseqa_Qagnn_Reader(
+    reader = CommonsenseqaQagnnReader(
         raw_data_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA_for_QAGNN/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
