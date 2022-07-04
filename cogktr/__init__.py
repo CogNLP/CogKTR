@@ -16,6 +16,7 @@ __all__ = [
 
     # data
     "BaseProcessor",
+    "CommonsenseqaQagnnProcessor",
     "Conll2003Processor",
     "MultisegchnsentibertProcessor",
     "QnliProcessor",
