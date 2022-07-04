@@ -10,16 +10,30 @@ transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
 class CommonsenseqaQagnnProcessor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab):
+    def __init__(self, plm, max_token_len, vocab, addition):
         super().__init__()
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
+        self.addition = addition
+        self.use_cache = addition["use_cache"]
         self.tokenizer = AutoTokenizer.from_pretrained(plm)
 
-    def _process(self, data):
+    def _process(self, data, datatype=None):
         datable = DataTable()
         print("Processing data...")
+        if self.use_cache:
+            for edge_index, edge_type, concept_id, node_type_id, node_score, adj_length in tqdm(
+                    zip(data["edge_index"], data["edge_type"], data["concept_id"],
+                        data["node_type_id"], data["node_score"], data["adj_length"]), total=len(data['concept_id'])):
+                datable("edge_index", edge_index)
+                datable("edge_type", edge_type)
+                datable("concept_id", concept_id)
+                datable("node_type_id", node_type_id)
+                datable("node_score", node_score)
+                datable("adj_length", adj_length)
+        else:
+            pass
         for context_list, candidate_text_list, answer_label, example_id in tqdm(
                 zip(data['context'], data['candidate_text_list'], data['answer_label'], data['example_id']),
                 total=len(data['example_id'])):
@@ -49,14 +63,26 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
         return DataTableSet(datable)
 
     def process_train(self, data):
-        return self._process(data)
+        return self._process(data=data, datatype="train")
 
     def process_dev(self, data):
-        return self._process(data)
+        return self._process(data=data, datatype="dev")
 
     def process_test(self, data):
         datable = DataTable()
         print("Processing data...")
+        if self.use_cache:
+            for edge_index, edge_type, concept_id, node_type_id, node_score, adj_length in tqdm(
+                    zip(data["edge_index"], data["edge_type"], data["concept_id"],
+                        data["node_type_id"], data["node_score"], data["adj_length"]), total=len(data['concept_id'])):
+                datable("edge_index", edge_index)
+                datable("edge_type", edge_type)
+                datable("concept_id", concept_id)
+                datable("node_type_id", node_type_id)
+                datable("node_score", node_score)
+                datable("adj_length", adj_length)
+            else:
+                pass
         for context_list, candidate_text_list, example_id in tqdm(
                 zip(data['context'], data['candidate_text_list'], data['example_id']),
                 total=len(data['example_id'])):
@@ -94,7 +120,7 @@ if __name__ == "__main__":
     vocab = reader.read_vocab()
     addition = reader.read_addition()
 
-    processor = CommonsenseqaQagnnProcessor(plm="roberta-large", max_token_len=100, vocab=vocab)
+    processor = CommonsenseqaQagnnProcessor(plm="roberta-large", max_token_len=100, vocab=vocab, addition=addition)
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     test_dataset = processor.process_test(test_data)
