@@ -1,3 +1,6 @@
+import sys
+sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
+
 from cogktr.enhancers.searcher.wikidata_searcher import WikidataSearcher
 from cogktr.utils.io_utils import load_json, save_json
 import os
@@ -41,9 +44,9 @@ class NewEnhancer:
         self.ner_tool = self.config["ner"]["tool"]
         self.wikipedia_linker_tool = self.config["wikipedia"]["wikipedia_linker_tool"]
         self.wikipedia_searcher_tool = self.config["wikipedia"]["wikipedia_searcher_tool"]
-        self.wikipedia_searcher_path = self.config["wikipedia"]["wikipedia_searcher_path"]
+        self.wikipedia_searcher_path = os.path.join(self.root_path, self.config["wikipedia"]["wikipedia_searcher_path"])
         self.wikipedia_embedder_tool = self.config["wikipedia"]["wikipedia_embedder_tool"]
-        self.wikipedia_embedder_path = self.config["wikipedia"]["wikipedia_embedder_path"]
+        self.wikipedia_embedder_path = os.path.join(self.root_path, self.config["wikipedia"]["wikipedia_embedder_path"])
 
         if self.load_syntax:
             self.syntax_tagger = SyntaxTagger(tool=self.syntax_tool)
@@ -76,11 +79,15 @@ class NewEnhancer:
             enhanced_dict[sentence]["ner"] = self.ner_tagger.tag(sentence)
         if return_wikipedia:
             entity_list = self.wikipedia_linker.link(sentence)
+            print("finish linker.")
             for entity in entity_list:
-                entity["description"] = self.wikipedia_searcher.search(entity["wikipedia_id"])
-                entity["embedding"] = self.wikipedia_embedder.embed(entity["entity_title"])
+                entity["desc"] = self.wikipedia_searcher.search(entity["wikipedia_id"])["desc"]
+                print("finish searcher.")
+                entity["entity_embedding"] = self.wikipedia_embedder.embed(entity["entity_title"])["entity_embedding"]
+                print("finish embedder.")
                 entity["kg"] = self.wikidata_searcher.search(wikipedia_id=entity["wikipedia_id"],
                                                              result_num=10)
+                print("finish kg.")
             enhanced_dict[sentence]["wikipedia"] = entity_list
 
         return enhanced_dict
@@ -255,18 +262,16 @@ if __name__ == "__main__":
     vocab = reader.read_vocab()
 
     enhancer = NewEnhancer(config_path="/home/chenyuheng/zhouyuyang/CogKTR/cogktr/utils/config/enhancer_config.json",
-                           knowledge_graph_path="/home/chenyuheng/zhouyuyang/CogKTR/cogktr/datapath/knowledge_graph",
+                           knowledge_graph_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph",
                            save_file_name="pre_enhanced_data",
                            enhanced_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/enhanced_data",
-                           load_syntax=True,
-                           load_ner=True,
+                           load_wikipedia=True,
                            reprocess=True)
 
     enhanced_sentence_dict = enhancer.enhance_sentence(sentence="Bert likes reading in the Sesame Street Library.",
-                                                       return_syntax=True,
-                                                       return_ner=True)
-
-    enhanced_dev_dict = enhancer.enhance_dev(dev_data,
-                                             return_syntax=True,
-                                             return_ner=True)
+                                                       return_wikipedia=True)
+    print(enhanced_sentence_dict)
+    # enhanced_dev_dict = enhancer.enhance_dev(dev_data,
+    #                                          return_syntax=True,
+    #                                          return_ner=True)
     print("end")
