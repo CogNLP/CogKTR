@@ -9,9 +9,10 @@ import pickle
 
 
 class CommonsenseqaQagnnReader(BaseReader):
-    def __init__(self, raw_data_path):
+    def __init__(self, raw_data_path, use_cache=True):
         super().__init__()
         self.raw_data_path = raw_data_path
+        self.use_cache = use_cache
         downloader = Downloader()
         downloader.download_commonsenseqa_qagnn_raw_data(raw_data_path)
         self.train_file = 'statement/train.statement.jsonl'
@@ -37,12 +38,30 @@ class CommonsenseqaQagnnReader(BaseReader):
         self.label_vocab = Vocabulary()
         self.addition = {}
 
-    def _read_data(self, path, adj_path=None):
+    def _read_data(self, path, adj_path=None, adj_cache_path=None):
         datable = DataTable()
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
         with open(adj_path, 'rb') as adj_file:
             adj_concept_pairs = pickle.load(adj_file)
+        if self.use_cache:
+            adj_cache = self._read_cache(adj_cache_path)
+            adj_lengths_oris = list(adj_cache["adj_lengths_ori"])
+            concept_ids = list(adj_cache["concept_ids"])
+            node_type_ids = list(adj_cache["node_type_ids"])
+            node_scores = list(adj_cache["node_scores"])
+            adj_lengths = list(adj_cache["adj_lengths"])
+            edge_indexes = adj_cache["edge_index"]
+            edge_types = adj_cache["edge_type"]
+            for adj_lengths_ori, concept_id, node_type_id, node_score, adj_length, edge_index, edge_type in zip(
+                    adj_lengths_oris, concept_ids, node_type_ids, node_scores, adj_lengths, edge_indexes, edge_types):
+                datable("adj_lengths_ori", adj_lengths_ori)
+                datable("concept_id", concept_id)
+                datable("node_type_id", node_type_id)
+                datable("node_score", node_score)
+                datable("adj_length", adj_length)
+                datable("edge_index", edge_index)
+                datable("edge_type", edge_type)
         for line, adj_concept_pair in zip(lines, adj_concept_pairs):
             line_dict = json.loads(line)
             example_id = line_dict["id"]
@@ -51,35 +70,55 @@ class CommonsenseqaQagnnReader(BaseReader):
             candidate_text_list = [label_dict["text"] for label_dict in line_dict["question"]["choices"]]
             candidate_num = len(candidate_text_list)
             context = [line_dict["question"]["stem"]] * candidate_num
-            adj = adj_concept_pair["adj"]
-            concepts = adj_concept_pair["concepts"]
-            qmask = adj_concept_pair["qmask"]
-            amask = adj_concept_pair["amask"]
-            cid2score = adj_concept_pair["cid2score"]
             datable("example_id", example_id)
             datable("answer_label", answer_label)
             datable("context", context)
             datable("candidate_text_list", candidate_text_list)
-            datable("adj", adj)
-            datable("concepts", concepts)
-            datable("qmask", qmask)
-            datable("amask", amask)
-            datable("cid2score", cid2score)
+            if not self.use_cache:
+                adj = adj_concept_pair["adj"]
+                concepts = adj_concept_pair["concepts"]
+                qmask = adj_concept_pair["qmask"]
+                amask = adj_concept_pair["amask"]
+                cid2score = adj_concept_pair["cid2score"]
+                datable("adj", adj)
+                datable("concepts", concepts)
+                datable("qmask", qmask)
+                datable("amask", amask)
+                datable("cid2score", cid2score)
             self.label_vocab.add_sequence(candidate_character_list)
         return datable
 
-    def _read_train(self, path, adj_path=None):
-        return self._read_data(path, adj_path)
+    def _read_train(self, path, adj_path=None, adj_cache_path=None):
+        return self._read_data(path, adj_path, adj_cache_path)
 
-    def _read_dev(self, path, adj_path=None):
-        return self._read_data(path, adj_path)
+    def _read_dev(self, path, adj_path=None, adj_cache_path=None):
+        return self._read_data(path, adj_path, adj_cache_path)
 
-    def _read_test(self, path, adj_path=None):
+    def _read_test(self, path, adj_path=None, adj_cache_path=None):
         datable = DataTable()
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
         with open(adj_path, 'rb') as adj_file:
             adj_concept_pairs = pickle.load(adj_file)
+        if self.use_cache:
+            print("Reading cache...")
+            adj_cache = self._read_cache(adj_cache_path)
+            adj_lengths_oris = list(adj_cache["adj_lengths_ori"])
+            concept_ids = list(adj_cache["concept_ids"])
+            node_type_ids = list(adj_cache["node_type_ids"])
+            node_scores = list(adj_cache["node_scores"])
+            adj_lengths = list(adj_cache["adj_lengths"])
+            edge_indexes = adj_cache["edge_index"]
+            edge_types = adj_cache["edge_type"]
+            for adj_lengths_ori, concept_id, node_type_id, node_score, adj_length, edge_index, edge_type in zip(
+                    adj_lengths_oris, concept_ids, node_type_ids, node_scores, adj_lengths, edge_indexes, edge_types):
+                datable("adj_lengths_ori", adj_lengths_ori)
+                datable("concept_id", concept_id)
+                datable("node_type_id", node_type_id)
+                datable("node_score", node_score)
+                datable("adj_length", adj_length)
+                datable("edge_index", edge_index)
+                datable("edge_type", edge_type)
         for line, adj_concept_pair in zip(lines, adj_concept_pairs):
             line_dict = json.loads(line)
             example_id = line_dict["id"]
@@ -87,26 +126,27 @@ class CommonsenseqaQagnnReader(BaseReader):
             candidate_text_list = [label_dict["text"] for label_dict in line_dict["question"]["choices"]]
             candidate_num = len(candidate_text_list)
             context = [line_dict["question"]["stem"]] * candidate_num
-            adj = adj_concept_pair["adj"]
-            concepts = adj_concept_pair["concepts"]
-            qmask = adj_concept_pair["qmask"]
-            amask = adj_concept_pair["amask"]
-            cid2score = adj_concept_pair["cid2score"]
             datable("example_id", example_id)
             datable("context", context)
             datable("candidate_text_list", candidate_text_list)
-            datable("adj", adj)
-            datable("concepts", concepts)
-            datable("qmask", qmask)
-            datable("amask", amask)
-            datable("cid2score", cid2score)
+            if not self.use_cache:
+                adj = adj_concept_pair["adj"]
+                concepts = adj_concept_pair["concepts"]
+                qmask = adj_concept_pair["qmask"]
+                amask = adj_concept_pair["amask"]
+                cid2score = adj_concept_pair["cid2score"]
+                datable("adj", adj)
+                datable("concepts", concepts)
+                datable("qmask", qmask)
+                datable("amask", amask)
+                datable("cid2score", cid2score)
             self.label_vocab.add_sequence(candidate_character_list)
         return datable
 
     def read_all(self):
-        return self._read_train(self.train_path, self.train_adj_path), \
-               self._read_dev(self.dev_path, self.dev_adj_path), \
-               self._read_test(self.test_path, self.test_adj_path)
+        return self._read_train(self.train_path, self.train_adj_path, self.train_adj_cache_path), \
+               self._read_dev(self.dev_path, self.dev_adj_path, self.dev_adj_cache_path), \
+               self._read_test(self.test_path, self.test_adj_path, self.test_adj_cache_path)
 
     def read_vocab(self):
         self.label_vocab.create()
@@ -130,10 +170,13 @@ class CommonsenseqaQagnnReader(BaseReader):
     def read_addition(self):
         cp_emb = np.load(self.ent_emb_path)
         self.addition["cp_emb"] = cp_emb
-        print("Reading cache ...")
-        self.addition["train_adj_cache"] = self._read_cache(self.train_adj_cache_path)
-        self.addition["dev_adj_cache"] = self._read_cache(self.dev_adj_cache_path)
-        self.addition["test_adj_cache"] = self._read_cache(self.test_adj_cache_path)
+        if self.use_cache:
+            train_adj_cache = self._read_cache(self.train_adj_cache_path)
+            dev_adj_cache = self._read_cache(self.dev_adj_cache_path)
+            test_adj_cache = self._read_cache(self.test_adj_cache_path)
+            self.addition["half_n_rel_train"] = train_adj_cache["half_n_rel"]
+            self.addition["half_n_rel_dev"] = dev_adj_cache["half_n_rel"]
+            self.addition["half_n_rel_test"] = test_adj_cache["half_n_rel"]
         return self.addition
 
 
