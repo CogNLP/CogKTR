@@ -16,7 +16,7 @@ vocab = reader.read_vocab()
 addition = reader.read_addition()
 
 processor = CommonsenseqaQagnnProcessor(plm="bert-base-cased", max_token_len=100, vocab=vocab, addition=addition)
-train_dataset = processor.process_train(train_data)
+# train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
@@ -27,7 +27,7 @@ loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,
-                  train_dataset,
+                  dev_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
                   batch_size=10,
@@ -52,7 +52,7 @@ trainer = Trainer(model,
                   metric_key=None,
                   fp16=False,
                   fp16_opt_level='O1',
-                  collate_fn=train_dataset.to_dict,
+                  collate_fn=dev_dataset.to_dict,
                   dev_collate_fn=dev_dataset.to_dict,
                   )
 trainer.train()

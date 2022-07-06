@@ -34,6 +34,7 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
                 datable("node_score", torch.stack(node_score))
                 datable("adj_length", torch.stack(adj_length))
         else:
+            # TODO:use_cache==False
             pass
         for context_list, candidate_text_list, answer_label, example_id in tqdm(
                 zip(data['context'], data['candidate_text_list'], data['answer_label'], data['example_id']),
@@ -83,6 +84,7 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
                 datable("node_score", torch.stack(node_score))
                 datable("adj_length", torch.stack(adj_length))
             else:
+                # TODO:use_cache==False
                 pass
         for context_list, candidate_text_list, example_id in tqdm(
                 zip(data['context'], data['candidate_text_list'], data['example_id']),
