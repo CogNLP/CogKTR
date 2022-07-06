@@ -16,8 +16,8 @@
     "conceptnet": {
         "path": "conceptnet"
     },
-    "wikipeida": {
-        "path": "wikipeida",
+    "wikipedia": {
+        "path": "wikipedia",
         "wikipedia_linker_tool": "tagme",
         "wikipedia_searcher_tool": "blink",
         "wikipedia_searcher_path": "wikipedia/entity.jsonl",
