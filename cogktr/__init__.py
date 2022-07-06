@@ -62,10 +62,12 @@ __all__ = [
     "HLGModel",
     "KgembModel",
     "KtembModel",
+    "QAGNNModel",
     "SyntaxAttentionModel",
 
     # modules
     "PlmBertModel",
+    "PlmAutoModel",
 
     # toolkits
 

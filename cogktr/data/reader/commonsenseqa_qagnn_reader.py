@@ -6,6 +6,7 @@ from cogktr.utils.download_utils import Downloader
 import numpy as np
 import json
 import pickle
+import torch
 
 
 class CommonsenseqaQagnnReader(BaseReader):
@@ -215,7 +216,7 @@ class CommonsenseqaQagnnReader(BaseReader):
 
     def read_addition(self):
         cp_emb = np.load(self.ent_emb_path)
-        self.addition["cp_emb"] = cp_emb
+        self.addition["cp_emb"] = torch.tensor(cp_emb)
         self.addition["use_cache"] = self.use_cache
         return self.addition
 

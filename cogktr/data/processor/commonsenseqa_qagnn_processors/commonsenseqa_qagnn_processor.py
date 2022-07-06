@@ -5,6 +5,7 @@ from tqdm import tqdm
 from cogktr.data.processor.base_processor import BaseProcessor
 import transformers
 import numpy as np
+import torch
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -28,10 +29,10 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
                         data["node_type_id"], data["node_score"], data["adj_length"]), total=len(data['concept_id'])):
                 datable("edge_index", edge_index)
                 datable("edge_type", edge_type)
-                datable("concept_id", concept_id)
-                datable("node_type_id", node_type_id)
-                datable("node_score", node_score)
-                datable("adj_length", adj_length)
+                datable("concept_id", torch.stack(concept_id))
+                datable("node_type_id", torch.stack(node_type_id))
+                datable("node_score", torch.stack(node_score))
+                datable("adj_length", torch.stack(adj_length))
         else:
             pass
         for context_list, candidate_text_list, answer_label, example_id in tqdm(
@@ -50,15 +51,15 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
                                                             return_token_type_ids=True,
                                                             return_special_tokens_mask=True,
                                                             max_length=self.max_token_len)
-                input_ids_list.append(tokenized_data['input_ids'])
-                attention_mask_list.append(tokenized_data['attention_mask'])
-                token_type_ids_list.append(tokenized_data['token_type_ids'])
-                special_tokens_mask_list.append(tokenized_data['special_tokens_mask'])
+                input_ids_list.append(torch.tensor(tokenized_data['input_ids']))
+                attention_mask_list.append(torch.tensor(tokenized_data['attention_mask']))
+                token_type_ids_list.append(torch.tensor(tokenized_data['token_type_ids']))
+                special_tokens_mask_list.append(torch.tensor(tokenized_data['special_tokens_mask']))
             datable("example_id", example_id)
-            datable("input_ids", np.array(input_ids_list))
-            datable("attention_mask", np.array(attention_mask_list))
-            datable("token_type_ids_list", np.array(token_type_ids_list))
-            datable("special_tokens_mask_list", np.array(special_tokens_mask_list))
+            datable("input_ids", torch.stack(input_ids_list))
+            datable("attention_mask", torch.stack(attention_mask_list))
+            datable("token_type_ids", torch.stack(token_type_ids_list))
+            datable("special_tokens_mask", torch.stack(special_tokens_mask_list))
             datable("label", self.vocab["label_vocab"].label2id(answer_label))
         return DataTableSet(datable)
 
@@ -77,10 +78,10 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
                         data["node_type_id"], data["node_score"], data["adj_length"]), total=len(data['concept_id'])):
                 datable("edge_index", edge_index)
                 datable("edge_type", edge_type)
-                datable("concept_id", concept_id)
-                datable("node_type_id", node_type_id)
-                datable("node_score", node_score)
-                datable("adj_length", adj_length)
+                datable("concept_id", torch.stack(concept_id))
+                datable("node_type_id", torch.stack(node_type_id))
+                datable("node_score", torch.stack(node_score))
+                datable("adj_length", torch.stack(adj_length))
             else:
                 pass
         for context_list, candidate_text_list, example_id in tqdm(
@@ -99,15 +100,15 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
                                                             return_token_type_ids=True,
                                                             return_special_tokens_mask=True,
                                                             max_length=self.max_token_len)
-                input_ids_list.append(tokenized_data['input_ids'])
-                attention_mask_list.append(tokenized_data['attention_mask'])
-                token_type_ids_list.append(tokenized_data['token_type_ids'])
-                special_tokens_mask_list.append(tokenized_data['special_tokens_mask'])
+                input_ids_list.append(torch.tensor(tokenized_data['input_ids']))
+                attention_mask_list.append(torch.tensor(tokenized_data['attention_mask']))
+                token_type_ids_list.append(torch.tensor(tokenized_data['token_type_ids']))
+                special_tokens_mask_list.append(torch.tensor(tokenized_data['special_tokens_mask']))
             datable("example_id", example_id)
-            datable("input_ids", np.array(input_ids_list))
-            datable("attention_mask", np.array(attention_mask_list))
-            datable("token_type_ids_list", np.array(token_type_ids_list))
-            datable("special_tokens_mask_list", np.array(special_tokens_mask_list))
+            datable("input_ids", torch.stack(input_ids_list))
+            datable("attention_mask", torch.stack(attention_mask_list))
+            datable("token_type_ids", torch.stack(token_type_ids_list))
+            datable("special_tokens_mask", torch.stack(special_tokens_mask_list))
         return DataTableSet(datable)
 
 
