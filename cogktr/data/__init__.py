@@ -22,6 +22,7 @@ __all__ = [
 
     # reader
     "BaseReader",
+    "CommonsenseqaReader",
     "CommonsenseqaQagnnReader",
     "Conll2003Reader",
     "MultisegchnsentibertReader",
