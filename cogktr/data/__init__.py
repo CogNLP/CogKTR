@@ -6,6 +6,7 @@ from .datableset import *
 __all__ = [
     # processor
     "BaseProcessor",
+    "CommonsenseqaProcessor",
     "CommonsenseqaQagnnProcessor",
     "Conll2003Processor",
     "MultisegchnsentibertProcessor",

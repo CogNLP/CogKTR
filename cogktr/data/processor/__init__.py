@@ -1,4 +1,5 @@
 from .base_processor import *
+from cogktr.data.processor.commonsenseqa_processors import *
 from cogktr.data.processor.commonsenseqa_qagnn_processors import *
 from cogktr.data.processor.conll2003_processors import *
 from cogktr.data.processor.multisegchnsentibert_processors import *
@@ -11,7 +12,10 @@ __all__ = [
     # baseprocessor
     "BaseProcessor",
 
-    #commonsenseqaqagnnprocessor
+    # commonsenseqaprocessor
+    "CommonsenseqaProcessor",
+
+    # commonsenseqaqagnnprocessor
     "CommonsenseqaQagnnProcessor",
 
     # conll2003processor

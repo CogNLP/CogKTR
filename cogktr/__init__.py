@@ -16,6 +16,7 @@ __all__ = [
 
     # data
     "BaseProcessor",
+    "CommonsenseqaProcessor",
     "CommonsenseqaQagnnProcessor",
     "Conll2003Processor",
     "MultisegchnsentibertProcessor",
@@ -56,6 +57,7 @@ __all__ = [
 
     # models
     "BaseModel",
+    "BaseQuestionAnsweringModel",
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
     "BaseSequenceLabelingModel",
