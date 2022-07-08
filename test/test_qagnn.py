@@ -26,10 +26,14 @@ metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
 no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
 grouped_parameters = [
-    {'params': [p for n, p in model.plm._plm.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01, 'lr': 1e-05},
-    {'params': [p for n, p in model.plm._plm.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0, 'lr': 1e-05},
-    {'params': [p for n, p in model.decoder.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01, 'lr': 0.001},
-    {'params': [p for n, p in model.decoder.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0, 'lr': 0.001},
+    {'params': [p for n, p in model.plm._plm.named_parameters() if not any(nd in n for nd in no_decay)],
+     'weight_decay': 0.01, 'lr': 1e-06},
+    {'params': [p for n, p in model.plm._plm.named_parameters() if any(nd in n for nd in no_decay)],
+     'weight_decay': 0.0, 'lr': 1e-06},
+    {'params': [p for n, p in model.decoder.named_parameters() if not any(nd in n for nd in no_decay)],
+     'weight_decay': 0.01, 'lr': 0.0001},
+    {'params': [p for n, p in model.decoder.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0,
+     'lr': 0.0001},
 ]
 optimizer = optim.RAdam(grouped_parameters)
 
