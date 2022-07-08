@@ -32,7 +32,6 @@ grouped_parameters = [
     {'params': [p for n, p in model.decoder.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0, 'lr': 0.001},
 ]
 optimizer = optim.RAdam(grouped_parameters)
-# optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,
                   train_dataset,
