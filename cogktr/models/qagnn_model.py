@@ -505,7 +505,7 @@ from cogktr.models.base_model import BaseModel
 
 class QAGNNModel(BaseModel):
     def __init__(self, vocab, plm, addition,
-                 k=4, n_ntype=4, n_etype=38, n_concept=799273, concept_dim=200,
+                 k=5, n_ntype=4, n_etype=38, n_concept=799273, concept_dim=200,
                  concept_in_dim=1024, n_attention_head=2, fc_dim=200, n_fc_layer=0,
                  p_emb=0.2, p_gnn=0.2, p_fc=0.2, freeze_ent_emb=True, init_range=0.02):
         super().__init__()
@@ -566,7 +566,7 @@ class QAGNNModel(BaseModel):
         sent_vecs = self.plm(batch).pooler_output
         logits, attn = self.decoder(sent_vecs.to(device),
                                     concept_id,
-                                    node_type_id, node_score, adj_length, adj)
+                                    node_type_id, node_score, adj_length, adj, emb_data=None)
         logits = logits.view(batch_size, batch_answer_num)
 
         return logits

@@ -4,7 +4,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=1,
+    device_id=7,
     output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/experimental_result/",
     folder_tag="simple_test",
 )
@@ -14,12 +14,12 @@ reader = CommonsenseqaReader(
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = CommonsenseqaProcessor(plm="bert-base-cased", max_token_len=100, vocab=vocab, mode="concatenate")
+processor = CommonsenseqaProcessor(plm="roberta-large", max_token_len=100, vocab=vocab, mode="concatenate")
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = PlmBertModel(pretrained_model_name="bert-base-cased")
+plm = PlmAutoModel(pretrained_model_name="roberta-large")
 model = BaseQuestionAnsweringModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
@@ -29,7 +29,7 @@ trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=50,
+                  batch_size=10,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
