@@ -1,3 +1,7 @@
+import sys
+sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
+
+from cogktr.enhancers.searcher.wikidata_searcher import WikidataSearcher
 from cogktr.utils.io_utils import load_json, save_json
 import os
 from tqdm import tqdm
@@ -15,7 +19,7 @@ class NewEnhancer:
                  load_srl=False,
                  load_ner=False,
                  load_conceptnet=False,
-                 load_wikipeida=False,
+                 load_wikipedia=False,
                  load_medicine=False,
                  reprocess=False):
         self.config_path = config_path
@@ -27,22 +31,34 @@ class NewEnhancer:
         self.load_srl = load_srl
         self.load_ner = load_ner
         self.load_conceptnet = load_conceptnet
-        self.load_wikipeida = load_wikipeida
+        self.load_wikipedia = load_wikipedia
         self.load_medicine = load_medicine
         self.reprocess = reprocess
 
         # self.root_path = os.getenv("HOME")
-        self.root_path=knowledge_graph_path
+        self.root_path = knowledge_graph_path
         self.config = load_json(config_path)
         self.syntax_path = os.path.join(self.root_path, self.config["syntax"]["path"])
         self.syntax_tool = self.config["syntax"]["tool"]
         self.ner_path = os.path.join(self.root_path, self.config["ner"]["path"])
         self.ner_tool = self.config["ner"]["tool"]
+        self.wikipedia_linker_tool = self.config["wikipedia"]["wikipedia_linker_tool"]
+        self.wikipedia_searcher_tool = self.config["wikipedia"]["wikipedia_searcher_tool"]
+        self.wikipedia_searcher_path = os.path.join(self.root_path, self.config["wikipedia"]["wikipedia_searcher_path"])
+        self.wikipedia_embedder_tool = self.config["wikipedia"]["wikipedia_embedder_tool"]
+        self.wikipedia_embedder_path = os.path.join(self.root_path, self.config["wikipedia"]["wikipedia_embedder_path"])
 
         if self.load_syntax:
             self.syntax_tagger = SyntaxTagger(tool=self.syntax_tool)
         if self.load_ner:
             self.ner_tagger = NerTagger(tool=self.ner_tool)
+        if self.load_wikipedia:
+            self.wikipedia_linker = WikipediaLinker(tool=self.wikipedia_linker_tool)
+            self.wikipedia_searcher = WikipediaSearcher(tool=self.wikipedia_searcher_tool,
+                                                        path=self.wikipedia_searcher_path)
+            self.wikipedia_embedder = WikipediaEmbedder(tool=self.wikipedia_embedder_tool,
+                                                        path=self.wikipedia_embedder_path)
+            self.wikidata_searcher = WikidataSearcher()
 
         print("end")
 
@@ -53,7 +69,7 @@ class NewEnhancer:
                          return_srl=False,
                          return_ner=False,
                          return_conceptnet=False,
-                         return_wikipeida=False,
+                         return_wikipedia=False,
                          return_medicine=False):
         enhanced_dict = {}
         enhanced_dict[sentence] = {}
@@ -61,6 +77,18 @@ class NewEnhancer:
             enhanced_dict[sentence]["syntax"] = self.syntax_tagger.tag(sentence)
         if return_ner:
             enhanced_dict[sentence]["ner"] = self.ner_tagger.tag(sentence)
+        if return_wikipedia:
+            entity_list = self.wikipedia_linker.link(sentence)
+            print("finish linker.")
+            for entity in entity_list:
+                entity["desc"] = self.wikipedia_searcher.search(entity["wikipedia_id"])["desc"]
+                print("finish searcher.")
+                entity["entity_embedding"] = self.wikipedia_embedder.embed(entity["entity_title"])["entity_embedding"]
+                print("finish embedder.")
+                entity["kg"] = self.wikidata_searcher.search(wikipedia_id=entity["wikipedia_id"],
+                                                             result_num=10)
+                print("finish kg.")
+            enhanced_dict[sentence]["wikipedia"] = entity_list
 
         return enhanced_dict
 
@@ -74,7 +102,7 @@ class NewEnhancer:
                       return_srl,
                       return_ner,
                       return_conceptnet,
-                      return_wikipeida,
+                      return_wikipedia,
                       return_medicine):
         if not os.path.exists(self.enhanced_data_path):
             raise FileExistsError("{} doesn't exist".format(self.enhanced_data_path))
@@ -88,12 +116,16 @@ class NewEnhancer:
                 syntax_dict = load_json(os.path.join(enhanced_path, "syntax.json"))
             if return_ner:
                 ner_dict = load_json(os.path.join(enhanced_path, "ner.json"))
+            if return_wikipedia:
+                wikipedia_dict = load_json(os.path.join(enhanced_path, "wikipedia.json"))
             for sentence in tqdm(datable[enhanced_key]):
                 enhanced_dict[sentence] = {}
                 if return_syntax:
                     enhanced_dict[sentence]["syntax"] = syntax_dict[sentence]["syntax"]
                 if return_ner:
                     enhanced_dict[sentence]["ner"] = ner_dict[sentence]["ner"]
+                if return_wikipedia:
+                    enhanced_dict[sentence]["wikipedia"] = wikipedia_dict[sentence]["wikipedia"]
         else:
             print("Enhancing data...")
             if enhanced_key_pair is None:
@@ -104,7 +136,7 @@ class NewEnhancer:
                                                               return_srl=return_srl,
                                                               return_ner=return_ner,
                                                               return_conceptnet=return_conceptnet,
-                                                              return_wikipeida=return_wikipeida,
+                                                              return_wikipedia=return_wikipedia,
                                                               return_medicine=return_medicine)
                     enhanced_dict.update(enhanced_sentence)
             if enhanced_key_pair is not None:
@@ -116,7 +148,7 @@ class NewEnhancer:
                                                               return_srl=return_srl,
                                                               return_ner=return_ner,
                                                               return_conceptnet=return_conceptnet,
-                                                              return_wikipeida=return_wikipeida,
+                                                              return_wikipedia=return_wikipedia,
                                                               return_medicine=return_medicine)
                     enhanced_sentence_pair = self.enhance_sentence(sentence=sentence_pair,
                                                                    return_syntax=return_syntax,
@@ -124,13 +156,14 @@ class NewEnhancer:
                                                                    return_srl=return_srl,
                                                                    return_ner=return_ner,
                                                                    return_conceptnet=return_conceptnet,
-                                                                   return_wikipeida=return_wikipeida,
+                                                                   return_wikipedia=return_wikipedia,
                                                                    return_medicine=return_medicine)
                     enhanced_dict.update(enhanced_sentence)
                     enhanced_dict.update(enhanced_sentence_pair)
 
             syntax_dict = {}
             ner_dict = {}
+            wikipedia_dict = {}
             for sentence, knowledge_type in enhanced_dict.items():
                 if return_syntax:
                     syntax_dict[sentence] = {}
@@ -138,11 +171,16 @@ class NewEnhancer:
                 if return_ner:
                     ner_dict[sentence] = {}
                     ner_dict[sentence]["ner"] = enhanced_dict[sentence]["ner"]
+                if return_wikipedia:
+                    wikipedia_dict[sentence] = {}
+                    wikipedia_dict[sentence]["wikipedia"] = enhanced_dict[sentence]["wikipedia"]
 
             if return_syntax:
                 save_json(syntax_dict, os.path.join(enhanced_path, "syntax.json"))
             if return_ner:
                 save_json(ner_dict, os.path.join(enhanced_path, "ner.json"))
+            if return_wikipedia:
+                save_json(wikipedia_dict, os.path.join(enhanced_path, "wikipedia.json"))
 
         return enhanced_dict
 
@@ -155,7 +193,7 @@ class NewEnhancer:
                       return_srl=False,
                       return_ner=False,
                       return_conceptnet=False,
-                      return_wikipeida=False,
+                      return_wikipedia=False,
                       return_medicine=False):
         return self._enhance_data(datable=datable,
                                   enhanced_key=enhanced_key,
@@ -166,7 +204,7 @@ class NewEnhancer:
                                   return_srl=return_srl,
                                   return_ner=return_ner,
                                   return_conceptnet=return_conceptnet,
-                                  return_wikipeida=return_wikipeida,
+                                  return_wikipedia=return_wikipedia,
                                   return_medicine=return_medicine)
 
     def enhance_dev(self,
@@ -178,7 +216,7 @@ class NewEnhancer:
                     return_srl=False,
                     return_ner=False,
                     return_conceptnet=False,
-                    return_wikipeida=False,
+                    return_wikipedia=False,
                     return_medicine=False):
         return self._enhance_data(datable=datable,
                                   enhanced_key=enhanced_key,
@@ -189,7 +227,7 @@ class NewEnhancer:
                                   return_srl=return_srl,
                                   return_ner=return_ner,
                                   return_conceptnet=return_conceptnet,
-                                  return_wikipeida=return_wikipeida,
+                                  return_wikipedia=return_wikipedia,
                                   return_medicine=return_medicine)
 
     def enhance_test(self,
@@ -201,7 +239,7 @@ class NewEnhancer:
                      return_srl=False,
                      return_ner=False,
                      return_conceptnet=False,
-                     return_wikipeida=False,
+                     return_wikipedia=False,
                      return_medicine=False):
         return self._enhance_data(datable=datable,
                                   enhanced_key=enhanced_key,
@@ -212,30 +250,28 @@ class NewEnhancer:
                                   return_srl=return_srl,
                                   return_ner=return_ner,
                                   return_conceptnet=return_conceptnet,
-                                  return_wikipeida=return_wikipeida,
+                                  return_wikipedia=return_wikipedia,
                                   return_medicine=return_medicine)
 
 
 if __name__ == "__main__":
     from cogktr import *
 
-    reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+    reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
-    enhancer = NewEnhancer(config_path="/data/mentianyi/code/CogKTR/cogktr/utils/config/enhancer_config.json",
-                           knowledge_graph_path="/data/mentianyi/code/CogKTR/cogktr/datapath/knowledge_graph",
+    enhancer = NewEnhancer(config_path="/home/chenyuheng/zhouyuyang/CogKTR/cogktr/utils/config/enhancer_config.json",
+                           knowledge_graph_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph",
                            save_file_name="pre_enhanced_data",
-                           enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data",
-                           load_syntax=True,
-                           load_ner=True,
+                           enhanced_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/enhanced_data",
+                           load_wikipedia=True,
                            reprocess=True)
 
     enhanced_sentence_dict = enhancer.enhance_sentence(sentence="Bert likes reading in the Sesame Street Library.",
-                                                       return_syntax=True,
-                                                       return_ner=True)
-
-    enhanced_dev_dict = enhancer.enhance_dev(dev_data,
-                                             return_syntax=True,
-                                             return_ner=True)
+                                                       return_wikipedia=True)
+    print(enhanced_sentence_dict)
+    # enhanced_dev_dict = enhancer.enhance_dev(dev_data,
+    #                                          return_syntax=True,
+    #                                          return_ner=True)
     print("end")

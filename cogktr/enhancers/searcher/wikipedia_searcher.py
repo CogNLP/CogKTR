@@ -1,7 +1,7 @@
 from cogktr.enhancers.searcher import BaseSearcher
 import json
 from tqdm import tqdm
-from cogktr.enhancers.searcher.kilt_searcher import KnowledgeSource
+from cogktr.enhancers.searcher.kilt_searcher import KiltSearcher
 
 
 class WikipediaSearcher(BaseSearcher):
@@ -51,7 +51,7 @@ class WikipediaSearcher(BaseSearcher):
         return search_dict
 
     def _kilt_search(self, id):
-        ks = KnowledgeSource()
+        ks = KiltSearcher()
         search_dict = {}
         search_dict["desc"] = None
         if self.return_desc:
@@ -60,7 +60,11 @@ class WikipediaSearcher(BaseSearcher):
 
 
 if __name__ == "__main__":
+    # searcher = WikipediaSearcher(tool="blink",
+    #                              path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
+    # search_dict = searcher.search(18978754)
     searcher = WikipediaSearcher(tool="blink",
-                                 path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
-    search_dict = searcher.search(18978754)
+                                 path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikipedia/entity.jsonl")
+    search_dict = searcher.search(174924)
+    search_dict_2 = searcher.search(48064)
     print("end")

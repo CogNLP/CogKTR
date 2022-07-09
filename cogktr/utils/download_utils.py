@@ -73,6 +73,23 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
+    def download_commonsenseqa_qagnn_raw_data(self, output_file):
+        dataset_list = ["cpnet", "graph", "grounded", "statement", "train_rand_split.jsonl", "dev_rand_split.jsonl",
+                        "test_rand_split_no_answers.jsonl", "inhouse_split_qids.txt"]
+        zip_name = "RAW_COMMONSENSEQA_QAGNN.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
+    def download_commonsenseqa_raw_data(self, output_file):
+        dataset_list = ["train_rand_split.jsonl", "dev_rand_split.jsonl", "test_rand_split_no_answers.jsonl",
+                        "inhouse_split_qids.txt", "train.statement.jsonl", "dev.statement.jsonl",
+                        "test.statement.jsonl"]
+        zip_name = "RAW_COMMONSENSEQA.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
 
 if __name__ == "__main__":
     downloader = Downloader()
@@ -87,3 +104,7 @@ if __name__ == "__main__":
         "/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0_subset/raw_data")
     downloader.download_multisegchnsentibert_raw_data(
         "/data/mentianyi/code/CogKTR/datapath/text_classification/MultiSegChnSentiBERT/raw_data")
+    downloader.download_commonsenseqa_qagnn_raw_data(
+        "/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA_for_QAGNN/raw_data")
+    downloader.download_commonsenseqa_raw_data(
+        "/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/raw_data")

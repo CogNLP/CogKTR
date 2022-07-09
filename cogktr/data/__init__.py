@@ -6,14 +6,14 @@ from .datableset import *
 __all__ = [
     # processor
     "BaseProcessor",
+    "CommonsenseqaProcessor",
+    "CommonsenseqaQagnnProcessor",
     "Conll2003Processor",
-    "Conll2005SrlSubsetProcessor",
     "MultisegchnsentibertProcessor",
     "QnliProcessor",
     "QnliSembertProcessor",
     "Squad2Processor",
     "Squad2SembertProcessor",
-    "Squad2SubsetProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
@@ -23,12 +23,12 @@ __all__ = [
 
     # reader
     "BaseReader",
+    "CommonsenseqaReader",
+    "CommonsenseqaQagnnReader",
     "Conll2003Reader",
-    "Conll2005SrlSubsetReader",
     "MultisegchnsentibertReader",
     "QnliReader",
     "Squad2Reader",
-    "Squad2SubsetReader",
     "Sst2Reader",
     "StsbReader",
 

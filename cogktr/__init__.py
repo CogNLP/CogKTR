@@ -16,14 +16,14 @@ __all__ = [
 
     # data
     "BaseProcessor",
+    "CommonsenseqaProcessor",
+    "CommonsenseqaQagnnProcessor",
     "Conll2003Processor",
-    "Conll2005SrlSubsetProcessor",
     "MultisegchnsentibertProcessor",
     "QnliProcessor",
     "QnliSembertProcessor",
     "Squad2Processor",
     "Squad2SembertProcessor",
-    "Squad2SubsetProcessor",
     "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
@@ -31,12 +31,12 @@ __all__ = [
     "Sst2SembertProcessor",
     "StsbProcessor",
     "BaseReader",
+    "CommonsenseqaReader",
+    "CommonsenseqaQagnnReader",
     "Conll2003Reader",
-    "Conll2005SrlSubsetReader",
     "MultisegchnsentibertReader",
     "QnliReader",
     "Squad2Reader",
-    "Squad2SubsetReader",
     "Sst2Reader",
     "StsbReader",
     "DataTable",
@@ -57,6 +57,7 @@ __all__ = [
 
     # models
     "BaseModel",
+    "BaseQuestionAnsweringModel",
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
     "BaseSequenceLabelingModel",
@@ -64,10 +65,12 @@ __all__ = [
     "HLGModel",
     "KgembModel",
     "KtembModel",
+    "QAGNNModel",
     "SyntaxAttentionModel",
 
     # modules
     "PlmBertModel",
+    "PlmAutoModel",
 
     # toolkits
 

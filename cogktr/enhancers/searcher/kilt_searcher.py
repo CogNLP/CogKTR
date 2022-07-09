@@ -15,59 +15,59 @@ from urllib.parse import parse_qs
 DEFAULT_MONGO_CONNECTION_STRING = "mongodb://127.0.0.1:27017/admin"
 
 
-def _get_pageid_from_api(title, client=None):
-    pageid = None
+# def _get_pageid_from_api(title, client=None):
+#     pageid = None
+#
+#     title_html = title.strip().replace(" ", "%20")
+#     url = (
+#         "https://en.wikipedia.org/w/api.php?action=query&titles={}&format=json".format(
+#             title_html
+#         )
+#     )
+#
+#     try:
+#         # Package the request, send the request and catch the response: r
+#         r = requests.get(url)
+#
+#         # Decode the JSON data into a dictionary: json_data
+#         json_data = r.json()
+#
+#         if len(json_data["query"]["pages"]) > 1:
+#             print("WARNING: more than one result returned from wikipedia_desc api")
+#
+#         for _, v in json_data["query"]["pages"].items():
+#             pageid = v["pageid"]
+#
+#     except Exception as e:
+#         #  print("Exception: {}".format(e))
+#         pass
+#
+#     return pageid
+#
+#
+# def _read_url(url):
+#     with urllib.request.urlopen(url) as response:
+#         html = response.read()
+#         soup = BeautifulSoup(html, features="html.parser")
+#         title = soup.title.string.replace(" - Wikipedia", "").strip()
+#     return title
+#
+#
+# def _get_title_from_wikipedia_url(url, client=None):
+#     title = None
+#     try:
+#         title = _read_url(url)
+#     except Exception:
+#         try:
+#             # try adding https
+#             title = _read_url("https://" + url)
+#         except Exception:
+#             #  print("Exception: {}".format(e))
+#             pass
+#     return title
 
-    title_html = title.strip().replace(" ", "%20")
-    url = (
-        "https://en.wikipedia.org/w/api.php?action=query&titles={}&format=json".format(
-            title_html
-        )
-    )
 
-    try:
-        # Package the request, send the request and catch the response: r
-        r = requests.get(url)
-
-        # Decode the JSON data into a dictionary: json_data
-        json_data = r.json()
-
-        if len(json_data["query"]["pages"]) > 1:
-            print("WARNING: more than one result returned from wikipedia_desc api")
-
-        for _, v in json_data["query"]["pages"].items():
-            pageid = v["pageid"]
-
-    except Exception as e:
-        #  print("Exception: {}".format(e))
-        pass
-
-    return pageid
-
-
-def _read_url(url):
-    with urllib.request.urlopen(url) as response:
-        html = response.read()
-        soup = BeautifulSoup(html, features="html.parser")
-        title = soup.title.string.replace(" - Wikipedia", "").strip()
-    return title
-
-
-def _get_title_from_wikipedia_url(url, client=None):
-    title = None
-    try:
-        title = _read_url(url)
-    except Exception:
-        try:
-            # try adding https
-            title = _read_url("https://" + url)
-        except Exception:
-            #  print("Exception: {}".format(e))
-            pass
-    return title
-
-
-class KnowledgeSource:
+class KiltSearcher:
     def __init__(
             self,
             mongo_connection_string=None,
@@ -78,6 +78,55 @@ class KnowledgeSource:
             mongo_connection_string = DEFAULT_MONGO_CONNECTION_STRING
         self.client = MongoClient(mongo_connection_string)
         self.db = self.client[database][collection]
+
+    def _get_pageid_from_api(self, title, client=None):
+        pageid = None
+
+        title_html = title.strip().replace(" ", "%20")
+        url = (
+            "https://en.wikipedia.org/w/api.php?action=query&titles={}&format=json".format(
+                title_html
+            )
+        )
+
+        try:
+            # Package the request, send the request and catch the response: r
+            r = requests.get(url)
+
+            # Decode the JSON data into a dictionary: json_data
+            json_data = r.json()
+
+            if len(json_data["query"]["pages"]) > 1:
+                print("WARNING: more than one result returned from wikipedia_desc api")
+
+            for _, v in json_data["query"]["pages"].items():
+                pageid = v["pageid"]
+
+        except Exception as e:
+            #  print("Exception: {}".format(e))
+            pass
+
+        return pageid
+
+    def _read_url(self, url):
+        with urllib.request.urlopen(url) as response:
+            html = response.read()
+            soup = BeautifulSoup(html, features="html.parser")
+            title = soup.title.string.replace(" - Wikipedia", "").strip()
+        return title
+
+    def _get_title_from_wikipedia_url(self, url, client=None):
+        title = None
+        try:
+            title = self._read_url(url)
+        except Exception:
+            try:
+                # try adding https
+                title = self._read_url("https://" + url)
+            except Exception:
+                #  print("Exception: {}".format(e))
+                pass
+        return title
 
     def get_all_pages_cursor(self):
         cursor = self.db.find({})
@@ -111,9 +160,9 @@ class KnowledgeSource:
 
         # 3. try to retrieve the current wikipedia_id from the url
         if page == None:
-            title = _get_title_from_wikipedia_url(url, client=self.client)
+            title = self._get_title_from_wikipedia_url(url, client=self.client)
             if title:
-                pageid = _get_pageid_from_api(title, client=self.client)
+                pageid = self._get_pageid_from_api(title, client=self.client)
                 if pageid:
                     page = self.get_page_by_id(pageid)
 
@@ -121,18 +170,19 @@ class KnowledgeSource:
 
 
 if __name__ == "__main__":
-    from cogktr.enhancers.searcher.kilt_searcher import KnowledgeSource
+    from cogktr.enhancers.searcher.kilt_searcher import KiltSearcher
 
     # get the knowledge souce
-    ks = KnowledgeSource()
+    ks = KiltSearcher()
 
     # count entries - 5903530
     ks.get_num_pages()
 
     # get page by id
     page = ks.get_page_by_id(174924)
+    page_1 = ks.get_page_by_id(48064)
 
-    desc = ks.get_page_by_id(174924)["wikidata_info"]["description"]
+    # desc = ks.get_page_by_id(18581264)["wikidata_info"]["description"]
 
     # get pages by title
     # page = ks.get_page_by_title("Michael Jordan")
