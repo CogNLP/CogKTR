@@ -10,6 +10,9 @@ from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
 from transformers import BertConfig
 from argparse import Namespace
 from cogktr.models.sembert_model import SembertForSequenceClassification
+# import wandb
+# wandb.init(project="CogKTR",entity="hongbangyuan")
+
 
 device, output_path = init_cogktr(
     device_id=2,
@@ -61,6 +64,8 @@ model = BertForSequenceClassificationTag.from_pretrained(
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=2e-5)
+# config = wandb.config
+# config.lr = 2e-5
 
 trainer = Trainer(model,
                   train_dataset,

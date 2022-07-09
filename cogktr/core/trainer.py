@@ -11,6 +11,7 @@ from cogktr.utils.log_utils import logger
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from cogktr.utils.general_utils import reduce_mean,move_dict_value_to_device
+# import wandb
 
 class Trainer:
     def __init__(
@@ -330,6 +331,10 @@ class Trainer:
                     if self.rank in [-1,0]:
                         for key, value in evaluate_result.items():
                             self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
+                        # wandb.log({
+                        #     "Global Step":global_step,
+                        #     **evaluate_result,
+                        # })
 
                     if self.early_stopping:
                         if not self.early_stopping.metric_name:
