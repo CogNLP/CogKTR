@@ -10,7 +10,8 @@ from torch.utils.tensorboard import SummaryWriter
 from cogktr.utils.log_utils import logger
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
-from cogktr.utils.general_utils import reduce_mean,move_dict_value_to_device
+from cogktr.utils.general_utils import reduce_mean, move_dict_value_to_device
+
 
 class Trainer:
     def __init__(
@@ -108,7 +109,7 @@ class Trainer:
         self.output_path = output_path
         self.rank = rank
 
-        if self.rank in [-1,0]:
+        if self.rank in [-1, 0]:
             if self.output_path:
                 self.writer_path = os.path.join(self.output_path, "tensorboard")
                 self.save_path = os.path.join(self.output_path, "model")
@@ -217,7 +218,7 @@ class Trainer:
 
         for epoch in range(epochs_trained, self.n_epochs + 1):
             if self.early_stop:
-                logger.info("Break at epoch {} and global step {}".format(epoch,global_step))
+                logger.info("Break at epoch {} and global step {}".format(epoch, global_step))
                 break
             logger.info("Train epoch = %d", epoch)
             epoch_loss = 0.0
@@ -225,7 +226,7 @@ class Trainer:
             if self.rank != -1:
                 self.train_sampler.set_epoch(epoch)
 
-            if self.use_tqdm and self.rank in [-1,0]:
+            if self.use_tqdm and self.rank in [-1, 0]:
                 progress = enumerate(tqdm(self.train_dataloader, desc="Iteration", leave=False), 1)
             else:
                 progress = enumerate(self.train_dataloader, 1)
@@ -237,18 +238,18 @@ class Trainer:
                     steps_trained_in_current_epoch -= 1
                     continue
 
-                move_dict_value_to_device(batch,device=self.device,rank=self.rank)
+                move_dict_value_to_device(batch, device=self.device, rank=self.rank)
                 if self.rank == -1:
-                    loss = self.model.loss(batch, self.loss)
+                    loss = self.model.loss(batch, self.loss)/self.gradient_accumulation_steps
                     epoch_loss += loss.item()
                     total_loss += loss.item()
                 else:
-                    loss = self.model.module.loss(batch,self.loss)
+                    loss = self.model.module.loss(batch, self.loss)
                     single_batch_loss = reduce_mean(loss, dist.get_world_size()).item()
                     epoch_loss += single_batch_loss
                     total_loss += single_batch_loss
 
-                if self.rank in [-1,0]:
+                if self.rank in [-1, 0]:
                     self.writer.add_scalar(tag='loss', scalar_value=loss, global_step=global_step)
 
                 # 梯度反传
@@ -263,7 +264,6 @@ class Trainer:
                 else:
                     loss.backward()
 
-
                 # 参数更新
                 if isinstance(self.gradient_accumulation_steps,
                               int) and global_step % self.gradient_accumulation_steps == 0:
@@ -277,7 +277,7 @@ class Trainer:
 
                     self.optimizer.step()
                     self.optimizer.zero_grad()
-                    global_step += 1
+                global_step += 1
 
                 # 学习率更新
                 if self.scheduler and isinstance(self.scheduler_steps, int) and global_step % self.scheduler_steps == 0:
@@ -285,16 +285,17 @@ class Trainer:
                     # If there is one global learning rate (which is the common case).
                     lr = next(iter(self.optimizer.param_groups))['lr']
                     logger.info('Global step: {}, Learning rate: {}'.format(global_step, lr))
-                    if self.rank in [-1,0]:
+                    if self.rank in [-1, 0]:
                         self.writer.add_scalar(tag='Learning rate', scalar_value=lr, global_step=global_step)
 
                 # 打印训练信息
                 if isinstance(self.print_every, int) and global_step % self.print_every == 0:
                     logger.info('Epoch: [{}/{}], Step: [{}/{}], Loss: {}'.
-                                      format(epoch, self.n_epochs, step, self.batch_count, loss.item()))
+                                format(epoch, self.n_epochs, step, self.batch_count, loss.item()))
 
                 # 保存模型
-                if self.save_path and isinstance(self.save_steps, int) and global_step % self.save_steps == 0 and self.rank in [-1,0]:
+                if self.save_path and isinstance(self.save_steps,
+                                                 int) and global_step % self.save_steps == 0 and self.rank in [-1, 0]:
                     logger.info("Saving models step = %d", global_step)
                     output_dir = os.path.join(self.save_path, "checkpoint-{}".format(global_step))
                     if not os.path.exists(output_dir):
@@ -312,7 +313,9 @@ class Trainer:
                         torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
 
                 # 验证模型
-                if self.dev_data and isinstance(self.validate_steps, int) and global_step % self.validate_steps == 0 and self.rank in [-1,0]:
+                if self.dev_data and isinstance(self.validate_steps,
+                                                int) and global_step % self.validate_steps == 0 and self.rank in [-1,
+                                                                                                                  0]:
                     logger.info("Evaluate step = %d", global_step)
                     model = self.model if self.rank == -1 else self.model.module
                     model.eval()
@@ -327,7 +330,7 @@ class Trainer:
                     self.model.train()
                     evaluate_result = self.metrics.get_metric()
                     logger.info("Evaluate result = %s", str(evaluate_result))
-                    if self.rank in [-1,0]:
+                    if self.rank in [-1, 0]:
                         for key, value in evaluate_result.items():
                             self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
 
@@ -338,7 +341,8 @@ class Trainer:
                         if self.early_stopping.early_stop:
                             self.early_stop = True
                             logger.info("Early Stop with patience={} and threshold={} on metric {}.".format(
-                                self.early_stopping.patience,self.early_stopping.threshold,self.early_stopping.metric_name
+                                self.early_stopping.patience, self.early_stopping.threshold,
+                                self.early_stopping.metric_name
                             ))
                             break
 
