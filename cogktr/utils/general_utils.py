@@ -84,7 +84,7 @@ def init_cogktr(
         output_path,
         device_id=None,
         folder_tag="",
-        seed=1,
+        seed=0,
         rank=-1,
 ):
     # set the random seed

@@ -45,6 +45,7 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
             special_tokens_mask_list = []
             for context, candidate_text in zip(context_list, candidate_text_list):
                 # TODO:check if need add " " before candidate text
+                candidate_text=" "+candidate_text
                 tokenized_data = self.tokenizer.encode_plus(text=context, text_pair=candidate_text,
                                                             truncation='longest_first',
                                                             padding="max_length",
@@ -95,6 +96,7 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
             special_tokens_mask_list = []
             for context, candidate_text in zip(context_list, candidate_text_list):
                 # TODO:check if need add " " before candidate text
+                candidate_text=" "+candidate_text
                 tokenized_data = self.tokenizer.encode_plus(text=context, text_pair=candidate_text,
                                                             truncation='longest_first',
                                                             padding="max_length",
