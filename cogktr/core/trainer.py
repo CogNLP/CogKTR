@@ -240,11 +240,11 @@ class Trainer:
 
                 move_dict_value_to_device(batch,device=self.device,rank=self.rank)
                 if self.rank == -1:
-                    loss = self.model.loss(batch, self.loss)
+                    loss = self.model.loss(batch, self.loss)/self.gradient_accumulation_steps
                     epoch_loss += loss.item()
                     total_loss += loss.item()
                 else:
-                    loss = self.model.module.loss(batch,self.loss)
+                    loss = self.model.module.loss(batch,self.loss)/self.gradient_accumulation_steps
                     single_batch_loss = reduce_mean(loss, dist.get_world_size()).item()
                     epoch_loss += single_batch_loss
                     total_loss += single_batch_loss
