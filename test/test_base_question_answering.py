@@ -4,7 +4,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=5,
+    device_id=8,
     output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/experimental_result/",
     folder_tag="simple_test",
 )
@@ -23,7 +23,7 @@ plm = PlmAutoModel(pretrained_model_name="roberta-large")
 model = BaseQuestionAnsweringModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(model.parameters(), lr=0.000001)
 
 trainer = Trainer(model,
                   train_dataset,
