@@ -36,12 +36,14 @@ class BaseClassificationMetric(BaseMetric):
             macro_P = precision_score(self.label_list, self.pre_list, average="macro")
             macro_R = recall_score(self.label_list, self.pre_list, average="macro")
             macro_F1 = f1_score(self.label_list, self.pre_list, average="macro")
+            Acc = accuracy_score(self.label_list,self.pre_list)
             evaluate_result = {"micro_P": micro_P,
                                "micro_R": micro_R,
                                "micro_F1": micro_F1,
                                "macro_P": macro_P,
                                "macro_R": macro_R,
                                "macro_F1": macro_F1,
+                               "Acc":Acc,
                                }
         if reset:
             self.label_list = list()

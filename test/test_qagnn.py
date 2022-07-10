@@ -4,7 +4,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=2,
+    device_id=6,
     output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA_for_QAGNN/experimental_result",
     folder_tag="simple_test",
 )
@@ -24,24 +24,13 @@ plm = PlmAutoModel(pretrained_model_name="roberta-large")
 model = QAGNNModel(plm=plm, vocab=vocab, addition=addition)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
-no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
-grouped_parameters = [
-    {'params': [p for n, p in model.plm._plm.named_parameters() if not any(nd in n for nd in no_decay)],
-     'weight_decay': 0.01, 'lr': 1e-06},
-    {'params': [p for n, p in model.plm._plm.named_parameters() if any(nd in n for nd in no_decay)],
-     'weight_decay': 0.0, 'lr': 1e-06},
-    {'params': [p for n, p in model.decoder.named_parameters() if not any(nd in n for nd in no_decay)],
-     'weight_decay': 0.01, 'lr': 0.0001},
-    {'params': [p for n, p in model.decoder.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0,
-     'lr': 0.0001},
-]
-optimizer = optim.RAdam(grouped_parameters)
+optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=5,
+                  batch_size=2,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
@@ -49,12 +38,12 @@ trainer = Trainer(model,
                   train_sampler=None,
                   dev_sampler=None,
                   drop_last=False,
-                  gradient_accumulation_steps=1,
+                  gradient_accumulation_steps=32,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
-                  save_steps=100,
+                  validate_steps=1000,
+                  save_steps=1000,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,

@@ -11,6 +11,7 @@ from cogktr.utils.log_utils import logger
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from cogktr.utils.general_utils import reduce_mean,move_dict_value_to_device
+# import wandb
 
 class Trainer:
     def __init__(
@@ -239,11 +240,11 @@ class Trainer:
 
                 move_dict_value_to_device(batch,device=self.device,rank=self.rank)
                 if self.rank == -1:
-                    loss = self.model.loss(batch, self.loss)
+                    loss = self.model.loss(batch, self.loss)/self.gradient_accumulation_steps
                     epoch_loss += loss.item()
                     total_loss += loss.item()
                 else:
-                    loss = self.model.module.loss(batch,self.loss)
+                    loss = self.model.module.loss(batch,self.loss)/self.gradient_accumulation_steps
                     single_batch_loss = reduce_mean(loss, dist.get_world_size()).item()
                     epoch_loss += single_batch_loss
                     total_loss += single_batch_loss
@@ -277,7 +278,7 @@ class Trainer:
 
                     self.optimizer.step()
                     self.optimizer.zero_grad()
-                    global_step += 1
+                global_step += 1
 
                 # 学习率更新
                 if self.scheduler and isinstance(self.scheduler_steps, int) and global_step % self.scheduler_steps == 0:
@@ -330,6 +331,10 @@ class Trainer:
                     if self.rank in [-1,0]:
                         for key, value in evaluate_result.items():
                             self.writer.add_scalar(tag=key, scalar_value=value, global_step=global_step)
+                        # wandb.log({
+                        #     "Global Step":global_step,
+                        #     **evaluate_result,
+                        # })
 
                     if self.early_stopping:
                         if not self.early_stopping.metric_name:
