@@ -90,6 +90,14 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
+    def download_lama_raw_data(self, output_file):
+        dataset_list = ["ConceptNet", "Google_RE", "Squad",
+                        "TREx", "relations.jsonl"]
+        zip_name = "RAW_LAMA.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
 
 if __name__ == "__main__":
     downloader = Downloader()
