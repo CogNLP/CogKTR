@@ -278,7 +278,7 @@ class Trainer:
 
                     self.optimizer.step()
                     self.optimizer.zero_grad()
-                    global_step += 1
+                global_step += 1
 
                 # 学习率更新
                 if self.scheduler and isinstance(self.scheduler_steps, int) and global_step % self.scheduler_steps == 0:
