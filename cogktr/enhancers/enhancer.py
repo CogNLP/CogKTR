@@ -9,7 +9,6 @@ from cogktr.enhancers.tagger import NerTagger, SrlTagger, SyntaxTagger
 from cogktr.enhancers.linker import WikipediaLinker
 from cogktr.enhancers.searcher import WikipediaSearcher
 from cogktr.enhancers.embedder import WikipediaEmbedder
-from cogktr.utils.constant_utils import TABLE_DATA_TAGGER, TABLE_DATA_LINKER, TABLE_DATA_SEARCHER, TABLE_DATA_EMBEDDER
 
 
 class Enhancer:
