@@ -4,7 +4,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=7,
+    device_id=5,
     output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/experimental_result/",
     folder_tag="simple_test",
 )
@@ -41,8 +41,8 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
-                  save_steps=100,
+                  validate_steps=1000,
+                  save_steps=1000,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
