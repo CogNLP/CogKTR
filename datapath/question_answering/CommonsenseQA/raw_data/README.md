@@ -1,7 +1,7 @@
 # The CommonsenseQA Dataset
 
-Download The CommonsenseQA_for_QAGNN Dataset from https://github.com/michiyasunaga/qagnn/blob/main/download_raw_data.sh.    
-Put the raw data in path`datapath/question_answering/CommonsenseQA/raw_data`.   
+Download The CommonsenseQA_for_QAGNN Dataset from https://github.com/michiyasunaga/qagnn/blob/main/download_raw_data.sh.  
+Put the raw data in path`datapath/question_answering/CommonsenseQA/raw_data`.
 Like the following form:
 
 ```angular2html
