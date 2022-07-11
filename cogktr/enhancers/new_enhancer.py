@@ -2,10 +2,14 @@ import sys
 sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
 
 from cogktr.enhancers.searcher.wikidata_searcher import WikidataSearcher
+from cogktr.enhancers.embedder.wikipedia_embedder import WikipediaEmbedder
+from cogktr.enhancers.linker.wikipedia_linker import WikipediaLinker
+from cogktr.enhancers.searcher.wikipedia_searcher import WikipediaSearcher
 from cogktr.utils.io_utils import load_json, save_json
 import os
 from tqdm import tqdm
 from cogktr.enhancers.tagger import NerTagger, SrlTagger, SyntaxTagger
+import time
 
 
 class NewEnhancer:
@@ -79,15 +83,16 @@ class NewEnhancer:
             enhanced_dict[sentence]["ner"] = self.ner_tagger.tag(sentence)
         if return_wikipedia:
             entity_list = self.wikipedia_linker.link(sentence)
-            print("finish linker.")
+            # print("finish linker.")
             for entity in entity_list:
                 entity["desc"] = self.wikipedia_searcher.search(entity["wikipedia_id"])["desc"]
-                print("finish searcher.")
+                # print("finish searcher.")
                 entity["entity_embedding"] = self.wikipedia_embedder.embed(entity["entity_title"])["entity_embedding"]
-                print("finish embedder.")
+                # print("finish embedder.")
                 entity["kg"] = self.wikidata_searcher.search(wikipedia_id=entity["wikipedia_id"],
                                                              result_num=10)
-                print("finish kg.")
+                time.sleep(0.5)
+                # print("finish kg.")
             enhanced_dict[sentence]["wikipedia"] = entity_list
 
         return enhanced_dict
@@ -271,7 +276,6 @@ if __name__ == "__main__":
     enhanced_sentence_dict = enhancer.enhance_sentence(sentence="Bert likes reading in the Sesame Street Library.",
                                                        return_wikipedia=True)
     print(enhanced_sentence_dict)
-    # enhanced_dev_dict = enhancer.enhance_dev(dev_data,
-    #                                          return_syntax=True,
-    #                                          return_ner=True)
+    enhanced_dev_dict = enhancer.enhance_dev(dev_data,
+                                             return_wikipedia=True)
     print("end")
