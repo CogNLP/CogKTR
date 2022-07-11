@@ -8,6 +8,7 @@ __all__ = [
     "BaseProcessor",
     "CommonsenseqaProcessor",
     "CommonsenseqaQagnnProcessor",
+    "OpenBookQAReader",
     "Conll2003Processor",
     "MultisegchnsentibertProcessor",
     "QnliProcessor",

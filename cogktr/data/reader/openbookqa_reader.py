@@ -28,6 +28,9 @@ class OpenBookQAReader(BaseReader):
     def _read_dev(self, path):
         return self._read_data(path)
 
+    def _read_test(self, path):
+        return self._read_data(path)
+
     def _read_data(self, path):
         datable = DataTable()
         with open(path, "r", encoding="utf-8") as file:
@@ -36,10 +39,16 @@ class OpenBookQAReader(BaseReader):
             json_line = json.loads(line)
             output_dict = convert_qajson_to_entailment(json_line)
             datable("output_dict", output_dict)
+            self.label_vocab.add(output_dict["answerKey"])
         return datable
 
     def read_all(self):
-        return self._read_train(self.train_path), self._read_dev(self.dev_path)
+        return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
+
+    def read_vocab(self):
+        self.label_vocab.create()
+        return {"label_vocab": self.label_vocab}
+
 
 
 # Convert the QA file json to output dictionary containing premise and hypothesis
@@ -66,4 +75,4 @@ if __name__ == '__main__':
     reader = OpenBookQAReader(
         raw_data_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/raw_data"
     )
-    train_data, dev_data = reader.read_all()
+    train_data, dev_data, test_data = reader.read_all()

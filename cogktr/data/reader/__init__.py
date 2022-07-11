@@ -7,11 +7,13 @@ from .qnli_reader import *
 from .squad2_reader import *
 from .sst2_reader import *
 from .stsb_reader import *
+from .openbookqa_reader import *
 
 __all__ = [
     "BaseReader",
     "CommonsenseqaReader",
     "CommonsenseqaQagnnReader",
+    "OpenBookQAReader",
     "Conll2003Reader",
     "MultisegchnsentibertReader",
     "QnliReader",
