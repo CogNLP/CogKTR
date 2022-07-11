@@ -8,6 +8,7 @@ import spacy
 import nltk
 from cogktr.utils.log_utils import logger
 from spacy.matcher import Matcher
+from cogktr.utils.vocab_utils import Vocabulary
 
 
 class ConcetNetLinker(BaseLinker):
@@ -39,7 +40,16 @@ class ConcetNetLinker(BaseLinker):
                 output_path=self.pattern_path,
             )
 
-        self.conceptnet_vocab = load_cpnet_vocab(self.vocab_path)
+        self.conceptnet_vocab = {
+            "node":Vocabulary(),
+            "relation":Vocabulary(),
+        }
+        vocab_list = load_cpnet_vocab(self.vocab_path)
+        self.conceptnet_vocab["node"].add_sequence(vocab_list)
+        self.conceptnet_vocab["node"].create()
+        self.conceptnet_vocab["relation"].add_sequence(MERGED_RELATIONS)
+        self.conceptnet_vocab["relation"].create()
+
         self.nlp = spacy.load('en_core_web_sm', disable=['tokenizer','ner', 'parser', 'textcat'])
         try:
             self.nlp.add_pipe(self.nlp.create_pipe('sentencizer'))
@@ -47,11 +57,21 @@ class ConcetNetLinker(BaseLinker):
             self.nlp.add_pipe('sentencizer')
 
         self.matcher = load_matcher(self.nlp, self.pattern_path)
+        self.conceptnet = nx.read_gpickle(os.path.join(path, "conceptnet.en.pruned.graph"))
+        conceptnet_simple = nx.Graph()
+        for u, v, data in self.conceptnet.edges(data=True):
+            w = data['weight'] if 'weight' in data else 1.0
+            if conceptnet_simple.has_edge(u, v):
+                conceptnet_simple[u][v]['weight'] += w
+            else:
+                conceptnet_simple.add_edge(u, v, weight=w)
+        self.conceptnet_simple = conceptnet_simple
+
 
     def link(self, sentence):
         concepts = ground_mentioned_concepts(self.nlp,self.matcher,sentence)
         if len(concepts) == 0:
-            concepts = hard_ground(self.nlp,sentence,self.conceptnet_vocab)
+            concepts = hard_ground(self.nlp,sentence,self.conceptnet_vocab["node"])
         return concepts
 
 
@@ -253,10 +273,10 @@ def hard_ground(nlp, s, cpnet_vocab):
 
     res = set()
     for t in doc:
-        if t.lemma_ in cpnet_vocab:
+        if t.lemma_ in cpnet_vocab.label_set:
             res.add(t.lemma_)
     sent = " ".join([t.text for t in doc])
-    if sent in cpnet_vocab:
+    if sent in cpnet_vocab.label_set:
         res.add(sent)
     try:
         assert len(res) > 0
@@ -344,8 +364,8 @@ if __name__ == '__main__':
     # sentence = "The sun is responsible for puppies learning new tricks."
     sentence = "all of these"
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
-    words = ['all','of','these']
-    concepts = conceptnet_linker.link(words)
+    # words = ['all','of','these']
+    concepts = conceptnet_linker.link(sentence)
     for concept in concepts:
         print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
 
