@@ -11,27 +11,27 @@ from spacy.matcher import Matcher
 
 
 class ConcetNetLinker(BaseLinker):
-    def __init__(self, datapath,reprocess=False):
+    def __init__(self, path,reprocess=False):
         super(ConcetNetLinker, self).__init__()
-        self.pattern_path = os.path.join(datapath, "matcher_patterns.json")
-        self.vocab_path = os.path.join(datapath, "concept.txt")
+        self.pattern_path = os.path.join(path, "matcher_patterns.json")
+        self.vocab_path = os.path.join(path, "concept.txt")
 
         if reprocess:
             extract_english(
-                conceptnet_path=os.path.join(datapath, "conceptnet-assertions-5.6.0.csv"),
-                output_csv_path=os.path.join(datapath, "conceptnet.en.csv"),
+                conceptnet_path=os.path.join(path, "conceptnet-assertions-5.6.0.csv"),
+                output_csv_path=os.path.join(path, "conceptnet.en.csv"),
                 output_vocab_path=self.vocab_path,
             )
             construct_graph(
-                cpnet_csv_path=os.path.join(datapath, "conceptnet.en.csv"),
+                cpnet_csv_path=os.path.join(path, "conceptnet.en.csv"),
                 cpnet_vocab_path=self.vocab_path,
-                output_path=os.path.join(datapath, "conceptnet.en.unpruned.graph"),
+                output_path=os.path.join(path, "conceptnet.en.unpruned.graph"),
                 prune=False,
             )
             construct_graph(
-                cpnet_csv_path=os.path.join(datapath, "conceptnet.en.csv"),
+                cpnet_csv_path=os.path.join(path, "conceptnet.en.csv"),
                 cpnet_vocab_path=self.vocab_path,
-                output_path=os.path.join(datapath, "conceptnet.en.pruned.graph"),
+                output_path=os.path.join(path, "conceptnet.en.pruned.graph"),
                 prune=True,
             )
             create_matcher_patterns(
@@ -50,6 +50,8 @@ class ConcetNetLinker(BaseLinker):
 
     def link(self, sentence):
         concepts = ground_mentioned_concepts(self.nlp,self.matcher,sentence)
+        if len(concepts) == 0:
+            concepts = hard_ground(self.nlp,sentence,self.conceptnet_vocab)
         return concepts
 
 
@@ -237,6 +239,32 @@ def ground_mentioned_concepts(nlp, matcher, s):
     return mentioned_concepts
 
 
+def hard_ground(nlp, s, cpnet_vocab):
+    if isinstance(s,str):
+        s = s.lower()
+        doc = nlp(s)
+    elif isinstance(s,list):
+        from spacy.tokens import Doc
+        s = [c.lower() for c in s]
+        input_doc = Doc(nlp.vocab,words=s)
+        doc = nlp(input_doc)
+    else:
+        raise ValueError("Only str of list of str is supported but got {}!".format(type(s)))
+
+    res = set()
+    for t in doc:
+        if t.lemma_ in cpnet_vocab:
+            res.add(t.lemma_)
+    sent = " ".join([t.text for t in doc])
+    if sent in cpnet_vocab:
+        res.add(sent)
+    try:
+        assert len(res) > 0
+    except Exception:
+        logger.info(f"for {sent}, concept not found in hard grounding.")
+    return res
+
+
 def load_merge_relation():
     relation_mapping = dict()
     for line in RELATION_GROUPS:
@@ -312,9 +340,11 @@ def lemmatize(nlp, concept):
     return lcs
 
 if __name__ == '__main__':
-    conceptnet_linker = ConcetNetLinker(datapath='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/')
-    sentence = "The sun is responsible for puppies learning new tricks."
-    words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
+    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/')
+    # sentence = "The sun is responsible for puppies learning new tricks."
+    sentence = "all of these"
+    # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
+    words = ['all','of','these']
     concepts = conceptnet_linker.link(words)
     for concept in concepts:
         print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
