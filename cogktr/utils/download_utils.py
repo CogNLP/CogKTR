@@ -90,6 +90,21 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
+    def download_openbookqa_raw_data(self,output_file):
+        dataset_list = [
+            "train.jsonl",
+            "train.tsv",
+            "dev.jsonl",
+            "dev.tsv",
+            "test.jsonl",
+            "test.tsv",
+            "openbook.txt",
+        ]
+        zip_name = "Raw_OpenBookQA.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
 
 if __name__ == "__main__":
     downloader = Downloader()
