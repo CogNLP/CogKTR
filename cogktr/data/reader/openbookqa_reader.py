@@ -4,6 +4,7 @@ import os
 from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.data.datable import DataTable
 import json
+from tqdm import tqdm
 
 
 class OpenBookQAReader(BaseReader):
@@ -38,7 +39,13 @@ class OpenBookQAReader(BaseReader):
         for line in lines:
             json_line = json.loads(line)
             output_dict = convert_qajson_to_entailment(json_line)
-            datable("output_dict", output_dict)
+            for idx,choice in enumerate(json_line["question"]["choices"]):
+                datable("id", json_line["id"])
+                datable("stem",json_line["question"]["stem"])
+                datable("answer_text",choice["text"])
+                datable("key",choice["label"])
+                datable("statement",json_line["statements"][idx]["statement"])
+                datable("answerKey",json_line["answerKey"])
             self.label_vocab.add(output_dict["answerKey"])
         return datable
 
