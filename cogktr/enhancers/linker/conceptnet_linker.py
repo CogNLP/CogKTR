@@ -17,38 +17,48 @@ class ConcetNetLinker(BaseLinker):
         self.pattern_path = os.path.join(path, "matcher_patterns.json")
         self.vocab_path = os.path.join(path, "concept.txt")
 
+        self.id2relation = MERGED_RELATIONS
+        self.relation2id = {r: i for i, r in enumerate(self.id2relation)}
+
         if reprocess:
             extract_english(
                 conceptnet_path=os.path.join(path, "conceptnet-assertions-5.6.0.csv"),
                 output_csv_path=os.path.join(path, "conceptnet.en.csv"),
                 output_vocab_path=self.vocab_path,
             )
+        else:
+            if not os.path.exists(os.path.join(path,"conceptnet.en.csv")):
+                raise FileNotFoundError(os.path.join(path,"conceptnet.en.csv") + " not found!")
+            if not os.path.exists(self.vocab_path):
+                raise FileNotFoundError(self.vocab_path + " not found!")
+
+        with open(self.vocab_path, "r", encoding="utf8") as fin:
+            self.id2concept = [w.strip() for w in fin]
+        self.concept2id = {w: i for i, w in enumerate(self.id2concept)}
+        self.vocab = {
+            "id2relation":self.id2relation,
+            "relation2id":self.relation2id,
+            "id2concept":self.id2concept,
+            "concept2id":self.concept2id,
+        }
+
+        if reprocess:
             construct_graph(
                 cpnet_csv_path=os.path.join(path, "conceptnet.en.csv"),
-                cpnet_vocab_path=self.vocab_path,
+                cpnet_vocab=self.vocab,
                 output_path=os.path.join(path, "conceptnet.en.unpruned.graph"),
                 prune=False,
             )
             construct_graph(
                 cpnet_csv_path=os.path.join(path, "conceptnet.en.csv"),
-                cpnet_vocab_path=self.vocab_path,
+                cpnet_vocab=self.vocab,
                 output_path=os.path.join(path, "conceptnet.en.pruned.graph"),
                 prune=True,
             )
             create_matcher_patterns(
-                cpnet_vocab_path=self.vocab_path,
+                cpnet_vocab=self.vocab,
                 output_path=self.pattern_path,
             )
-
-        self.conceptnet_vocab = {
-            "node":Vocabulary(),
-            "relation":Vocabulary(),
-        }
-        vocab_list = load_cpnet_vocab(self.vocab_path)
-        self.conceptnet_vocab["node"].add_sequence(vocab_list)
-        self.conceptnet_vocab["node"].create()
-        self.conceptnet_vocab["relation"].add_sequence(MERGED_RELATIONS)
-        self.conceptnet_vocab["relation"].create()
 
         self.nlp = spacy.load('en_core_web_sm', disable=['tokenizer','ner', 'parser', 'textcat'])
         try:
@@ -71,8 +81,26 @@ class ConcetNetLinker(BaseLinker):
     def link(self, sentence):
         concepts = ground_mentioned_concepts(self.nlp,self.matcher,sentence)
         if len(concepts) == 0:
-            concepts = hard_ground(self.nlp,sentence,self.conceptnet_vocab["node"])
+            concepts = hard_ground(self.nlp,sentence,self.vocab["id2concept"])
+        concepts = prune(concepts,self.vocab["id2concept"])
         return concepts
+
+def prune(concepts,vocab):
+    prune_concepts = []
+    for concept in concepts:
+        if concept[-2:] == 'er' and concept[:-2] in concepts:
+            continue
+        if concept[-1:] == 'e' and concept[:1] in concepts:
+            continue
+        stop = False
+        for t in concept.split("_"):
+            if t in NLTK_STOPWORDS:
+                stop = True
+                break
+        if not stop and concept in vocab:
+            prune_concepts.append(concept)
+    return prune_concepts
+
 
 
 def extract_english(conceptnet_path, output_csv_path, output_vocab_path):
@@ -129,15 +157,13 @@ def extract_english(conceptnet_path, output_csv_path, output_vocab_path):
     logger.info(f'extracted concept vocabulary saved to {output_vocab_path}')
 
 
-def construct_graph(cpnet_csv_path, cpnet_vocab_path, output_path, prune=True):
+def construct_graph(cpnet_csv_path, cpnet_vocab, output_path, prune=True):
     logger.info("Generating ConceptNet graph files with prune={}".format(str(prune)))
 
-    with open(cpnet_vocab_path, "r", encoding="utf8") as fin:
-        id2concept = [w.strip() for w in fin]
-    concept2id = {w: i for i, w in enumerate(id2concept)}
-
-    id2relation = MERGED_RELATIONS
-    relation2id = {r: i for i, r in enumerate(id2relation)}
+    # id2concept = cpnet_vocab["id2conceptnet"]
+    id2relation = cpnet_vocab["id2relation"]
+    concept2id = cpnet_vocab["concept2id"]
+    relation2id = cpnet_vocab["relation2id"]
 
     graph = nx.MultiDiGraph()
     nrow = sum(1 for _ in open(cpnet_csv_path, 'r', encoding='utf-8'))
@@ -170,8 +196,10 @@ def construct_graph(cpnet_csv_path, cpnet_vocab_path, output_path, prune=True):
     logger.info(f"graph file saved to {output_path}")
 
 
-def create_matcher_patterns(cpnet_vocab_path, output_path, debug=False):
-    cpnet_vocab = load_cpnet_vocab(cpnet_vocab_path)
+def create_matcher_patterns(cpnet_vocab, output_path, debug=False):
+    id2concept = cpnet_vocab["concept2id"]
+    cpnet_vocab = [c.replace("_", " ") for c in id2concept]
+
     nlp = spacy.load('en_core_web_sm', disable=['parser', 'ner', 'textcat'])
     docs = nlp.pipe(cpnet_vocab)
     all_patterns = {}
@@ -273,10 +301,10 @@ def hard_ground(nlp, s, cpnet_vocab):
 
     res = set()
     for t in doc:
-        if t.lemma_ in cpnet_vocab.label_set:
+        if t.lemma_ in cpnet_vocab:
             res.add(t.lemma_)
-    sent = " ".join([t.text for t in doc])
-    if sent in cpnet_vocab.label_set:
+    sent = "_".join([t.text for t in doc])
+    if sent in cpnet_vocab:
         res.add(sent)
     try:
         assert len(res) > 0
@@ -312,22 +340,14 @@ def del_pos(s):
 def load_cpnet_vocab(cpnet_vocab_path):
     with open(cpnet_vocab_path, "r", encoding="utf8") as fin:
         cpnet_vocab = [l.strip() for l in fin]
-    cpnet_vocab = [c.replace("_", " ") for c in cpnet_vocab]
+    # cpnet_vocab = [c.replace("_", " ") for c in cpnet_vocab]
     return cpnet_vocab
 
 
 def create_pattern(nlp, doc, debug=False):
-    pronoun_list = {"my", "you", "it", "its", "your", "i", "he", "she", "his", "her", "they", "them", "their", "our",
-                    "we"}
-    blacklist = {"-PRON-", "actually", "likely", "possibly", "want", "make", "my", "someone", "sometimes_people",
-                 "sometimes", "would", "want_to", "one", "something", "sometimes", "everybody", "somebody", "could",
-                 "could_be"}
-    nltk.download('stopwords', quiet=True)
-    nltk_stopwords = nltk.corpus.stopwords.words('english')
-
     # Filtering concepts consisting of all stop words and longer than four words.
-    if len(doc) >= 5 or doc[0].text in pronoun_list or doc[-1].text in pronoun_list or \
-            all([(token.text in nltk_stopwords or token.lemma_ in nltk_stopwords or token.lemma_ in blacklist) for token
+    if len(doc) >= 5 or doc[0].text in PATTERN_PRONOUN_LIST or doc[-1].text in PATTERN_PRONOUN_LIST or \
+            all([(token.text in NLTK_STOPWORDS or token.lemma_ in NLTK_STOPWORDS or token.lemma_ in PATTERN_BACKLIST) for token
                  in doc]):
         if debug:
             return False, doc.text
@@ -360,14 +380,20 @@ def lemmatize(nlp, concept):
     return lcs
 
 if __name__ == '__main__':
-    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/')
-    # sentence = "The sun is responsible for puppies learning new tricks."
-    sentence = "all of these"
+    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',reprocess=False)
+    sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
+    answer = "the mountains seem very close"
+    # sentence = "all of these"
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']
-    concepts = conceptnet_linker.link(sentence)
-    for concept in concepts:
-        print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
+    all_concepts = conceptnet_linker.link(sentence)
+    ans_concepts = conceptnet_linker.link(answer)
+    ac = set(all_concepts) - set(ans_concepts)
+    qc = set(ans_concepts)
+    print(qc)
+    print(ac)
+    # for concept in concepts:
+    #     print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
 
 
 

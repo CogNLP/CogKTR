@@ -64,3 +64,14 @@ RELATION_TEXT = [
 BLACKLIST = {"uk", "us", "take", "make", "object", "person",
              "people"}
 
+
+PATTERN_PRONOUN_LIST = {"my", "you", "it", "its", "your", "i", "he", "she", "his", "her", "they", "them", "their", "our",
+                "we"}
+
+PATTERN_BACKLIST = {"-PRON-", "actually", "likely", "possibly", "want", "make", "my", "someone", "sometimes_people",
+             "sometimes", "would", "want_to", "one", "something", "sometimes", "everybody", "somebody", "could",
+             "could_be"}
+
+import nltk
+nltk.download('stopwords', quiet=True)
+NLTK_STOPWORDS = nltk.corpus.stopwords.words('english')
