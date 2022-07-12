@@ -12,7 +12,7 @@ from cogktr.utils.vocab_utils import Vocabulary
 
 
 class ConcetNetLinker(BaseLinker):
-    def __init__(self, path,reprocess=False):
+    def __init__(self, path, reprocess=False):
         super(ConcetNetLinker, self).__init__()
         self.pattern_path = os.path.join(path, "matcher_patterns.json")
         self.vocab_path = os.path.join(path, "concept.txt")
@@ -27,8 +27,8 @@ class ConcetNetLinker(BaseLinker):
                 output_vocab_path=self.vocab_path,
             )
         else:
-            if not os.path.exists(os.path.join(path,"conceptnet.en.csv")):
-                raise FileNotFoundError(os.path.join(path,"conceptnet.en.csv") + " not found!")
+            if not os.path.exists(os.path.join(path, "conceptnet.en.csv")):
+                raise FileNotFoundError(os.path.join(path, "conceptnet.en.csv") + " not found!")
             if not os.path.exists(self.vocab_path):
                 raise FileNotFoundError(self.vocab_path + " not found!")
 
@@ -36,10 +36,10 @@ class ConcetNetLinker(BaseLinker):
             self.id2concept = [w.strip() for w in fin]
         self.concept2id = {w: i for i, w in enumerate(self.id2concept)}
         self.vocab = {
-            "id2relation":self.id2relation,
-            "relation2id":self.relation2id,
-            "id2concept":self.id2concept,
-            "concept2id":self.concept2id,
+            "id2relation": self.id2relation,
+            "relation2id": self.relation2id,
+            "id2concept": self.id2concept,
+            "concept2id": self.concept2id,
         }
 
         if reprocess:
@@ -60,7 +60,7 @@ class ConcetNetLinker(BaseLinker):
                 output_path=self.pattern_path,
             )
 
-        self.nlp = spacy.load('en_core_web_sm', disable=['tokenizer','ner', 'parser', 'textcat'])
+        self.nlp = spacy.load('en_core_web_sm', disable=['tokenizer', 'ner', 'parser', 'textcat'])
         try:
             self.nlp.add_pipe(self.nlp.create_pipe('sentencizer'))
         except:
@@ -77,15 +77,15 @@ class ConcetNetLinker(BaseLinker):
                 conceptnet_simple.add_edge(u, v, weight=w)
         self.conceptnet_simple = conceptnet_simple
 
-
     def link(self, sentence):
-        concepts = ground_mentioned_concepts(self.nlp,self.matcher,sentence)
+        concepts = ground_mentioned_concepts(self.nlp, self.matcher, sentence)
         if len(concepts) == 0:
-            concepts = hard_ground(self.nlp,sentence,self.vocab["id2concept"])
-        concepts = prune(concepts,self.vocab["id2concept"])
+            concepts = hard_ground(self.nlp, sentence, self.vocab["id2concept"])
+        concepts = prune(concepts, self.vocab["id2concept"])
         return concepts
 
-def prune(concepts,vocab):
+
+def prune(concepts, vocab):
     prune_concepts = []
     for concept in concepts:
         if concept[-2:] == 'er' and concept[:-2] in concepts:
@@ -100,7 +100,6 @@ def prune(concepts,vocab):
         if not stop and concept in vocab:
             prune_concepts.append(concept)
     return prune_concepts
-
 
 
 def extract_english(conceptnet_path, output_csv_path, output_vocab_path):
@@ -230,13 +229,13 @@ def ground_mentioned_concepts(nlp, matcher, s):
                  "sometimes", "would", "want_to", "one", "something", "sometimes", "everybody", "somebody", "could",
                  "could_be"}
 
-    if isinstance(s,str):
+    if isinstance(s, str):
         s = s.lower()
         doc = nlp(s)
-    elif isinstance(s,list):
+    elif isinstance(s, list):
         from spacy.tokens import Doc
         s = [c.lower() for c in s]
-        input_doc = Doc(nlp.vocab,words=s)
+        input_doc = Doc(nlp.vocab, words=s)
         doc = nlp(input_doc)
     else:
         raise ValueError("Only str of list of str is supported but got {}!".format(type(s)))
@@ -258,7 +257,6 @@ def ground_mentioned_concepts(nlp, matcher, s):
             span_to_concepts[span] = set()
 
         span_to_concepts[span].update(original_concept_set)
-
 
     for span, concepts in span_to_concepts.items():
         concepts_sorted = list(concepts)
@@ -288,13 +286,13 @@ def ground_mentioned_concepts(nlp, matcher, s):
 
 
 def hard_ground(nlp, s, cpnet_vocab):
-    if isinstance(s,str):
+    if isinstance(s, str):
         s = s.lower()
         doc = nlp(s)
-    elif isinstance(s,list):
+    elif isinstance(s, list):
         from spacy.tokens import Doc
         s = [c.lower() for c in s]
-        input_doc = Doc(nlp.vocab,words=s)
+        input_doc = Doc(nlp.vocab, words=s)
         doc = nlp(input_doc)
     else:
         raise ValueError("Only str of list of str is supported but got {}!".format(type(s)))
@@ -347,7 +345,8 @@ def load_cpnet_vocab(cpnet_vocab_path):
 def create_pattern(nlp, doc, debug=False):
     # Filtering concepts consisting of all stop words and longer than four words.
     if len(doc) >= 5 or doc[0].text in PATTERN_PRONOUN_LIST or doc[-1].text in PATTERN_PRONOUN_LIST or \
-            all([(token.text in NLTK_STOPWORDS or token.lemma_ in NLTK_STOPWORDS or token.lemma_ in PATTERN_BACKLIST) for token
+            all([(token.text in NLTK_STOPWORDS or token.lemma_ in NLTK_STOPWORDS or token.lemma_ in PATTERN_BACKLIST)
+                 for token
                  in doc]):
         if debug:
             return False, doc.text
@@ -372,15 +371,17 @@ def load_matcher(nlp, pattern_path):
         matcher.add(concept, [pattern])
     return matcher
 
-def lemmatize(nlp, concept):
 
+def lemmatize(nlp, concept):
     doc = nlp(concept.replace("_", " "))
     lcs = set()
     lcs.add("_".join([token.lemma_ for token in doc]))  # all lemma
     return lcs
 
+
 if __name__ == '__main__':
-    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',reprocess=False)
+    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',
+                                        reprocess=False)
     sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
     answer = "the mountains seem very close"
     # sentence = "all of these"
@@ -394,7 +395,3 @@ if __name__ == '__main__':
     print(ac)
     # for concept in concepts:
     #     print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
-
-
-
-
