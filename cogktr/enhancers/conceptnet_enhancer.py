@@ -1,18 +1,18 @@
 from cogktr.enhancers.linker.conceptnet_linker import ConcetNetLinker
 from cogktr.utils.general_utils import query_yes_no
 from cogktr.utils.log_utils import logger
-from cogktr.utils.io_utils import save_json,load_json,save_pickle,load_pickle
+from cogktr.utils.io_utils import save_json, load_json, save_pickle, load_pickle
 import os
 from tqdm import tqdm
 import numpy as np
 from scipy.sparse import coo_matrix
+
 
 class ConceptNetEnhancer():
     def __init__(self, knowledge_graph_path, cache_path, reprocess=True):
         self.reprocess = reprocess
         self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path)
         self.cache_path = os.path.abspath(cache_path)
-        self.cached_file = os.path.join(self.cache_path,"conceptnet_enhanced_cache.pkl")
 
     def concepts2adj(self, node_ids):
         id2relation = self.conceptnet_linker.id2relation
@@ -35,20 +35,24 @@ class ConceptNetEnhancer():
             adj = None
         return adj, cids
 
-    def _enhance_qa(self, datable, statement, answer):
+    def _enhance_qa(self, datable, statement, answer, cached_file):
+        cached_file = os.path.join(self.cache_path, cached_file)
         if not os.path.exists(self.cache_path):
-            if query_yes_no("Cache path {} does not exits.Do you want to create a new one?".format(self.cache_path),default="no"):
+            if query_yes_no("Cache path {} does not exits.Do you want to create a new one?".format(self.cache_path),
+                            default="no"):
                 os.makedirs(self.cache_path)
                 logger.info("Created cached path {}.".format(self.cache_path))
             else:
                 raise ValueError("Cached path {} is not valid!".format(self.cache_path))
 
         if not self.reprocess:
-            enhanced_data_dict = load_pickle(self.cached_file)
+            logger.info("Reading from cached file {}...".format(cached_file))
+            enhanced_data_dict = load_pickle(cached_file)
         else:
             enhanced_data_dict = {}
+            logger.info("Creating enhanced data and the cached file will be {}...".format(cached_file))
             for statement, answer in tqdm(zip(datable[statement], datable[answer]),
-                                                total=len(datable[statement])):
+                                          total=len(datable[statement])):
                 all_concepts = self.conceptnet_linker.link(statement)
                 answer_concepts = self.conceptnet_linker.link(answer)
                 all_ids = set(self.conceptnet_linker.concept2id[c] for c in all_concepts)
@@ -63,22 +67,39 @@ class ConceptNetEnhancer():
                 amask = (arange >= len(qc_ids)) & (arange < len(schema_graph))
                 adj, concepts = self.concepts2adj(schema_graph)
                 enhanced_data_dict.update({
-                    statement:{
-                        "adj":adj,
-                        "concept":concepts,
-                        "qmask":qmask,
-                        "amask":amask,
+                    statement: {
+                        "adj": adj,
+                        "concept": concepts,
+                        "qmask": qmask,
+                        "amask": amask,
                     }
                 })
-            save_pickle(enhanced_data_dict,self.cached_file)
+            save_pickle(enhanced_data_dict, cached_file)
+            logger.info("Successfully created the cached file {}!".format(cached_file))
         return enhanced_data_dict
-
 
     def enhance_train(self, datable, enhanced_key, enhanced_key_pair):
         return self._enhance_qa(
             datable=datable,
             statement=enhanced_key,
             answer=enhanced_key_pair,
+            cached_file="conceptnet_enhanced_cache_train.pkl"
+        )
+
+    def enhance_dev(self, datable, enhanced_key, enhanced_key_pair):
+        return self._enhance_qa(
+            datable=datable,
+            statement=enhanced_key,
+            answer=enhanced_key_pair,
+            cached_file="conceptnet_enhanced_cache_dev.pkl"
+        )
+
+    def enhance_test(self, datable, enhanced_key, enhanced_key_pair):
+        return self._enhance_qa(
+            datable=datable,
+            statement=enhanced_key,
+            answer=enhanced_key_pair,
+            cached_file="conceptnet_enhanced_cache_test.pkl"
         )
 
 
@@ -90,10 +111,13 @@ if __name__ == '__main__':
     )
 
     from cogktr import OpenBookQAReader
+
     reader = OpenBookQAReader(
         raw_data_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
     enhanced_train_dict = enhancer.enhance_train(train_data,enhanced_key="statement",enhanced_key_pair="answer_text")
+    enhanced_dev_dict = enhancer.enhance_dev(train_data,enhanced_key="statement",enhanced_key_pair="answer_text")
+    enhanced_test_dict = enhancer.enhance_test(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
 
