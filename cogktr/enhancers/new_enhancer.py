@@ -4,6 +4,7 @@ sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
 from cogktr.enhancers.searcher.wikidata_searcher import WikidataSearcher
 from cogktr.enhancers.embedder.wikipedia_embedder import WikipediaEmbedder
 from cogktr.enhancers.linker.wikipedia_linker import WikipediaLinker
+from cogktr.enhancers.linker.conceptnet_linker import ConcetNetLinker
 from cogktr.enhancers.searcher.wikipedia_searcher import WikipediaSearcher
 from cogktr.utils.io_utils import load_json, save_json
 import os
@@ -51,6 +52,7 @@ class NewEnhancer:
         self.wikipedia_searcher_path = os.path.join(self.root_path, self.config["wikipedia"]["wikipedia_searcher_path"])
         self.wikipedia_embedder_tool = self.config["wikipedia"]["wikipedia_embedder_tool"]
         self.wikipedia_embedder_path = os.path.join(self.root_path, self.config["wikipedia"]["wikipedia_embedder_path"])
+        self.conceptnet_linker_path = os.path.join(self.root_path,self.config["conceptnet"]["path"])
 
         if self.load_syntax:
             self.syntax_tagger = SyntaxTagger(tool=self.syntax_tool)
@@ -63,6 +65,8 @@ class NewEnhancer:
             self.wikipedia_embedder = WikipediaEmbedder(tool=self.wikipedia_embedder_tool,
                                                         path=self.wikipedia_embedder_path)
             self.wikidata_searcher = WikidataSearcher()
+        if self.load_conceptnet:
+            self.conceptnet_linker = ConcetNetLinker(path=self.conceptnet_linker_path)
 
         print("end")
 
@@ -94,6 +98,10 @@ class NewEnhancer:
                 time.sleep(0.5)
                 # print("finish kg.")
             enhanced_dict[sentence]["wikipedia"] = entity_list
+
+        if return_conceptnet:
+            concepts = self.conceptnet_linker.link(sentence)
+            enhanced_dict[sentence]["concept"] = concepts
 
         return enhanced_dict
 

@@ -5,6 +5,7 @@ import torch
 import numpy as np
 import datetime
 import torch.distributed as dist
+import sys
 
 
 def move_dict_value_to_device(batch, device, rank=-1, non_blocking=False):
@@ -31,6 +32,35 @@ def reduce_mean(tensor, nprocs):
     rt = rt / nprocs
     return rt
 
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+            It must be "yes" (the default), "no" or None (meaning
+            an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == "":
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 class EarlyStopping:
     def __init__(self,mode="min",patience=4,threshold=1e-4,threshold_mode="rel",metric_name=None):

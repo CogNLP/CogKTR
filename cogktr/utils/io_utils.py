@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 import torch.nn as nn
 import torch
+import pickle
 
 
 def load_json(file_path):
@@ -18,6 +19,20 @@ def save_json(data, file_path):
     with open(str(file_path), 'w') as f:
         json.dump(data, f, indent=4)
 
+
+def save_pickle(data, file_path):
+    if not isinstance(file_path, Path):
+        file_path = Path(file_path)
+    with open(str(file_path), 'wb') as f:
+        pickle.dump(data, f)
+
+
+def load_pickle(file_path):
+    if not isinstance(file_path, Path):
+        file_path = Path(file_path)
+    with open(str(file_path), 'rb') as f:
+        data = pickle.load(f)
+    return data
 
 def load_model(model, model_path):
     if isinstance(model_path, Path):
