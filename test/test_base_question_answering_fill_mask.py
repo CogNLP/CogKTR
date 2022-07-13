@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from cogktr import BaseClassificationMetric
+from cogktr.core.metric.base_question_answering_metric import BaseQuestionAnsweringMetric
 from cogktr.data.processor.lama_processors import LamaProcessor
 from cogktr.data.reader.lama_reader import LamaReader
 from cogktr.models.base_question_answering_fill_mask_model import BaseQuestionAnsweringFillMaskModel
@@ -10,14 +11,14 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.core.trainer import Trainer
 
 device, output_path = init_cogktr(
-    device_id=0,
+    device_id=3,
     output_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/question_answering/LAMA/experimental_result/",
     folder_tag="simple_test",
 )
 
 reader = LamaReader(
     raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/question_answering/LAMA/raw_data")
-train_data, dev_data, test_data = reader.read_all()
+train_data, dev_data, test_data = reader.read_all(dataset_name="google_re")
 vocab = reader.read_vocab()
 
 processor = LamaProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
@@ -25,9 +26,9 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = PlmMaskedLMBertModel(pretrained_model_name="roberta-large")
+plm = PlmMaskedLMBertModel(pretrained_model_name="bert-base-cased")
 model = BaseQuestionAnsweringFillMaskModel(plm=plm, vocab=vocab)
-metric = BaseClassificationMetric(mode="multi")
+metric = BaseQuestionAnsweringMetric()
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 

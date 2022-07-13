@@ -9,7 +9,7 @@ class BaseQuestionAnsweringFillMaskModel(BaseModel):
         super().__init__()
         self.vocab = vocab
         self.plm = plm
-        self.input_size = self.plm.hidden_dim
+        # self.input_size = self.plm.hidden_dim
         # self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 
     def loss(self, batch, loss_function):
@@ -21,14 +21,15 @@ class BaseQuestionAnsweringFillMaskModel(BaseModel):
 
     def evaluate(self, batch, metric_function):
         pred = self.predict(batch)
-        metric_function.evaluate(pred, batch["object"])
+        metric_function.evaluate(pred, batch["masked_token_id"])
 
     def predict(self, batch, topk=1):
         output = self.forward(batch)
         result_scores = []
         for i, masked_index in enumerate(batch["masked_index"]):
             result_scores.append(output[i, masked_index, :])
-        result_scores = torch.stack(result_scores, dim=0)
-        pred = F.softmax(result_scores, dim=1)
-        pred = torch.topk(pred, topk, dim=1)[0]
+        pred = torch.stack(result_scores, dim=0)
+        # print(pred.size())
+        # pred = F.softmax(result_scores, dim=1)
+        # pred = torch.topk(pred, topk, dim=1)[0]
         return pred
