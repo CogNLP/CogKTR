@@ -17,6 +17,7 @@ __all__ = [
     # searcher
     "BaseSearcher",
     "WikipediaSearcher",
+    "WordnetSearcher",
 
     # tagger
     "BaseTagger",
