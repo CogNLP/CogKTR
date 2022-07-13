@@ -60,6 +60,7 @@ __all__ = [
     "NerTagger",
     "SrlTagger",
     "SyntaxTagger",
+    "BaseEnhancer",
     "Enhancer",
 
     # models
