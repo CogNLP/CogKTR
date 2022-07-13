@@ -90,16 +90,9 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
-    def download_openbookqa_raw_data(self,output_file):
-        dataset_list = [
-            "train.jsonl",
-            "train.tsv",
-            "dev.jsonl",
-            "dev.tsv",
-            "test.jsonl",
-            "test.tsv",
-            "openbook.txt",
-        ]
+    def download_openbookqa_raw_data(self, output_file):
+        dataset_list = ["train.jsonl", "train.tsv", "dev.jsonl",
+                        "dev.tsv", "test.jsonl", "test.tsv", "openbook.txt"]
         zip_name = "Raw_OpenBookQA.zip"
         self._download_data(output_file=output_file,
                             dataset_list=dataset_list,
@@ -109,6 +102,13 @@ class Downloader:
         dataset_list = ["ConceptNet", "Google_RE", "Squad",
                         "TREx", "relations.jsonl"]
         zip_name = "RAW_LAMA.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
+    def download_semcor_raw_data(self, output_file):
+        dataset_list = ["Training_Corpora", "Evaluation_Datasets"]
+        zip_name = "RAW_SEMCOR.zip"
         self._download_data(output_file=output_file,
                             dataset_list=dataset_list,
                             zip_name=zip_name)
@@ -131,3 +131,5 @@ if __name__ == "__main__":
         "/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA_for_QAGNN/raw_data")
     downloader.download_commonsenseqa_raw_data(
         "/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/raw_data")
+    downloader.download_semcor_raw_data(
+        "/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/raw_data")

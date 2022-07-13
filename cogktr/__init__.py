@@ -9,6 +9,7 @@ from .utils import *
 __all__ = [
     # core
     "BaseMetric",
+    "BaseDisambiguationMetric",
     "BaseClassificationMetric",
     "BaseRegressionMetric",
     "Trainer",
@@ -23,6 +24,7 @@ __all__ = [
     "MultisegchnsentibertProcessor",
     "QnliProcessor",
     "QnliSembertProcessor",
+    "SemcorProcessor",
     "Squad2Processor",
     "Squad2SembertProcessor",
     "Sst2Processor",
@@ -37,9 +39,11 @@ __all__ = [
     "Conll2003Reader",
     "MultisegchnsentibertReader",
     "QnliReader",
+    "SemcorReader",
     "Squad2Reader",
     "Sst2Reader",
     "StsbReader",
+    "TSemcorReader",
     "DataTable",
     "DataTableSet",
 
@@ -48,6 +52,7 @@ __all__ = [
     "WikipediaEmbedder",
     "BaseLinker",
     "WikipediaLinker",
+    "WordnetLinker",
     "BaseSearcher",
     "WikipediaSearcher",
     "BaseTagger",
@@ -63,6 +68,7 @@ __all__ = [
     "BaseSentencePairRegressionModel",
     "BaseSequenceLabelingModel",
     "BaseTextClassificationModel",
+    "EsrModel",
     "HLGModel",
     "KgembModel",
     "KtembModel",
