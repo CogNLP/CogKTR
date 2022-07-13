@@ -4,9 +4,10 @@ from cogktr.data.processor.commonsenseqa_qagnn_processors import *
 from cogktr.data.processor.conll2003_processors import *
 from cogktr.data.processor.multisegchnsentibert_processors import *
 from cogktr.data.processor.qnli_processors import *
+from cogktr.data.processor.semcor_processors import *
+from cogktr.data.processor.squad2_processors import *
 from cogktr.data.processor.sst2_processors import *
 from cogktr.data.processor.stsb_processors import *
-from cogktr.data.processor.squad2_processors import *
 
 __all__ = [
     # baseprocessor
@@ -27,6 +28,9 @@ __all__ = [
     # qnliprocessor
     "QnliProcessor",
     "QnliSembertProcessor",
+
+    #semcorprocessor
+    "SemcorProcessor",
 
     # squad2processor
     "Squad2Processor",

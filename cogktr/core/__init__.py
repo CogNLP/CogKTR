@@ -8,6 +8,7 @@ __all__ = [
 
     # metric
     "BaseMetric",
+    "BaseDisambiguationMetric",
     "BaseClassificationMetric",
     "BaseRegressionMetric",
 

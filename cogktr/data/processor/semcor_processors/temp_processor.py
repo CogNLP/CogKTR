@@ -1,0 +1,63 @@
+from cogktr.data.datable import DataTable
+from cogktr.data.datableset import DataTableSet
+from transformers import AutoTokenizer
+from tqdm import tqdm
+import transformers
+import torch
+from cogktr.data.processor.base_processor import BaseProcessor
+
+transformers.logging.set_verbosity_error()  # set transformers logging level
+
+
+class SemcorProcessor(BaseProcessor):
+    def __init__(self, plm, max_token_len, vocab):
+        super().__init__()
+        self.plm = plm
+        self.max_token_len = max_token_len
+        self.vocab = vocab
+        self.tokenizer = AutoTokenizer.from_pretrained(plm)
+
+    def _process(self, data):
+        datable = DataTable()
+        print("Processing data...")
+        for word_list, tag_list, lemma_list, pos_list, sentence_id in tqdm(
+                zip(data['word_list'], data['tag_list'], data['lemma_list'], data['pos_list'], data['sentence_id']),
+                total=len(data['word_list'])):
+            input_ids=[]
+            word_tokens_len_list=[]
+            for word in word_list:
+                word_tokens = self.tokenizer.tokenize(word)
+                word_tokens_len=len(word_tokens)
+                input_ids.extend(word_tokens)
+                word_tokens_len_list.append(word_tokens_len)
+
+
+
+            print("end")
+        return DataTableSet(datable)
+
+    def process_train(self, data):
+        return self._process(data)
+
+    def process_dev(self, data):
+        return self._process(data)
+
+    def process_test(self, data):
+        return self._process(data)
+
+
+if __name__ == "__main__":
+    from cogktr.data.reader.temp import TSemcorReader
+
+    reader = TSemcorReader(
+        raw_data_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/raw_data")
+    train_data, dev_data, test_data = reader.read_all()
+    vocab = reader.read_vocab()
+    addition = reader.read_addition()
+    print("end")
+
+    processor = SemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab)
+    train_dataset = processor.process_train(train_data)
+    dev_dataset = processor.process_dev(dev_data)
+    test_dataset = processor.process_test(test_data)
+    print("end")

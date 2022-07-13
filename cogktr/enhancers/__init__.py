@@ -12,10 +12,12 @@ __all__ = [
     # linker
     "BaseLinker",
     "WikipediaLinker",
+    "WordnetLinker",
 
     # searcher
     "BaseSearcher",
     "WikipediaSearcher",
+    "WordnetSearcher",
 
     # tagger
     "BaseTagger",
