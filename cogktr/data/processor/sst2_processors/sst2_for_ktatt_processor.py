@@ -1,11 +1,13 @@
+from cogktr import Sst2Reader
 from cogktr.enhancers.linker.wikipedia_linker import WikipediaLinker
 from cogktr.enhancers.searcher.wikipedia_searcher import WikipediaSearcher
 from cogktr.data.datable import DataTable
 from cogktr.data.datableset import DataTableSet
 from tqdm import tqdm
+from cogktr.data.processor.sst2_processors import Sst2Processor
 
 
-class KTSST2Processor(SST2Processor):
+class Sst2ForKtattProcessor(Sst2Processor):
     def __init__(self, plm, max_token_len, vocab, knowledge_path):
         super().__init__(plm, max_token_len, vocab)
         self.knowledge_path = knowledge_path
@@ -34,10 +36,10 @@ class KTSST2Processor(SST2Processor):
 if __name__ == "__main__":
     # sentence = KTSST2Processor.integrate_kt(sentence="Bert likes reading in the library.",
     #                                        knowledge_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
-    reader = SST2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
+    reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
-    processor = KTSST2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab,
+    processor = Sst2ForKtattProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab,
                                 knowledge_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
     train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
