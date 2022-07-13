@@ -3,6 +3,7 @@ from .linker import *
 from .searcher import *
 from .tagger import *
 from .enhancer import *
+from .base_enhancer import *
 
 __all__ = [
     # embedder
@@ -17,6 +18,7 @@ __all__ = [
     # searcher
     "BaseSearcher",
     "WikipediaSearcher",
+    "WordnetSearcher",
 
     # tagger
     "BaseTagger",
@@ -25,5 +27,6 @@ __all__ = [
     "SyntaxTagger",
 
     # enhancer
+    "BaseEnhancer",
     "Enhancer",
 ]
