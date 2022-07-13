@@ -1,8 +1,10 @@
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
+from cogktr.utils.io_utils import save_pickle,load_pickle
 from cogktr.utils.general_utils import init_cogktr
-from cogktr.enhancers.new_enhancer import NewEnhancer
+from cogktr.data.processor.openbookqa_processors.openbookqa_for_safe_processor import OpenBookQAForSafeProcessor
+from cogktr.enhancers.conceptnet_enhancer import ConceptNetEnhancer
 
 # device, output_path = init_cogktr(
 #     device_id=8,
@@ -15,17 +17,28 @@ reader = OpenBookQAReader(
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-enhancer = NewEnhancer(config_path="/data/hongbang/CogKTR/cogktr/utils/config/enhancer_config.json",
-                       knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph",
-                       save_file_name="pre_enhanced_data",
-                       enhanced_data_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data",
-                       load_conceptnet=True,
-                       reprocess=True)
+enhancer = ConceptNetEnhancer(
+        knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
+        cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data',
+        reprocess=True
+    )
 
-
-enhanced_train_dict = enhancer.enhance_train(train_data,enhanced_key="statement",enhanced_key_pair="answer_text")
-enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key="statement",enhanced_key_pair="answer_text")
-
+# enhanced_train_dict = enhancer.enhance_train(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+# enhanced_dev_dict = enhancer.enhance_dev(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+# enhanced_test_dict = enhancer.enhance_test(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+# _,enhanced_dev_dict,enhacned_test_dict = enhancer.enhance_all(vocab)
+enhanced_train_dict = load_pickle("/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data/conceptnet_enhanced_cache_train_with_metapath.pkl")
+meta_path_set = load_pickle("/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data/meta_path_subset.pkl")
+cpnet_vocab = Vocabulary()
+cpnet_vocab.add_sequence(list(meta_path_set))
+cpnet_vocab.create()
+vocab["metapath"] = cpnet_vocab
+processor = OpenBookQAForSafeProcessor(
+    plm="bert-base-cased",
+    max_token_len=256,
+    vocab=vocab
+)
+train_dataset = processor.process_train(train_data,enhanced_train_dict)
 
 
 

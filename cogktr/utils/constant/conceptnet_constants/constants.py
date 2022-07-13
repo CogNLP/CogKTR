@@ -75,3 +75,8 @@ PATTERN_BACKLIST = {"-PRON-", "actually", "likely", "possibly", "want", "make", 
 import nltk
 nltk.download('stopwords', quiet=True)
 NLTK_STOPWORDS = nltk.corpus.stopwords.words('english')
+
+NODE_TYPE_DICT = {'Q': 0, 'A': 1}
+NODE_TYPE_NUM = len(NODE_TYPE_DICT)
+REL_TYPE_NUM = 17 + 1
+ONE_HOT_FEATURE_LENGTH=NODE_TYPE_NUM + 2 * (NODE_TYPE_NUM + REL_TYPE_NUM)

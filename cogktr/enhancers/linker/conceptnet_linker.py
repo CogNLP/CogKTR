@@ -9,6 +9,7 @@ import nltk
 from cogktr.utils.log_utils import logger
 from spacy.matcher import Matcher
 from cogktr.utils.vocab_utils import Vocabulary
+from cogktr.utils.io_utils import save_pickle,load_pickle
 
 
 class ConcetNetLinker(BaseLinker):
@@ -66,7 +67,7 @@ class ConcetNetLinker(BaseLinker):
         except:
             self.nlp.add_pipe('sentencizer')
 
-        self.matcher = load_matcher(self.nlp, self.pattern_path)
+        self.matcher = load_matcher(self.nlp, self.pattern_path,reprocess,cache_file=os.path.join(path,"conceptnet_matcher.pkl"))
         self.conceptnet = nx.read_gpickle(os.path.join(path, "conceptnet.en.pruned.graph"))
         conceptnet_simple = nx.Graph()
         for u, v, data in self.conceptnet.edges(data=True):
@@ -84,6 +85,22 @@ class ConcetNetLinker(BaseLinker):
         concepts = prune(concepts, self.vocab["id2concept"])
         return concepts
 
+
+def load_matcher(nlp, pattern_path, reprocess,cache_file):
+    logger.info("Creating matcher...")
+    reprocess=True
+    if reprocess:
+        with open(pattern_path, "r", encoding="utf8") as fin:
+            all_patterns = json.load(fin)
+        matcher = Matcher(nlp.vocab)
+        for concept, pattern in tqdm(all_patterns.items()):
+            # matcher.add(concept, None, pattern) # old spacy versions less than v3.0
+            matcher.add(concept, [pattern])
+        save_pickle(matcher,cache_file)
+    else:
+        matcher = load_pickle(cache_file)
+        logger.info("Load matcher from cached file {}.".format(cache_file))
+    return matcher
 
 def prune(concepts, vocab):
     prune_concepts = []
@@ -358,18 +375,6 @@ def create_pattern(nlp, doc, debug=False):
     if debug:
         return True, doc.text
     return pattern
-
-
-def load_matcher(nlp, pattern_path):
-    logger.info("Creating matcher...")
-    with open(pattern_path, "r", encoding="utf8") as fin:
-        all_patterns = json.load(fin)
-
-    matcher = Matcher(nlp.vocab)
-    for concept, pattern in tqdm(all_patterns.items()):
-        # matcher.add(concept, None, pattern) # old spacy versions less than v3.0
-        matcher.add(concept, [pattern])
-    return matcher
 
 
 def lemmatize(nlp, concept):
