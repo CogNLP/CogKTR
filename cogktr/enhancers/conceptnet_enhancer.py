@@ -1,7 +1,7 @@
 from cogktr.enhancers.linker.conceptnet_linker import ConcetNetLinker
 from cogktr.utils.general_utils import query_yes_no
 from cogktr.utils.log_utils import logger
-from cogktr.utils.io_utils import save_json,load_json
+from cogktr.utils.io_utils import save_json,load_json,save_pickle,load_pickle
 import os
 from tqdm import tqdm
 import numpy as np
@@ -12,7 +12,7 @@ class ConceptNetEnhancer():
         self.reprocess = reprocess
         self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path)
         self.cache_path = os.path.abspath(cache_path)
-        self.cached_file = os.path.join(self.cache_path,"conceptnet_enhanced_cache.json")
+        self.cached_file = os.path.join(self.cache_path,"conceptnet_enhanced_cache.pkl")
 
     def concepts2adj(self, node_ids):
         id2relation = self.conceptnet_linker.id2relation
@@ -44,7 +44,7 @@ class ConceptNetEnhancer():
                 raise ValueError("Cached path {} is not valid!".format(self.cache_path))
 
         if not self.reprocess:
-            enhanced_data_dict = load_json(self.cached_file)
+            enhanced_data_dict = load_pickle(self.cached_file)
         else:
             enhanced_data_dict = {}
             for statement, answer in tqdm(zip(datable[statement], datable[answer]),
@@ -70,7 +70,7 @@ class ConceptNetEnhancer():
                         "amask":amask,
                     }
                 })
-            save_json(enhanced_data_dict,self.cached_file)
+            save_pickle(enhanced_data_dict,self.cached_file)
         return enhanced_data_dict
 
 
