@@ -34,8 +34,8 @@ cpnet_vocab.add_sequence(list(meta_path_set))
 cpnet_vocab.create()
 vocab["metapath"] = cpnet_vocab
 processor = OpenBookQAForSafeProcessor(
-    plm="bert-base-cased",
-    max_token_len=256,
+    plm="roberta-base",
+    max_token_len=100,
     vocab=vocab
 )
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
