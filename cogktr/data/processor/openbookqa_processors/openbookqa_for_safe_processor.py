@@ -27,7 +27,13 @@ class OpenBookQAForSafeProcessor(BaseProcessor):
         data = self.debug_process(data)
         print("Processing data...")
         num_choices = 4
-        for i in tqdm(range(len(data["statement"])//num_choices)):
+        for i in tqdm(range(len(data)//num_choices)):
+            input_ids_list = []
+            attention_mask_list = []
+            token_type_ids_lis = []
+            meta_path_feature_list = []
+            meta_path_count_list = []
+            answerKey = data["answerKey"][i * num_choices]
             for j in range(num_choices):
                 k = num_choices * i + j
                 id,stem,answer_text,key,statement,answerKey = data[k]
@@ -44,18 +50,21 @@ class OpenBookQAForSafeProcessor(BaseProcessor):
                                                             return_special_tokens_mask=True,
                                                             max_length=self.max_token_len)
                 input_ids = tokenized_data["input_ids"]
-                input_mask = tokenized_data["input_mask"]
-                segment_ids = tokenized_data["segment_ids"]
-                output_mask = tokenized_data["output_mask"]
+                attention_mask = tokenized_data["attention_mask"]
+                token_type_ids = tokenized_data["token_type_ids"]
+                input_ids_list.append(input_ids)
+                attention_mask_list.append(attention_mask)
+                token_type_ids_lis.append(token_type_ids)
+                meta_path_feature_list.append(meta_path_feature)
+                meta_path_count_list.append(meta_path_count)
             # stack the choice features together to create one sample
-
-
-            # datable("input_ids", dict_data["input_ids"])
-            # datable("input_mask", dict_data["input_mask"])
-            # datable("token_type_ids", dict_data["token_type_ids"])
-            # datable("input_tag_ids", dict_data["input_tag_ids"])
-            # datable("start_end_idx", dict_data["start_end_idx"])
-            # datable("label", dict_data["label"])
+            datable("input_ids",np.array(input_ids_list))
+            datable("attention_mask", np.array(attention_mask_list))
+            datable("token_type_ids", np.array(token_type_ids_lis))
+            datable("meta_path_feature", np.array(meta_path_feature_list))
+            datable("meta_path_count", np.array(meta_path_count_list))
+            meta_path_vocab = self.vocab["label_vocab"]
+            datable("answerKey",meta_path_vocab.label2id(answerKey))
 
         return DataTableSet(datable)
 
@@ -113,11 +122,6 @@ def process_roberta(text_a,text_b,tokenizer,max_token_length):
     segment_ids = [cls_token_segment_id] + segment_ids
 
     input_ids = tokenizer.convert_tokens_to_ids(tokens)
-
-
-
-
-
 
 
 def _truncate_seq_pair(tokens_a, tokens_b, max_length):

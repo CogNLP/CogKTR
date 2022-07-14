@@ -11,9 +11,9 @@ import networkx as nx
 
 
 class ConceptNetEnhancer():
-    def __init__(self,knowledge_graph_path, cache_path, reprocess=True):
+    def __init__(self,knowledge_graph_path, cache_path, reprocess=True,reprocess_conceptnet=False):
         self.reprocess = reprocess
-        self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path)
+        self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path,reprocess=reprocess_conceptnet)
         self.cache_path = os.path.abspath(cache_path)
         self.meta_paths_set = set()
 
@@ -186,15 +186,24 @@ class ConceptNetEnhancer():
             cached_file="conceptnet_enhanced_cache_test.pkl"
         )
 
-    def enhance_all(self,vocab=None):
-        enhanced_train_dict = enhancer.enhance_train(train_data, enhanced_key="statement",
+    def enhance_all(self,train_data,dev_data,test_data,vocab=None):
+        enhanced_train_dict = self.enhance_train(train_data, enhanced_key="statement",
                                                      enhanced_key_pair="answer_text")
-        enhanced_dev_dict = enhancer.enhance_dev(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-        enhanced_test_dict = enhancer.enhance_test(train_data, enhanced_key="statement",
+        enhanced_dev_dict = self.enhance_dev(dev_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+        enhanced_test_dict = self.enhance_test(test_data, enhanced_key="statement",
                                                    enhanced_key_pair="answer_text")
         if isinstance(vocab,dict):
+            if self.reprocess:
+                meta_paths_set =self.meta_paths_set
+            else:
+                meta_paths_set = set()
+                for data_dict in [enhanced_train_dict,enhanced_dev_dict,enhanced_test_dict]:
+                    for key,value in data_dict.items():
+                        meta_paths_set.update(value["meta_paths_set"])
+
+
             cpnet_vocab = Vocabulary()
-            cpnet_vocab.add_sequence(list(self.meta_paths_set))
+            cpnet_vocab.add_sequence(list(meta_paths_set))
             cpnet_vocab.create()
             vocab["metapath"] = cpnet_vocab
             self.meta_paths_set = set()
@@ -216,8 +225,8 @@ if __name__ == '__main__':
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
 
-    enhanced_train_dict = enhancer.enhance_train(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-    enhanced_dev_dict = enhancer.enhance_dev(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-    enhanced_test_dict = enhancer.enhance_test(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-    save_pickle(enhancer.meta_paths_set,'/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data/meta_path_set.pkl')
+    # enhanced_train_dict = enhancer.enhance_train(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+    # enhanced_dev_dict = enhancer.enhance_dev(dev_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+    # enhanced_test_dict = enhancer.enhance_test(test_data, enhanced_key="statement", enhanced_key_pair="answer_text")
+    # save_pickle(enhancer.meta_paths_set,'/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data/meta_path_set.pkl')
 

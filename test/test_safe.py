@@ -20,25 +20,18 @@ vocab = reader.read_vocab()
 enhancer = ConceptNetEnhancer(
         knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
         cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data',
-        reprocess=True
+        reprocess=False
     )
 
-# enhanced_train_dict = enhancer.enhance_train(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-# enhanced_dev_dict = enhancer.enhance_dev(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-# enhanced_test_dict = enhancer.enhance_test(train_data, enhanced_key="statement", enhanced_key_pair="answer_text")
-# _,enhanced_dev_dict,enhacned_test_dict = enhancer.enhance_all(vocab)
-enhanced_train_dict = load_pickle("/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data/conceptnet_enhanced_cache_train_with_metapath.pkl")
-meta_path_set = load_pickle("/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data/meta_path_subset.pkl")
-cpnet_vocab = Vocabulary()
-cpnet_vocab.add_sequence(list(meta_path_set))
-cpnet_vocab.create()
-vocab["metapath"] = cpnet_vocab
+enhanced_train_dict,enhanced_dev_dict,enhanced_test_dict = enhancer.enhance_all(train_data,dev_data,test_data,vocab)
+
 processor = OpenBookQAForSafeProcessor(
     plm="roberta-base",
     max_token_len=100,
     vocab=vocab
 )
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
+dev_dataset = processor.process_train(dev_data,enhanced_dev_dict)
 
 
 
