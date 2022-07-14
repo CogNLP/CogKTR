@@ -10,11 +10,16 @@ class SyntaxTagger(BaseTagger):
 
         self.tool = tool
         self.knowledge_type = "syntaxtagger"
+
+
+        print("Loading SyntaxTagger...")
         if self.tool == "stanza":
+            # download stanza use:
             # stanza.download(lang='en', processors='tokenize,mwt,pos,lemma,depparse')
             self.syntaxtagger = stanza.Pipeline(lang='en',
                                                 processors='tokenize,mwt,pos,lemma,depparse',
                                                 tokenize_pretokenized=True)
+        print("Finish loading SyntaxTagger...")
 
     def tag(self, sentence):
         tag_dict = {}
@@ -24,9 +29,11 @@ class SyntaxTagger(BaseTagger):
 
     def _stanza_tag(self, sentence):
         if isinstance(sentence, str):
-            sentence=sentence
-        if isinstance(sentence,list):
-            sentence=[sentence]
+            sentence = sentence
+        elif isinstance(sentence, list):
+            sentence = [sentence]
+        else:
+            raise ValueError("Sentence must be str or a list of words!")
 
         tag_dict = {}
         word_list = []
@@ -45,11 +52,12 @@ class SyntaxTagger(BaseTagger):
             pos_list.append(word.pos)
             lemma_list.append(word.lemma)
         tag_dict["words"] = word_list
-        tag_dict["deprels"] = deprel_list
-        tag_dict["heads"] = head_list
-        tag_dict["indexes"] = indexes_list
-        tag_dict["pos"] = pos_list
-        tag_dict["lemma"] = lemma_list
+        tag_dict["knowledge"] = {}
+        tag_dict["knowledge"]["deprels"] = deprel_list
+        tag_dict["knowledge"]["heads"] = head_list
+        tag_dict["knowledge"]["indexes"] = indexes_list
+        tag_dict["knowledge"]["pos"] = pos_list
+        tag_dict["knowledge"]["lemma"] = lemma_list
         return tag_dict
 
 

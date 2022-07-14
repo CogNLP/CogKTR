@@ -50,21 +50,21 @@ class WordnetLinker(BaseLinker):
 
         link_dict = {}
         link_dict["words"] = words
-        link_dict["spans"] = []
+        link_dict["knowledge"] = []
         for enhancing_word, enhancing_word_index in zip(enhancing_word_list, enhancing_word_index_list):
             wnl = WordNetLemmatizer()
             word_lemma = wnl.lemmatize(enhancing_word)
             word_lemma_items = wn.lemmas(word_lemma)
             span_dict = {}
             if len(word_lemma_items) > 0:
-                span_dict["start_loc"] = enhancing_word_index
-                span_dict["end_loc"] = enhancing_word_index + 1
+                span_dict["start"] = enhancing_word_index
+                span_dict["end"] = enhancing_word_index + 1
                 span_dict["mention"] = enhancing_word
                 span_dict["lemma"] = word_lemma
                 span_dict["lemma_item"] = []
                 for word_lemma_item in word_lemma_items:
                     span_dict["lemma_item"].append(word_lemma_item)
-                link_dict["spans"].append(span_dict)
+                link_dict["knowledge"].append(span_dict)
         return link_dict
 
 
