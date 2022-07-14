@@ -8,16 +8,19 @@ from cogie.toolkit.tokenize.tokenize_toolkit import TokenizeToolkit
 class NerTagger(BaseTagger):
     def __init__(self, tool):
         super().__init__()
-        if tool not in ["flair","cogie"]:
+        if tool not in ["flair", "cogie"]:
             raise ValueError("{} in NerTagger is not supported!".format(tool))
 
         self.tool = tool
         self.knowledge_type = "nertagger"
+
+        print("Loading NerTagger...")
         if self.tool == "flair":
             self.nertagger = SequenceTagger.load('ner')
         elif self.tool == "cogie":
             self.tokenizer_toolkit = TokenizeToolkit()
             self.ner_toolkit = NerToolkit(corpus="conll2003")
+        print("Finish loading NerTagger!")
 
     def tag(self, sentence):
         tag_dict = {}
@@ -28,11 +31,12 @@ class NerTagger(BaseTagger):
         return tag_dict
 
     def _flair_tag(self, sentence):
-        flair_sentence=None
         if isinstance(sentence, str):
             flair_sentence = Sentence(sentence, use_tokenizer=True)
-        if isinstance(sentence, list):
+        elif isinstance(sentence, list):
             flair_sentence = Sentence(sentence, use_tokenizer=False)
+        else:
+            raise ValueError("Sentence must be str or a list of words!")
 
         tag_dict = {}
         token_list = []
@@ -50,18 +54,26 @@ class NerTagger(BaseTagger):
         tag_dict["ner_labels"] = label_list
         return tag_dict
 
-
-    def _cogie_tag(self,sentence):
-        if isinstance(sentence,str):
+    def _cogie_tag(self, sentence):
+        if isinstance(sentence, str):
             words = self.tokenizer_toolkit.run(sentence)
-        elif isinstance(sentence,list):
+        elif isinstance(sentence, list):
             words = sentence
         else:
             raise ValueError("Sentence must be str or a list of words!")
 
+        tag_dict = {}
+        tag_dict["words"] = words
+        tag_dict["knowledge"] = []
         ner_result = self.ner_toolkit.run(words)
-        return ner_result
-
+        for item in ner_result:
+            item_dict = {}
+            item_dict["mention"] = item["mention"]
+            item_dict["start"] = item["start"]
+            item_dict["end"] = item["end"]
+            item_dict["type"] = item["type"]
+            tag_dict["knowledge"].append(item_dict)
+        return tag_dict
 
 
 if __name__ == "__main__":
