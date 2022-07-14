@@ -34,14 +34,14 @@ class WordnetSearcher(BaseSearcher):
         if self.return_hypernym:
             # we use the first hypernym synset as the only hypernym
             search_dict["hypernym"] = {}
-            if len(lemma_item.synset().hypernyms())>0:
+            if len(lemma_item.synset().hypernyms()) > 0:
                 search_dict["hypernym"]["synset"] = lemma_item.synset().hypernyms()[0]
                 search_dict["hypernym"]["definition"] = lemma_item.synset().hypernyms()[0].definition()
                 search_dict["hypernym"]["examples"] = lemma_item.synset().hypernyms()[0].examples()
             else:
-                search_dict["hypernym"]["synset"]=None
-                search_dict["hypernym"]["definition"]=None
-                search_dict["hypernym"]["examples"]=None
+                search_dict["hypernym"]["synset"] = None
+                search_dict["hypernym"]["definition"] = None
+                search_dict["hypernym"]["examples"] = None
         if self.return_examples:
             search_dict["examples"] = lemma_item.synset().examples()
         if self.return_definition:
@@ -50,9 +50,6 @@ class WordnetSearcher(BaseSearcher):
 
 
 if __name__ == "__main__":
-    import os
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = "4"
     from nltk.corpus import wordnet as wn
 
     searcher = WordnetSearcher(tool="nltk",

@@ -1,6 +1,3 @@
-import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = "4"
 from cogktr.enhancers.base_enhancer import BaseEnhancer
 from cogktr.enhancers.tagger.ner_tagger import NerTagger
 from cogktr.enhancers.tagger.srl_tagger import SrlTagger
@@ -55,15 +52,22 @@ class LinguisticsEnhancer(BaseEnhancer):
                           return_wordnet=False):
         enhanced_dict = {}
 
-        words = word_tokenize(sentence)
-        enhanced_dict["words"] = words
+        if isinstance(sentence, list):
+            words = sentence
+            sentence = tuple(sentence)
+        elif isinstance(sentence, str):
+            words = word_tokenize(sentence)
+        else:
+            ValueError("Sentence must be str or a list of words!")
+        enhanced_dict[sentence] = {}
+        enhanced_dict[sentence]["words"] = words
 
         if return_ner:
-            enhanced_dict["ner"] = self.ner_tagger.tag(words)["knowledge"]
+            enhanced_dict[sentence]["ner"] = self.ner_tagger.tag(words)["knowledge"]
         if return_srl:
-            enhanced_dict["srl"] = self.srl_tagger.tag(words)["knowledge"]
+            enhanced_dict[sentence]["srl"] = self.srl_tagger.tag(words)["knowledge"]
         if return_syntax:
-            enhanced_dict["syntax"] = self.syntax_tagger.tag(words)["knowledge"]
+            enhanced_dict[sentence]["syntax"] = self.syntax_tagger.tag(words)["knowledge"]
         if return_wordnet:
             wordnet_link_list = self.wordnet_linker.link(words)["knowledge"]
             lemma_dict = {}
@@ -72,7 +76,7 @@ class LinguisticsEnhancer(BaseEnhancer):
                 for lemma_item in lemma_items:
                     lemma_dict[lemma_item] = self.wordnet_searcher.search(lemma_item)
                 wordnet_link_list[i]["lemma_item_details"] = lemma_dict
-            enhanced_dict["wordnet"] = wordnet_link_list
+            enhanced_dict[sentence]["wordnet"] = wordnet_link_list
 
         return enhanced_dict
 
@@ -119,7 +123,11 @@ if __name__ == "__main__":
                                                           return_srl=True,
                                                           return_syntax=True,
                                                           return_wordnet=True)
-    enhanced_sentence_dict_2 = enhancer.enhancer_sentence(sentence=["Bert", "likes", "reading", "in the", "Street"])
+    enhanced_sentence_dict_2 = enhancer.enhancer_sentence(sentence=["Bert", "likes", "reading", "in the", "Street"],
+                                                          return_ner=True,
+                                                          return_srl=True,
+                                                          return_syntax=True,
+                                                          return_wordnet=True)
     # enhanced_sentence_dict_3 = enhancer.enhancer_sentence_pair(
     #     sentence="Bert likes reading in the Sesame Street Library.",
     #     sentence_pair="Bert likes reading.")
