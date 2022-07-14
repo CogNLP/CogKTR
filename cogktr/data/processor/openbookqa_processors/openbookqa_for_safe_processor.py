@@ -58,13 +58,13 @@ class OpenBookQAForSafeProcessor(BaseProcessor):
                 meta_path_feature_list.append(meta_path_feature)
                 meta_path_count_list.append(meta_path_count)
             # stack the choice features together to create one sample
-            datable("input_ids",np.array(input_ids_list))
-            datable("attention_mask", np.array(attention_mask_list))
-            datable("token_type_ids", np.array(token_type_ids_lis))
-            datable("meta_path_feature", np.array(meta_path_feature_list))
-            datable("meta_path_count", np.array(meta_path_count_list))
+            datable("input_ids",np.array(input_ids_list,dtype=int))
+            datable("attention_mask", np.array(attention_mask_list,dtype=int))
+            datable("token_type_ids", np.array(token_type_ids_lis,dtype=int))
+            datable("meta_path_feature", np.array(meta_path_feature_list,dtype=np.float32))
+            datable("meta_path_count", np.array(meta_path_count_list,dtype=np.float32))
             meta_path_vocab = self.vocab["label_vocab"]
-            datable("answerKey",meta_path_vocab.label2id(answerKey))
+            datable("label",meta_path_vocab.label2id(answerKey))
 
         return DataTableSet(datable)
 
