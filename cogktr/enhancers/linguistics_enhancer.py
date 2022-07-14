@@ -229,10 +229,6 @@ if __name__ == "__main__":
     from cogktr.data.reader.sst2_reader import Sst2Reader
     from cogktr.data.reader.qnli_reader import QnliReader
 
-    import nltk
-
-    nltk.download('omw')
-
     enhancer = LinguisticsEnhancer(load_ner=True,
                                    load_srl=True,
                                    load_syntax=True,
