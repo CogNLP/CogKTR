@@ -1,6 +1,4 @@
 import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = "4"
 from cogktr.enhancers.base_enhancer import BaseEnhancer
 from cogktr.enhancers.tagger.ner_tagger import NerTagger
 from cogktr.enhancers.tagger.srl_tagger import SrlTagger
@@ -222,10 +220,6 @@ class LinguisticsEnhancer(BaseEnhancer):
 
 
 if __name__ == "__main__":
-    import os
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = "4"
-
     from cogktr.data.reader.sst2_reader import Sst2Reader
     from cogktr.data.reader.qnli_reader import QnliReader
 
@@ -274,14 +268,14 @@ if __name__ == "__main__":
                                                return_syntax=True,
                                                return_wordnet=True)
 
-    # reader_6 = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
-    # train_data_6, dev_data_6, test_data_6 = reader_6.read_all()
-    # enhanced_dev_dict_6 = enhancer.enhance_dev(datable=dev_data_6,
-    #                                            enhanced_key_1="question",
-    #                                            enhanced_key_2="sentence",
-    #                                            return_ner=True,
-    #                                            return_srl=True,
-    #                                            return_syntax=True,
-    #                                            return_wordnet=True)
+    reader_6 = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+    train_data_6, dev_data_6, test_data_6 = reader_6.read_all()
+    enhanced_dev_dict_6 = enhancer.enhance_dev(datable=dev_data_6,
+                                               enhanced_key_1="question",
+                                               enhanced_key_2="sentence",
+                                               return_ner=True,
+                                               return_srl=True,
+                                               return_syntax=True,
+                                               return_wordnet=True)
 
     print("end")
