@@ -28,14 +28,16 @@ class WordnetSearcher(BaseSearcher):
     def _nltk_search(self, lemma_item):
         search_dict = {}
         if self.return_synonym:
-            search_dict["synonym"] = lemma_item.synset().lemmas()
+            search_dict["synonym"] = []
+            for lemma in lemma_item.synset().lemmas():
+                search_dict["synonym"].append(lemma._name)
         if self.return_synset:
-            search_dict["synset"] = lemma_item.synset()
+            search_dict["synset"] = lemma_item.synset()._name
         if self.return_hypernym:
             # we use the first hypernym synset as the only hypernym
             search_dict["hypernym"] = {}
             if len(lemma_item.synset().hypernyms()) > 0:
-                search_dict["hypernym"]["synset"] = lemma_item.synset().hypernyms()[0]
+                search_dict["hypernym"]["synset"] = lemma_item.synset().hypernyms()[0]._name
                 search_dict["hypernym"]["definition"] = lemma_item.synset().hypernyms()[0].definition()
                 search_dict["hypernym"]["examples"] = lemma_item.synset().hypernyms()[0].examples()
             else:
