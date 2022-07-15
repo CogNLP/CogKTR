@@ -8,9 +8,9 @@ from cogktr.enhancers.conceptnet_enhancer import ConceptNetEnhancer
 from cogktr.models.safe_model import SAFEModel
 
 device, output_path = init_cogktr(
-    device_id=7,
+    device_id=8,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="safe_debug_1e-6_epoch100",
+    folder_tag="safe_debug_1e-5_epoch100",
 )
 
 reader = OpenBookQAReader(
@@ -35,11 +35,11 @@ train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_train(dev_data,enhanced_dev_dict)
 
 
-plm = PlmAutoModel(pretrained_model_name="roberta-large")
-model = SAFEModel(plm=plm,vocab=None)
+# plm = PlmAutoModel(pretrained_model_name="roberta-large")
+model = SAFEModel(plm="roberta-large",vocab=None)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.000001,weight_decay=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.00001,weight_decay=0.001)
 
 trainer = Trainer(model,
                   train_dataset,
