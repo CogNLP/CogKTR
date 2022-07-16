@@ -6,11 +6,12 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.data.processor.openbookqa_processors.openbookqa_for_safe_processor import OpenBookQAForSafeProcessor
 from cogktr.enhancers.conceptnet_enhancer import ConceptNetEnhancer
 from cogktr.models.safe_model import SAFEModel
+from transformers import get_constant_schedule
 
 device, output_path = init_cogktr(
-    device_id=8,
+    device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="safe_debug_1e-5_epoch100",
+    folder_tag="safe_original_debug_complex_optim_grad16_epoch100_batch8",
 )
 
 reader = OpenBookQAReader(
@@ -36,16 +37,32 @@ dev_dataset = processor.process_train(dev_data,enhanced_dev_dict)
 
 
 # plm = PlmAutoModel(pretrained_model_name="roberta-large")
-model = SAFEModel(plm="roberta-large",vocab=None)
+# model = SAFEModel(plm="roberta-large",vocab=None)
+model = SAFEModel()
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001,weight_decay=0.001)
+
+# optimizer = optim.Adam(model.parameters(), lr=0.000001,weight_decay=0.001)
+no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+grouped_parameters = [
+    {'params': [p for n, p in model.encoder.named_parameters() if not any(nd in n for nd in no_decay)],
+     'weight_decay': 0.001, 'lr': 1e-5},
+    {'params': [p for n, p in model.encoder.named_parameters() if any(nd in n for nd in no_decay)],
+     'weight_decay': 0.0, 'lr': 1e-5},
+    {'params': [p for n, p in model.decoder.named_parameters() if not any(nd in n for nd in no_decay)],
+     'weight_decay': 0.001, 'lr': 0.01},
+    {'params': [p for n, p in model.decoder.named_parameters() if any(nd in n for nd in no_decay)],
+     'weight_decay': 0.0, 'lr': 0.01},
+]
+optimizer = optim.RAdam(grouped_parameters)
+scheduler = get_constant_schedule(optimizer)
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=100,
-                  batch_size=3,
+                  batch_size=8,
+                  gradient_accumulation_steps=16,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
@@ -53,14 +70,13 @@ trainer = Trainer(model,
                   train_sampler=None,
                   dev_sampler=None,
                   drop_last=False,
-                  gradient_accumulation_steps=1,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
                   validate_steps=None,
                   save_steps=None,
                   output_path=output_path,
-                  grad_norm=1,
+                  grad_norm=1.0,
                   use_tqdm=True,
                   device=device,
                   callbacks=None,
