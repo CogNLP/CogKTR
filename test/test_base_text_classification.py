@@ -5,11 +5,11 @@ from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
     device_id=8,
-    output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
-    folder_tag="simple_test",
+    output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result",
+    folder_tag="classification",
 )
 
-reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+reader = Sst2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
@@ -23,6 +23,7 @@ model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mode="abs",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,
@@ -41,7 +42,9 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   validate_steps=100,
-                  save_steps=100,
+                  save_steps=None,
+                  save_by_metric="F1",
+                  early_stopping=early_stopping,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
