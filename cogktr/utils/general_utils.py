@@ -6,6 +6,7 @@ import numpy as np
 import datetime
 import torch.distributed as dist
 import sys
+from cogktr.utils.log_utils import logger
 
 
 def move_dict_value_to_device(batch, device, rank=-1, non_blocking=False):
@@ -31,6 +32,7 @@ def reduce_mean(tensor, nprocs):
     dist.all_reduce(rt, op=dist.ReduceOp.SUM)
     rt = rt / nprocs
     return rt
+
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -62,11 +64,23 @@ def query_yes_no(question, default="yes"):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
+
+def create_cache(cache_path, cache_file):
+    cache_path = os.path.abspath(os.path.join(cache_path, cache_file))
+    if not os.path.exists(cache_path):
+        if query_yes_no("Cache path {} does not exits.Do you want to create a new one?".format(cache_path),
+                        default="no"):
+            os.makedirs(os.path.join(cache_path))
+            logger.info("Created cache path {}.".format(cache_path))
+        else:
+            raise ValueError("Cache path {} is not valid!".format(cache_path))
+
+
 class EarlyStopping:
-    def __init__(self,mode="min",patience=4,threshold=1e-4,threshold_mode="rel",metric_name=None):
-        if mode not in ["min","max"]:
+    def __init__(self, mode="min", patience=4, threshold=1e-4, threshold_mode="rel", metric_name=None):
+        if mode not in ["min", "max"]:
             assert ValueError("Argument mode must be min or max but got {}".format(mode))
-        if threshold_mode not in ["rel","abs"]:
+        if threshold_mode not in ["rel", "abs"]:
             assert ValueError("Argument threshold_mode must be rel or abs but got {}".format(threshold_mode))
         if threshold_mode == 'rel' and (threshold < 0 or threshold > 1):
             assert ValueError("Threshold must be in [0,1] in rel threshold mode but got {}.".format(threshold))
@@ -85,7 +99,7 @@ class EarlyStopping:
             self.best_value = value
             return
 
-        if self.is_better(value,self.best_value):
+        if self.is_better(value, self.best_value):
             self.best_value = value
             self.counter = 0
         else:
@@ -93,8 +107,7 @@ class EarlyStopping:
             if self.counter >= self.patience:
                 self.early_stop = True
 
-
-    def is_better(self,value,best_value):
+    def is_better(self, value, best_value):
         if self.mode == 'min' and self.threshold_mode == 'rel':
             rel_epsilon = 1. - self.threshold
             return value < best_value * rel_epsilon
