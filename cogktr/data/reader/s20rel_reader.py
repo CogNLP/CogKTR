@@ -83,14 +83,13 @@ class S20relReader(BaseReader):
             print(
                 f"Using sub-set mode or some triples are missing, total:{triples_total} --> subset:{count}"
             )
-            triples_total = count
+            # triples_total = count
 
     def _read_data(self, group_idx: int):
         datable = DataTable()
 
         def cls_one_hot(ent_id):
             return self.nodes_partition[group_idx][ent_id]
-
 
         for (h_id, t_id, r_id) in self.triple_list[group_idx]:
             text_h = self.id2ent[h_id]
@@ -112,10 +111,11 @@ class S20relReader(BaseReader):
 
     def read_vocab(self):
         self.label_vocab.create()
-        return {"label_vocab": self.label_vocab}
+        # return {"label_vocab": self.label_vocab}
+        return {}
 
 
 if __name__ == "__main__":
     s20mop_reader = S20relReader("/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/S20Rel")
     train_dataset = s20mop_reader.read_train(group_idx=0)
-    vocab = reader.read_vocab()
+    vocab = s20mop_reader.read_vocab()

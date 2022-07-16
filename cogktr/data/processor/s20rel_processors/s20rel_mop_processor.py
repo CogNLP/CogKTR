@@ -12,11 +12,11 @@ from cogktr.data.reader.s20rel_reader import S20relReader
 
 
 class S20relMopProcessor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab):
+    def __init__(self, plm, max_token_len):
         super().__init__()
         self.plm = plm
         self.max_token_len = max_token_len
-        self.vocab = vocab
+        # self.vocab = vocab
         self.tokenizer = AutoTokenizer.from_pretrained(plm)
 
     def _process(self, data):
@@ -34,7 +34,7 @@ class S20relMopProcessor(BaseProcessor):
             datable("input_ids", text_feature.data["input_ids"])
             datable("token_type_ids", text_feature.data["token_type_ids"])
             datable("attention_mask", text_feature.data["attention_mask"])
-            datable("label", self.vocab["label_vocab"].label2id(label))
+            datable("label", data["label"])
         return DataTableSet(datable)
 
     def process_train(self, data):
@@ -46,7 +46,6 @@ if __name__ == "__main__":
     vocab = s20rel_reader.read_vocab()
 
     s20rel_processor = S20relMopProcessor(plm="microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext",
-                                          max_token_len= 128,
-                                          vocab=vocab)
+                                          max_token_len= 128)
     train_dataset = s20rel_processor.process_train(train_data)
     print("end")
