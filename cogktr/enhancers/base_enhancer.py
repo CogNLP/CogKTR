@@ -2,10 +2,10 @@ class BaseEnhancer:
     def __init__(self):
         pass
 
-    def enhancer_sentence(self, sentence):
+    def enhance_sentence(self, sentence):
         pass
 
-    def enhancer_sentence_pair(self, sentence, sentence_pair):
+    def enhance_sentence_pair(self, sentence, sentence_pair):
         pass
 
     def _enhance_data(self,datable):
@@ -17,5 +17,5 @@ class BaseEnhancer:
     def enhance_dev(self,datable):
         pass
 
-    def enahcne_test(self,datable):
+    def enhance_test(self,datable):
         pass

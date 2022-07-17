@@ -11,6 +11,7 @@ from cogktr.utils.log_utils import logger
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from cogktr.utils.general_utils import reduce_mean, move_dict_value_to_device
+import shutil
 
 
 # import wandb
@@ -41,6 +42,7 @@ class Trainer:
             validate_steps=None,
             output_path=None,
             save_steps=None,
+            save_by_metric=None,
             grad_norm=None,
             use_tqdm=True,
             device=None,
@@ -73,6 +75,7 @@ class Trainer:
         :param output_path: 实验结果保存的路径
         :param validate_steps:验证步数
         :param save_steps:保存步数
+        :param save_by_metric:根据某个metric保存最佳模型
         :param grad_norm:梯度裁剪
         :param use_tqdm:是否使用tqdm
         :param device:设备
@@ -110,11 +113,18 @@ class Trainer:
         self.metric_key = metric_key
         self.output_path = output_path
         self.rank = rank
+        self.save_by_metric = save_by_metric
+        if save_by_metric is not None:
+            self.best_metric = {self.save_by_metric: 0, "global_step": -1, }
 
         if self.rank in [-1, 0]:
             if self.output_path:
                 self.writer_path = os.path.join(self.output_path, "tensorboard")
                 self.save_path = os.path.join(self.output_path, "model")
+                if self.save_by_metric is not None:
+                    self.save_best_model_path = os.path.join(self.output_path, "best_model")
+                    if not os.path.exists(self.save_best_model_path):
+                        os.mkdir(self.save_best_model_path)
                 if not os.path.exists(self.writer_path):
                     os.mkdir(self.writer_path)
                 if not os.path.exists(self.save_path):
@@ -154,7 +164,7 @@ class Trainer:
         if save_steps:
             self.save_steps = save_steps
         else:
-            self.save_steps = self.batch_count
+            self.save_steps = None
 
         if print_every:
             self.print_every = print_every
@@ -339,6 +349,29 @@ class Trainer:
                         #     "Global Step":global_step,
                         #     **evaluate_result,
                         # })
+                    if self.save_by_metric is not None:
+                        curr_metric = {self.save_by_metric:evaluate_result[self.save_by_metric],"global_step":global_step}
+                        if curr_metric[self.save_by_metric] > self.best_metric[self.save_by_metric]:
+                            prev_step = self.best_metric["global_step"]
+                            curr_step = curr_metric["global_step"]
+                            if prev_step != -1:
+                                prev_output_dir = os.path.join(self.save_best_model_path,"checkpoint-{}".format(prev_step))
+                                shutil.rmtree(prev_output_dir)
+                            output_dir = os.path.join(self.save_best_model_path,"checkpoint-{}".format(curr_step))
+                            if not os.path.exists(output_dir):
+                                os.makedirs(output_dir)
+                            logger.info("Metric {} rises from {:.3f} to {:.3f},save models checkpoint to {}".format(
+                                self.save_by_metric,
+                                self.best_metric[self.save_by_metric],
+                                curr_metric[self.save_by_metric],output_dir)
+                            )
+                            model = self.model if self.rank == -1 else self.model.module
+                            save_model(model=model, model_path=os.path.join(output_dir, "models.pt"))
+                            if self.optimizer:
+                                torch.save(self.optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
+                            if self.scheduler:
+                                torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                            self.best_metric = curr_metric
 
                     if self.early_stopping:
                         if not self.early_stopping.metric_name:
