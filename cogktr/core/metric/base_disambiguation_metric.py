@@ -18,7 +18,7 @@ class BaseDisambiguationMetric(BaseMetric):
         evaluate_result = {}
         ok = 0
         for begin, end in zip(self.segment_list[:-1], self.segment_list[1:]):
-            if pre_list[begin:end].argmax() < label_list[begin:end].sum():
+            if pre_list[begin:end].argmax() == int(np.where(label_list[begin:end]==1)[0]):
                 ok += 1
         F1 =ok / (len(self.segment_list) - 1) * 100
         evaluate_result = {"F1": F1}

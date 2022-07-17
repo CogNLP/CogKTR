@@ -9,7 +9,7 @@ from nltk.corpus import stopwords
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class TSemcorProcessor(BaseProcessor):
+class BSemcorProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab, addition):
         super().__init__()
         self.plm = plm
@@ -24,44 +24,21 @@ class TSemcorProcessor(BaseProcessor):
 
     def _process(self, data, datatype=None, enhanced_dict=None):
         datable = DataTable()
-        wordnet_info_list = []
         print("Processing data...")
-        for sentence, tag_list, lemma_list, all_pos_list, sentence_id, pos_list, instance_list, instance_id_list in tqdm(
-                zip(data['sentence'], data['tag_list'], data['lemma_list'], data['pos_list'],
-                    data['sentence_id'], data["instance_pos_list"], data["instance_list"], data["instance_id_list"]),
-                total=len(data['sentence'])):
-            for index, instance_id in enumerate(instance_id_list):
-                instance_wordnet_dict = enhanced_dict[tuple(instance_list)]["wordnet"][index]["lemma_item_details"]
-                for instance_candidate, content in instance_wordnet_dict.items():
-                    wordnet_info_list.append(content)
-
         for index, item in enumerate(tqdm(self.addition[datatype]["example"])):
             instance_id = item[0]
-            instance_label = item[2]
+            instance_defination = item[2].split()
+            instance_label = item[3]
 
             instance_loc = self.addition[datatype]["instance"][instance_id]["instance_loc"]
 
             sentence_id = instance_id.split(".")[0] + "." + instance_id.split(".")[1]
             raw_sentence = self.addition[datatype]["sentence"][sentence_id]
 
-            wordnet_info = wordnet_info_list[index]
             enhanced_data = []
-            synonym = wordnet_info["synonym"]
-            examples = []
-            if len(wordnet_info["examples"]) > 0:
-                examples = wordnet_info["examples"][0].split()
-            definition = wordnet_info["definition"].split()
-            hypernym_examples = []
-            hypernym_definition = []
-            if wordnet_info["hypernym"]["definition"] is not None:
-                hypernym_examples = wordnet_info["hypernym"]["definition"].split()
-                if len(wordnet_info["hypernym"]["examples"]) > 0:
-                    hypernym_definition = wordnet_info["hypernym"]["examples"][0].split()
-            enhanced_data.extend(synonym)
-            enhanced_data.extend(examples)
-            enhanced_data.extend(definition)
-            enhanced_data.extend(hypernym_examples)
-            enhanced_data.extend(hypernym_definition)
+
+
+            enhanced_data.extend(instance_defination)
             enhanced_data = self._remove_stopwords(enhanced_data)
 
             if self.plm == "roberta-large" and self.plm == "roberta-base":
@@ -108,17 +85,7 @@ class TSemcorProcessor(BaseProcessor):
             else:
                 raise ValueError("other plm will come so on!")
 
-            # tokenized_data = self.tokenizer.encode_plus(text=" ".join(raw_sentence),
-            #                                             text_pair=" ".join(enhanced_data),
-            #                                             truncation='longest_first',
-            #                                             padding="max_length",
-            #                                             add_special_tokens=True,
-            #                                             max_length=self.max_token_len)
-            # datable("input_ids", tokenized_data["input_ids"])
-            # datable("attention_mask", tokenized_data["attention_mask"])
-            # if self.plm != "roberta-large" and self.plm != "roberta-base":
-            #     datable("token_type_ids", tokenized_data["token_type_ids"])
-            # datable("label", instance_label)
+
         return DataTableSet(datable)
 
     def process_train(self, data, datatype="train", enhanced_dict=None):
@@ -133,7 +100,6 @@ class TSemcorProcessor(BaseProcessor):
 
 if __name__ == "__main__":
     from cogktr.data.reader.temp import TSemcorReader
-    from cogktr.enhancers.linguistics_enhancer import LinguisticsEnhancer
 
     reader = TSemcorReader(
         raw_data_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/raw_data")
@@ -141,19 +107,6 @@ if __name__ == "__main__":
     vocab = reader.read_vocab()
     addition = reader.read_addition()
 
-    enhancer = LinguisticsEnhancer(load_wordnet=True,
-                                   cache_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/enhanced_data",
-                                   cache_file="linguistics_data",
-                                   reprocess=True)
-    enhanced_train_dict = enhancer.enhance_train(datable=train_data,
-                                                 return_wordnet=True,
-                                                 enhanced_key_1="instance_list",
-                                                 pos_key="instance_pos_list")
-    enhanced_dev_dict = enhancer.enhance_dev(datable=dev_data,
-                                             return_wordnet=True,
-                                             enhanced_key_1="instance_list",
-                                             pos_key="instance_pos_list")
-
-    processor = TSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
-    train_dataset = processor.process_train(train_data, enhanced_dict=enhanced_train_dict)
-    dev_dataset = processor.process_dev(dev_data, enhanced_dict=enhanced_dev_dict)
+    processor = BSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
+    dev_dataset = processor.process_dev(dev_data)
+    print("end")

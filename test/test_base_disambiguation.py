@@ -6,7 +6,7 @@ from torch.utils.data import SequentialSampler
 from cogktr.models.tesr import TEsrModel
 
 device, output_path = init_cogktr(
-    device_id=2,
+    device_id=3,
     output_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/experimental_result/",
     folder_tag="simple_test",
 )
@@ -17,22 +17,9 @@ train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 addition = reader.read_addition()
 
-enhancer = LinguisticsEnhancer(load_wordnet=True,
-                               cache_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/enhanced_data",
-                               cache_file="linguistics_data",
-                               reprocess=True)
-enhanced_train_dict = enhancer.enhance_train(datable=train_data,
-                                             return_wordnet=True,
-                                             enhanced_key_1="instance_list",
-                                             pos_key="instance_pos_list")
-enhanced_dev_dict = enhancer.enhance_dev(datable=dev_data,
-                                         return_wordnet=True,
-                                         enhanced_key_1="instance_list",
-                                         pos_key="instance_pos_list")
-
-processor = TSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
-train_dataset = processor.process_train(train_data, enhanced_dict=enhanced_train_dict)
-dev_dataset = processor.process_dev(dev_data, enhanced_dict=enhanced_dev_dict)
+processor = BSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
+train_dataset = processor.process_train(train_data)
+dev_dataset = processor.process_dev(dev_data)
 dev_sampler = SequentialSampler(dev_dataset)
 
 plm = PlmAutoModel(pretrained_model_name="bert-base-cased")

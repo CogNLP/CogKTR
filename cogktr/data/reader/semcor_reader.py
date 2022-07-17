@@ -110,16 +110,16 @@ class SemcorReader(BaseReader):
         print("Reading data...")
         tokenizer = transformers.AutoTokenizer.from_pretrained('roberta-base')
         limit = 432
-        annotators = [0]
+        annotators = [0]#
         wsd_label = self.train_gold_path
         datable = DataTable()
         self.analyze_tokenizer(tokenizer)
         begin_id = tokenizer.convert_tokens_to_ids(
-            tokenizer.cls_token if self.tokenize_bert_stype else tokenizer.bos_token)
+            tokenizer.cls_token if self.tokenize_bert_stype else tokenizer.bos_token)#
         end_id = tokenizer.convert_tokens_to_ids(
-            tokenizer.sep_token if self.tokenize_bert_stype else tokenizer.eos_token)
-        col_id = self.tokenize(':')
-        col_len = len(col_id)
+            tokenizer.sep_token if self.tokenize_bert_stype else tokenizer.eos_token)#
+        col_id = self.tokenize(':')#
+        col_len = len(col_id)#
         root = ET.parse(self.train_path).getroot()
         sentence_dict = {}
         instance_dict = {}

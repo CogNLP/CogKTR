@@ -4,6 +4,7 @@ from .searcher import *
 from .tagger import *
 from .enhancer import *
 from .base_enhancer import *
+from .linguistics_enhancer import *
 
 __all__ = [
     # embedder
@@ -29,4 +30,5 @@ __all__ = [
     # enhancer
     "BaseEnhancer",
     "Enhancer",
+    "LinguisticsEnhancer",
 ]
