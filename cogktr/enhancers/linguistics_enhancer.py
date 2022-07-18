@@ -6,7 +6,7 @@ from cogktr.enhancers.tagger.syntax_tagger import SyntaxTagger
 from cogktr.enhancers.linker.wordnet_linker import WordnetLinker
 from cogktr.enhancers.searcher.wordnet_searcher import WordnetSearcher
 from nltk.tokenize import word_tokenize
-from cogktr.utils.io_utils import save_json, load_json
+from cogktr.utils.io_utils import save_pickle, load_pickle
 from tqdm import tqdm
 
 
@@ -64,7 +64,8 @@ class LinguisticsEnhancer(BaseEnhancer):
                          return_ner=False,
                          return_srl=False,
                          return_syntax=False,
-                         return_wordnet=False):
+                         return_wordnet=False,
+                         pos_list=None):
         enhanced_dict = {}
 
         if isinstance(sentence, list):
@@ -84,7 +85,7 @@ class LinguisticsEnhancer(BaseEnhancer):
         if return_syntax:
             enhanced_dict[sentence]["syntax"] = self.syntax_tagger.tag(words)["knowledge"]
         if return_wordnet:
-            wordnet_link_list = self.wordnet_linker.link(words)["knowledge"]
+            wordnet_link_list = self.wordnet_linker.link(sentence=words, pos_list=pos_list)["knowledge"]
             for i, wordnet_link in enumerate(wordnet_link_list):
                 lemma_dict = {}
                 lemma_items = wordnet_link["lemma_item"]
@@ -100,18 +101,22 @@ class LinguisticsEnhancer(BaseEnhancer):
                               return_ner=False,
                               return_srl=False,
                               return_syntax=False,
-                              return_wordnet=False):
+                              return_wordnet=False,
+                              pos_list=None,
+                              pair_pos_list=None):
         enhanced_dict = {}
         enhanced_sentence_dict = self.enhance_sentence(sentence=sentence,
                                                        return_ner=return_ner,
                                                        return_srl=return_srl,
                                                        return_syntax=return_syntax,
-                                                       return_wordnet=return_wordnet)
+                                                       return_wordnet=return_wordnet,
+                                                       pos_list=pos_list)
         enhanced_sentence_pair_dict = self.enhance_sentence(sentence=sentence_pair,
                                                             return_ner=return_ner,
                                                             return_srl=return_srl,
                                                             return_syntax=return_syntax,
-                                                            return_wordnet=return_wordnet)
+                                                            return_wordnet=return_wordnet,
+                                                            pos_list=pair_pos_list)
         sentence_key = list(enhanced_sentence_dict.keys())[0]
         sentence_pair_key = list(enhanced_sentence_pair_dict.keys())[0]
         enhanced_dict[(sentence_key, sentence_pair_key)] = {}
@@ -136,49 +141,78 @@ class LinguisticsEnhancer(BaseEnhancer):
                       dict_name=None,
                       enhanced_key_1=None,
                       enhanced_key_2=None,
+                      pos_key=None,
                       return_ner=False,
                       return_srl=False,
                       return_syntax=False,
                       return_wordnet=False):
         enhanced_dict = {}
         if not self.reprocess and os.path.exists(os.path.join(self.cache_path_file, dict_name)):
-            enhanced_dict = load_json(enhanced_dict)
+            enhanced_dict = load_pickle(os.path.join(self.cache_path_file, dict_name))
         else:
             print("Enhancing data...")
             if enhanced_key_2 is None:
-                for sentence in tqdm(datable[enhanced_key_1]):
-                    enhanced_sentence_dict = self.enhance_sentence(sentence=sentence,
-                                                                   return_ner=return_ner,
-                                                                   return_srl=return_srl,
-                                                                   return_syntax=return_syntax,
-                                                                   return_wordnet=return_wordnet)
-                    enhanced_dict.update(enhanced_sentence_dict)
-                save_json(enhanced_dict, os.path.join(self.cache_path_file, dict_name))
+                if pos_key in datable.headers:
+                    for sentence, pos_list in tqdm(zip(datable[enhanced_key_1], datable[pos_key]),
+                                                   total=len(datable[enhanced_key_1])):
+                        enhanced_sentence_dict = self.enhance_sentence(sentence=sentence,
+                                                                       return_ner=return_ner,
+                                                                       return_srl=return_srl,
+                                                                       return_syntax=return_syntax,
+                                                                       return_wordnet=return_wordnet,
+                                                                       pos_list=pos_list)
+                        enhanced_dict.update(enhanced_sentence_dict)
+                else:
+                    for sentence in tqdm(datable[enhanced_key_1], total=len(datable[enhanced_key_1])):
+                        enhanced_sentence_dict = self.enhance_sentence(sentence=sentence,
+                                                                       return_ner=return_ner,
+                                                                       return_srl=return_srl,
+                                                                       return_syntax=return_syntax,
+                                                                       return_wordnet=return_wordnet)
+                        enhanced_dict.update(enhanced_sentence_dict)
             else:
-                for sentence, sentence_pair in tqdm(zip(datable[enhanced_key_1], datable[enhanced_key_2]),
-                                                    total=len(datable[enhanced_key_1])):
-                    enhanced_sentence_pair = self.enhance_sentence_pair(sentence=sentence,
-                                                                        sentence_pair=sentence_pair,
-                                                                        return_ner=return_ner,
-                                                                        return_srl=return_srl,
-                                                                        return_syntax=return_syntax,
-                                                                        return_wordnet=return_wordnet)
-                    enhanced_dict.update(enhanced_sentence_pair)
-                save_json(enhanced_dict, os.path.join(self.cache_path_file, dict_name))
+                if pos_key in datable.headers and "pair_pos_list" in datable.headers:
+                    for sentence, sentence_pair, pos_list, pair_pos_list in tqdm(
+                            zip(datable[enhanced_key_1], datable[enhanced_key_2],
+                                datable[pos_key], datable["pair_pos_list"]),
+                            total=len(datable[enhanced_key_1])):
+                        enhanced_sentence_pair = self.enhance_sentence_pair(sentence=sentence,
+                                                                            sentence_pair=sentence_pair,
+                                                                            return_ner=return_ner,
+                                                                            return_srl=return_srl,
+                                                                            return_syntax=return_syntax,
+                                                                            return_wordnet=return_wordnet,
+                                                                            pos_list=pos_list,
+                                                                            pair_pos_list=pair_pos_list)
+                        enhanced_dict.update(enhanced_sentence_pair)
+                else:
+                    for sentence, sentence_pair in tqdm(
+                            zip(datable[enhanced_key_1], datable[enhanced_key_2]),
+                            total=len(datable[enhanced_key_1])):
+                        enhanced_sentence_pair = self.enhance_sentence_pair(sentence=sentence,
+                                                                            sentence_pair=sentence_pair,
+                                                                            return_ner=return_ner,
+                                                                            return_srl=return_srl,
+                                                                            return_syntax=return_syntax,
+                                                                            return_wordnet=return_wordnet)
+                        enhanced_dict.update(enhanced_sentence_pair)
+            save_pickle(enhanced_dict, os.path.join(self.cache_path_file, dict_name))
         return enhanced_dict
 
     def enhance_train(self,
                       datable,
                       enhanced_key_1="sentence",
                       enhanced_key_2=None,
+                      pos_key="pos_list",
                       return_ner=False,
                       return_srl=False,
                       return_syntax=False,
                       return_wordnet=False):
         return self._enhance_data(datable=datable,
-                                  dict_name="enhanced_train.json",
+                                  dict_name="enhanced_train.pkl",
                                   enhanced_key_1=enhanced_key_1,
                                   enhanced_key_2=enhanced_key_2,
+                                  pos_key=pos_key,
                                   return_ner=return_ner,
                                   return_srl=return_srl,
                                   return_syntax=return_syntax,
@@ -188,31 +222,35 @@ class LinguisticsEnhancer(BaseEnhancer):
                     datable,
                     enhanced_key_1="sentence",
                     enhanced_key_2=None,
+                    pos_key="pos_list",
                     return_ner=False,
                     return_srl=False,
                     return_syntax=False,
                     return_wordnet=False):
         return self._enhance_data(datable=datable,
-                                  dict_name="enhanced_dev.json",
+                                  dict_name="enhanced_dev.pkl",
                                   enhanced_key_1=enhanced_key_1,
                                   enhanced_key_2=enhanced_key_2,
+                                  pos_key=pos_key,
                                   return_ner=return_ner,
                                   return_srl=return_srl,
                                   return_syntax=return_syntax,
                                   return_wordnet=return_wordnet)
 
-    def enahcne_test(self,
+    def enhance_test(self,
                      datable,
                      enhanced_key_1="sentence",
                      enhanced_key_2=None,
+                     pos_key="pos_list",
                      return_ner=False,
                      return_srl=False,
                      return_syntax=False,
                      return_wordnet=False):
         return self._enhance_data(datable=datable,
-                                  dict_name="enhanced_test.json",
+                                  dict_name="enhanced_test.pkl",
                                   enhanced_key_1=enhanced_key_1,
                                   enhanced_key_2=enhanced_key_2,
+                                  pos_key=pos_key,
                                   return_ner=return_ner,
                                   return_srl=return_srl,
                                   return_syntax=return_syntax,
@@ -221,7 +259,7 @@ class LinguisticsEnhancer(BaseEnhancer):
 
 if __name__ == "__main__":
     from cogktr.data.reader.sst2_reader import Sst2Reader
-    from cogktr.data.reader.qnli_reader import QnliReader
+    from cogktr.data.reader.stsb_reader import StsbReader
 
     enhancer = LinguisticsEnhancer(load_ner=True,
                                    load_srl=True,
@@ -259,20 +297,20 @@ if __name__ == "__main__":
         return_syntax=True,
         return_wordnet=True)
 
-    reader_5 = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
-    train_data_5, dev_data_5, test_data_5 = reader_5.read_all()
-    enhanced_dev_dict_5 = enhancer.enhance_dev(datable=dev_data_5,
-                                               enhanced_key_1="sentence",
-                                               return_ner=True,
-                                               return_srl=True,
-                                               return_syntax=True,
-                                               return_wordnet=True)
+    # reader_5 = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+    # train_data_5, dev_data_5, test_data_5 = reader_5.read_all()
+    # enhanced_dev_dict_5 = enhancer.enhance_dev(datable=dev_data_5,
+    #                                            enhanced_key_1="sentence",
+    #                                            return_ner=True,
+    #                                            return_srl=True,
+    #                                            return_syntax=True,
+    #                                            return_wordnet=True)
 
-    reader_6 = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+    reader_6 = StsbReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/STS_B/raw_data")
     train_data_6, dev_data_6, test_data_6 = reader_6.read_all()
     enhanced_dev_dict_6 = enhancer.enhance_dev(datable=dev_data_6,
-                                               enhanced_key_1="question",
-                                               enhanced_key_2="sentence",
+                                               enhanced_key_1="sentence1",
+                                               enhanced_key_2="sentence2",
                                                return_ner=True,
                                                return_srl=True,
                                                return_syntax=True,

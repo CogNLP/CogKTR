@@ -14,6 +14,8 @@ __all__ = [
     "QnliProcessor",
     "QnliSembertProcessor",
     "SemcorProcessor",
+    "TSemcorProcessor",
+    "BSemcorProcessor",
     "Squad2Processor",
     "Squad2SembertProcessor",
     "Sst2Processor",

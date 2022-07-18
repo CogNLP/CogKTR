@@ -5,12 +5,7 @@ from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.download_utils import Downloader
 import xml.etree.ElementTree as ET
 from nltk.corpus import wordnet as wn
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from collections import Counter, OrderedDict
-
-SEMCOR2WN_POS_TAG = {'NOUN': wn.NOUN, 'VERB': wn.VERB, 'ADJ': wn.ADJ, 'ADV': wn.ADV}
-STOPWORDS = list(set(stopwords.words('english')))
+from collections import defaultdict
 
 
 class TSemcorReader(BaseReader):
@@ -19,8 +14,8 @@ class TSemcorReader(BaseReader):
         self.raw_data_path = raw_data_path
         downloader = Downloader()
         downloader.download_semcor_raw_data(raw_data_path)
-        self.train_file = 'Evaluation_Datasets/semeval2007/semeval2007.data.xml'
-        self.train_gold_file = 'Evaluation_Datasets/semeval2007/semeval2007.gold.key.txt'
+        self.train_file = 'Training_Corpora/SemCor/semcor.data.xml'
+        self.train_gold_file = 'Training_Corpora/SemCor/semcor.gold.key.txt'
         self.dev_file = 'Evaluation_Datasets/semeval2007/semeval2007.data.xml'
         self.dev_gold_file = 'Evaluation_Datasets/semeval2007/semeval2007.gold.key.txt'
         self.test_file = 'Evaluation_Datasets/semeval2007/semeval2007.data.xml'
@@ -32,20 +27,28 @@ class TSemcorReader(BaseReader):
         self.test_path = os.path.join(raw_data_path, self.test_file)
         self.test_gold_path = os.path.join(raw_data_path, self.test_gold_file)
         self.label_vocab = Vocabulary()
+        self.label_vocab.add_dict({0: 0, 1: 1})
         self.addition = {}
         self.addition["train"] = {}
-        self.addition["train"]["instance_loc"] = {}
-        self.addition["train"]["instance_label"] = {}
+        self.addition["train"]["instance"] = defaultdict(dict)
+        self.addition["train"]["sentence"] = defaultdict(dict)
+        self.addition["train"]["example"] = []
+        self.addition["train"]["segmentation"] = []
         self.addition["dev"] = {}
-        self.addition["dev"]["instance_loc"] = {}
-        self.addition["dev"]["instance_label"] = {}
+        self.addition["dev"]["instance"] = defaultdict(dict)
+        self.addition["dev"]["sentence"] = defaultdict(dict)
+        self.addition["dev"]["example"] = []
+        self.addition["dev"]["segmentation"] = []
         self.addition["test"] = {}
-        self.addition["test"]["instance_loc"] = {}
-        self.addition["test"]["instance_label"] = {}
+        self.addition["test"]["instance"] = defaultdict(dict)
+        self.addition["test"]["sentence"] = defaultdict(dict)
+        self.addition["test"]["example"] = []
+        self.addition["test"]["segmentation"] = []
+
+        self.SEMCOR2WN_POS_TAG = {'NOUN': wn.NOUN, 'VERB': wn.VERB, 'ADJ': wn.ADJ, 'ADV': wn.ADV}
 
     def _read_data(self, path, gold_path=None, datatype=None):
         datable = DataTable()
-        print("Reading data...")
 
         # read data
         root = ET.parse(path).getroot()
@@ -55,76 +58,56 @@ class TSemcorReader(BaseReader):
             tag_list = []
             lemma_list = []
             pos_list = []
+            instance_list = []
+            instance_pos_list = []
+            instance_id_list = []
             for index, word in enumerate(sentence):
                 word_list.append(word.text)
                 tag_list.append(word.tag)
-                lemma_list.append(word.get("pos"))
-                pos_list.append(word.get("lemma"))
+                lemma_list.append(word.get("lemma"))
+                pos_list.append(word.get("pos"))
                 if word.tag == "instance":
-                    self.addition[datatype]["instance_loc"][word.get("id")] = index
-            datable("word_list", word_list)
+                    self.addition[datatype]["instance"][word.get("id")]["instance_loc"] = index
+                    instance_list.append(word.get("lemma"))
+                    instance_pos_list.append(self.SEMCOR2WN_POS_TAG[word.get("pos")])
+                    instance_id_list.append(word.get("id"))
+            self.addition[datatype]["sentence"][sentence.get("id")] = word_list
+            datable("sentence_id", sentence.get("id"))
+            datable("sentence", word_list)
             datable("tag_list", tag_list)
             datable("lemma_list", lemma_list)
             datable("pos_list", pos_list)
-            datable("sentence_id", sentence.get("id"))
+            datable("instance_id_list", instance_id_list)
+            datable("instance_list", instance_list)
+            datable("instance_pos_list", instance_pos_list)
 
         # raed gold
         with open(gold_path, 'r') as file:
             lines = file.readlines()
             for line in lines:
                 line = line.split()
-                key = line[0]
+                instance_id = line[0]
                 # regard the first lemma label as gold label
                 label = line[1]
-                self.addition[datatype]["instance_label"][key] = label
+                self.addition[datatype]["instance"][instance_id]["instance_label"] = label
 
         # read instance
-        sample_list = []
-        gloss_dict = {}
+        start = 0
+        self.addition[datatype]["segmentation"].append(0)
         instances = root.findall('.//instance')
         for instance in instances:
-            instance_id = instance.get("id")
-            gold_lemma_label = self.addition[datatype]["instance_label"][instance_id]
-            sample_list.append((instance_id, gold_lemma_label, 1))
-            instance_pos = SEMCOR2WN_POS_TAG[instance.get("pos")]
-            # instance_lemma:'refer',represent word lemma
-            instance_lemma = instance.get("lemma")
-            # search lemma candidate set in WordNet according to pos tag
-            # input:instance_lemma:"refer",instance_pos:"v"
-            # return:Lemma('mention.v.01.refer'),Lemma('refer.v.02.refer')...
-            # word.pos.id.word_item_name
-            wn_lemmas = wn.lemmas(instance_lemma, instance_pos)
-            for wn_lemma in wn_lemmas:
-                # wn_lemma_key:'refer%2:32:01::',represnet lemma order number
-                wn_lemma_key = wn_lemma.key()
-                # wn_lemma_synset:Synset('mention.v.01'),represent lemma synset
-                wn_lemma_synset = wn_lemma.synset()
-                # wn_lemma_definition:'make reference to',represnt synset definition
-                wn_lemma_definition = wn_lemma_synset.definition()
-                # synonym
-                # wn_lemma_synset_lemma:Lemma('mention.v.01.mention'),Lemma('mention.v.01.advert'),Lemma('mention.v.01.bring_up')...
-                wn_lemma_synset_lemma = wn_lemma_synset.lemmas()
-                synonym_words = []
-                for lemma_lemma in wn_lemma_synset_lemma:
-                    synonym_words.append(lemma_lemma)
-                # example
-                wn_lemma_synset_example = wn_lemma_synset.examples()
-                examples_list = []
-                for lemma_example in wn_lemma_synset_example:
-                    examples_list.append(lemma_example)
-                # hypernym
-                wn_lemma_synset_hypernym = wn_lemma_synset.hypernyms()
-                hypernym_list = []
-                for lemma_hypernym in wn_lemma_synset_hypernym:
-                    hypernym_list.append(lemma_hypernym.definition())
-                gloss_dict[wn_lemma_key] = {}
-                gloss_dict[wn_lemma_key]["lemma_definition"] = wn_lemma_definition
-                gloss_dict[wn_lemma_key]["synonym"] = synonym_words
-                gloss_dict[wn_lemma_key]["example"] = examples_list
-                gloss_dict[wn_lemma_key]["hypernym"] = hypernym_list
-                if wn_lemma_key != gold_lemma_label:
-                    sample_list.append((instance_id, wn_lemma_key, 0))
-
+            word_lemma_items = wn.lemmas(instance.get("lemma"), self.SEMCOR2WN_POS_TAG[instance.get("pos")])
+            word_lemma_keys = [word_lemma_item.key() for word_lemma_item in word_lemma_items]
+            gold_word_lemma_key = self.addition[datatype]["instance"][instance.get("id")]["instance_label"]
+            for word_lemma_key, word_lemma_item in zip(word_lemma_keys, word_lemma_items):
+                if gold_word_lemma_key == word_lemma_key:
+                    self.addition[datatype]["example"].append(
+                        (instance.get("id"), word_lemma_key, word_lemma_item._synset._definition, 1))
+                else:
+                    self.addition[datatype]["example"].append(
+                        (instance.get("id"), word_lemma_key, word_lemma_item._synset._definition, 0))
+            start += len(word_lemma_keys)
+            self.addition[datatype]["segmentation"].append(start)
         return datable
 
     def _read_train(self, path, gold_path=None, datatype="train"):

@@ -5,7 +5,7 @@ from cogktr.utils.general_utils import init_cogktr
 from torch.utils.data import SequentialSampler
 
 device, output_path = init_cogktr(
-    device_id=2,
+    device_id=3,
     output_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/experimental_result/",
     folder_tag="simple_test",
 )
@@ -42,8 +42,8 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
-                  save_steps=100,
+                  validate_steps=500,
+                  save_steps=500,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,

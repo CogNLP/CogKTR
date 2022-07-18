@@ -40,6 +40,8 @@ __all__ = [
     "MultisegchnsentibertReader",
     "QnliReader",
     "SemcorReader",
+    "TSemcorProcessor",
+    "BSemcorProcessor",
     "Squad2Reader",
     "Sst2Reader",
     "StsbReader",
@@ -62,6 +64,7 @@ __all__ = [
     "SyntaxTagger",
     "BaseEnhancer",
     "Enhancer",
+    "LinguisticsEnhancer",
 
     # models
     "BaseModel",

@@ -27,6 +27,7 @@ class WordnetSearcher(BaseSearcher):
 
     def _nltk_search(self, lemma_item):
         search_dict = {}
+        search_dict["lemma_key"] = lemma_item.key()
         if self.return_synonym:
             search_dict["synonym"] = []
             for lemma in lemma_item.synset().lemmas():
