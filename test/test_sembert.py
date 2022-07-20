@@ -5,8 +5,8 @@ from cogktr import *
 from cogktr.core.evaluator import Evaluator
 from cogktr.utils.general_utils import init_cogktr
 from cogktr.data.processor.qnli_processors.qnli_sembert_processor import QnliSembertProcessor
-# from cogktr.models.sembert_model import BertForSequenceClassificationTag
-from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
+from cogktr.models.sembert_model import SembertForSequenceClassification
+# from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
 from transformers import BertConfig
 from argparse import Namespace
 from cogktr.models.sembert_model import SembertForSequenceClassification
@@ -15,9 +15,9 @@ from cogktr.models.sembert_model import SembertForSequenceClassification
 
 
 device, output_path = init_cogktr(
-    device_id=2,
+    device_id=8,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="old_sembert",
+    folder_tag="sembert",
 )
 
 reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
@@ -48,17 +48,17 @@ tag_config = {
    "num_aspect":3
 }
 tag_config = Namespace(**tag_config)
-model = BertForSequenceClassificationTag.from_pretrained(
-    "bert-base-uncased",
-    cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
-    num_labels=2,
-    tag_config=tag_config,
-)
-# model = SembertForSequenceClassification(
-#     vocab=vocab,
-#     plm="bert-base-uncased",
-#     tag_config=tag_config
+# model = BertForSequenceClassificationTag.from_pretrained(
+#     "bert-base-uncased",
+#     cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
+#     num_labels=2,
+#     tag_config=tag_config,
 # )
+model = SembertForSequenceClassification(
+    vocab=vocab,
+    plm="bert-base-uncased",
+    tag_config=tag_config
+)
 
 # model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")

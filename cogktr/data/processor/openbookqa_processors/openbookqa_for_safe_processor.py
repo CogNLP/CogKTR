@@ -37,7 +37,8 @@ class OpenBookQAForSafeProcessor(BaseProcessor):
             for j in range(num_choices):
                 k = num_choices * i + j
                 id,stem,answer_text,key,statement,answerKey = data[k]
-                data_dict = enhanced_data_dict[statement]
+                data_dict = enhanced_data_dict[(statement,answer_text)]["interaction"]
+                # data_dict = enhanced_data_dict[statement]
                 meta_path_feature,meta_path_count = encode_meta_path(
                     data_dict["meta_paths_list"],data_dict["meta_paths_set"],self.vocab["metapath"]
                 )
