@@ -1083,9 +1083,8 @@ class CNN_conv1d(nn.Module):
         return x.view(bsz, word_len, -1)
 
 class SembertEncoder(BertPreTrainedModel):
-    def __init__(self, config, num_labels=2, tag_config=None):
+    def __init__(self, config, tag_config=None):
         super(SembertEncoder, self).__init__(config)
-        self.num_labels = num_labels
         self.bert = BertModel(config)
         self.filter_size = 3
         self.cnn = CNN_conv1d(config, filter_size=self.filter_size)
@@ -1104,12 +1103,6 @@ class SembertEncoder(BertPreTrainedModel):
         else:
             self.hidden_size = config.hidden_size
 
-        if self.use_tag:
-            self.pool = nn.Linear(config.hidden_size + tag_config.hidden_size, config.hidden_size + tag_config.hidden_size)
-            self.classifier = nn.Linear(config.hidden_size + tag_config.hidden_size, num_labels)
-        else:
-            self.pool = nn.Linear(config.hidden_size, config.hidden_size)
-            self.classifier = nn.Linear(config.hidden_size, num_labels)
         self.apply(self.init_bert_weights)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, start_end_idx=None, input_tag_ids=None):
@@ -1178,15 +1171,7 @@ class SembertEncoder(BertPreTrainedModel):
 
         return sequence_output  # (batch_size,seq_of_words,hidden_size)
 
-        #first_token_tensor = sequence_output[:, 0]
-        # first_token_tensor, pool_index = torch.max(sequence_output, dim=1)
-        #
-        # pooled_output = self.pool(first_token_tensor)
-        # pooled_output = self.activation(pooled_output)
-        # pooled_output = self.dropout(pooled_output)
-        # logits = self.classifier(pooled_output)
-        #
-        # return logits
+
 
 
 

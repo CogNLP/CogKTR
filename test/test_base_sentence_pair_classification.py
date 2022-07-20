@@ -9,16 +9,16 @@ device, output_path = init_cogktr(
     folder_tag="base_qnli",
 )
 
-reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+reader = QnliReader(raw_data_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = QnliProcessor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
+processor = QnliProcessor(plm="bert-large-uncased", max_token_len=256, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = PlmBertModel(pretrained_model_name="bert-base-cased")
+plm = PlmBertModel(pretrained_model_name="bert-large-uncased")
 model = BaseSentencePairClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
@@ -29,7 +29,7 @@ trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=50,
+                  batch_size=25,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,

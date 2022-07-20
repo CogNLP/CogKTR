@@ -5,11 +5,11 @@ from cogktr import *
 from cogktr.core.evaluator import Evaluator
 from cogktr.utils.general_utils import init_cogktr
 from cogktr.data.processor.qnli_processors.qnli_sembert_processor import QnliSembertProcessor
-from cogktr.models.sembert_model import SembertForSequenceClassification
 # from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
 from transformers import BertConfig
 from argparse import Namespace
 from cogktr.models.sembert_model import SembertForSequenceClassification
+from cogktr.modules.encoder.sembert import SembertEncoder
 # import wandb
 # wandb.init(project="CogKTR",entity="hongbangyuan")
 
@@ -17,10 +17,10 @@ from cogktr.models.sembert_model import SembertForSequenceClassification
 device, output_path = init_cogktr(
     device_id=8,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="sembert",
+    folder_tag="sembert_with_tag",
 )
 
-reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
+reader = QnliReader(raw_data_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
@@ -34,11 +34,11 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence",enha
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence",enhanced_key_2="question")
 
 
-processor = QnliSembertProcessor(plm="bert-base-uncased", max_token_len=256, vocab=vocab,debug=False)
+processor = QnliSembertProcessor(plm="bert-large-uncased", max_token_len=256, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
-early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mode="abs",metric_name="F1")
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.001,threshold_mode="abs",metric_name="F1")
 
 tag_config = {
    "tag_vocab_size":len(vocab["tag_vocab"]),
@@ -54,11 +54,17 @@ tag_config = Namespace(**tag_config)
 #     num_labels=2,
 #     tag_config=tag_config,
 # )
+plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=tag_config)
+# plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=None)
 model = SembertForSequenceClassification(
     vocab=vocab,
-    plm="bert-base-uncased",
-    tag_config=tag_config
+    plm=plm,
 )
+# model = SembertForSequenceClassification(
+#     vocab=vocab,
+#     plm="bert-large-uncased",
+#     tag_config=tag_config
+# )
 
 # model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
@@ -71,7 +77,7 @@ trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=32,
+                  batch_size=16,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
