@@ -4,9 +4,9 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=1,
-    output_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="simple_test",
+    device_id=7,
+    output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
+    folder_tag="base_qnli",
 )
 
 reader = QnliReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/sentence_pair/QNLI/raw_data")
@@ -23,6 +23,7 @@ model = BaseSentencePairClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.001,threshold_mode="abs",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,
@@ -40,8 +41,9 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
-                  save_steps=100,
+                  validate_steps=500,
+                  early_stopping=early_stopping,
+                  save_steps=None,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
