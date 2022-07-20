@@ -5,6 +5,7 @@ from tqdm import tqdm
 from cogktr.data.processor.base_processor import BaseProcessor
 import transformers
 from nltk.corpus import stopwords
+import copy
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -37,40 +38,40 @@ class TSemcorProcessor(BaseProcessor):
 
         for index, item in enumerate(tqdm(self.addition[datatype]["example"])):
             instance_id = item[0]
-            instance_label = item[2]
+            instance_label = item[3]
 
             instance_loc = self.addition[datatype]["instance"][instance_id]["instance_loc"]
 
             sentence_id = instance_id.split(".")[0] + "." + instance_id.split(".")[1]
-            raw_sentence = self.addition[datatype]["sentence"][sentence_id]
+            raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id])
 
             wordnet_info = wordnet_info_list[index]
             enhanced_data = []
-            synonym = wordnet_info["synonym"]
-            examples = []
-            if len(wordnet_info["examples"]) > 0:
-                examples = wordnet_info["examples"][0].split()
+            # synonym = wordnet_info["synonym"]
+            # examples = []
+            # if len(wordnet_info["examples"]) > 0:
+            #     examples = wordnet_info["examples"][0].split()
             definition = wordnet_info["definition"].split()
-            hypernym_examples = []
-            hypernym_definition = []
-            if wordnet_info["hypernym"]["definition"] is not None:
-                hypernym_examples = wordnet_info["hypernym"]["definition"].split()
-                if len(wordnet_info["hypernym"]["examples"]) > 0:
-                    hypernym_definition = wordnet_info["hypernym"]["examples"][0].split()
-            enhanced_data.extend(synonym)
-            enhanced_data.extend(examples)
+            # hypernym_examples = []
+            # hypernym_definition = []
+            # if wordnet_info["hypernym"]["definition"] is not None:
+            #     hypernym_examples = wordnet_info["hypernym"]["definition"].split()
+            #     if len(wordnet_info["hypernym"]["examples"]) > 0:
+            #         hypernym_definition = wordnet_info["hypernym"]["examples"][0].split()
+            # enhanced_data.extend(synonym)
+            # enhanced_data.extend(examples)
             enhanced_data.extend(definition)
-            enhanced_data.extend(hypernym_examples)
-            enhanced_data.extend(hypernym_definition)
+            # enhanced_data.extend(hypernym_examples)
+            # enhanced_data.extend(hypernym_definition)
             enhanced_data = self._remove_stopwords(enhanced_data)
 
             if self.plm == "roberta-large" and self.plm == "roberta-base":
                 raise ValueError("roberta will come so on!")
             elif self.plm == "bert-base-cased" or self.plm == "bert-base-uncased":
                 input_tokens = []
+                instance_mask = []
                 raw_sentence.insert(0, '[CLS]')
                 raw_sentence.append('[SEP]')
-                instance_mask = []
                 for index, word in enumerate(raw_sentence):
                     token = self.tokenizer.tokenize(word)
                     input_tokens.extend(token)
@@ -145,15 +146,16 @@ if __name__ == "__main__":
                                    cache_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/enhanced_data",
                                    cache_file="linguistics_data",
                                    reprocess=True)
-    enhanced_train_dict = enhancer.enhance_train(datable=train_data,
-                                                 return_wordnet=True,
-                                                 enhanced_key_1="instance_list",
-                                                 pos_key="instance_pos_list")
+    # enhanced_train_dict = enhancer.enhance_train(datable=train_data,
+    #                                              return_wordnet=True,
+    #                                              enhanced_key_1="instance_list",
+    #                                              pos_key="instance_pos_list")
     enhanced_dev_dict = enhancer.enhance_dev(datable=dev_data,
                                              return_wordnet=True,
                                              enhanced_key_1="instance_list",
                                              pos_key="instance_pos_list")
 
     processor = TSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
-    train_dataset = processor.process_train(train_data, enhanced_dict=enhanced_train_dict)
+    # train_dataset = processor.process_train(train_data, enhanced_dict=enhanced_train_dict)
     dev_dataset = processor.process_dev(dev_data, enhanced_dict=enhanced_dev_dict)
+    print("end")

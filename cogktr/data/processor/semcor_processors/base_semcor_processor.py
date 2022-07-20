@@ -5,6 +5,7 @@ from tqdm import tqdm
 from cogktr.data.processor.base_processor import BaseProcessor
 import transformers
 from nltk.corpus import stopwords
+import copy
 
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
@@ -33,7 +34,7 @@ class BSemcorProcessor(BaseProcessor):
             instance_loc = self.addition[datatype]["instance"][instance_id]["instance_loc"]
 
             sentence_id = instance_id.split(".")[0] + "." + instance_id.split(".")[1]
-            raw_sentence = self.addition[datatype]["sentence"][sentence_id]
+            raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id])
 
             enhanced_data = []
 
