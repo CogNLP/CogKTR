@@ -89,7 +89,7 @@ class CommonsenseEnhancer(BaseEnhancer):
     def _enhance_data(self,datable,dict_name=None,enhanced_key_1=None,enhanced_key_2=None,return_metapath=False):
         enhanced_dict = {}
         if not self.reprocess and os.path.exists(os.path.join(self.cache_path_file, dict_name)):
-            enhanced_dict = load_pickle(enhanced_dict)
+            enhanced_dict = load_pickle(os.path.join(self.cache_path_file, dict_name))
         else:
             logger.info("Enhancing data...")
             if enhanced_key_2 is None:
@@ -284,7 +284,7 @@ if __name__ == '__main__':
         knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
         cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/',
         cache_file="enhanced_data",
-        reprocess=True,
+        reprocess=False,
         load_conceptnet=True
     )
     from cogktr import OpenBookQAReader
