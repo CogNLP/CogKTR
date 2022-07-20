@@ -387,16 +387,17 @@ def lemmatize(nlp, concept):
 if __name__ == '__main__':
     conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',
                                         reprocess=False)
-    sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
-    answer = "the mountains seem very close"
-    # sentence = "all of these"
+    # sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
+    # answer = "the mountains seem very close"
+    sentence = "Bert likes reading in the Sesame Street Library."
+    concepts = conceptnet_linker.link(sentence)
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']
-    all_concepts = conceptnet_linker.link(sentence)
-    ans_concepts = conceptnet_linker.link(answer)
-    ac = set(all_concepts) - set(ans_concepts)
-    qc = set(ans_concepts)
-    print(qc)
-    print(ac)
-    # for concept in concepts:
-    #     print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
+    # all_concepts = conceptnet_linker.link(sentence)
+    # ans_concepts = conceptnet_linker.link(answer)
+    # ac = set(all_concepts) - set(ans_concepts)
+    # qc = set(ans_concepts)
+    # print(qc)
+    # print(ac)
+    for concept in concepts:
+        print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))

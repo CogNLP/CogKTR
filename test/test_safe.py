@@ -7,11 +7,12 @@ from cogktr.data.processor.openbookqa_processors.openbookqa_for_safe_processor i
 from cogktr.enhancers.conceptnet_enhancer import ConceptNetEnhancer
 from cogktr.models.safe_model import SAFEModel
 from transformers import get_constant_schedule
+from cogktr.enhancers.commonsense_enhancer import CommonsenseEnhancer
 
 device, output_path = init_cogktr(
-    device_id=7,
+    device_id=9,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="safe_original_debug_complex_optim_grad16_epoch100_batch8",
+    folder_tag="commonsense_enhancer",
 )
 
 reader = OpenBookQAReader(
@@ -19,13 +20,22 @@ reader = OpenBookQAReader(
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-enhancer = ConceptNetEnhancer(
-        knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
-        cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data',
-        reprocess=False
-    )
-
-enhanced_train_dict,enhanced_dev_dict,enhanced_test_dict = enhancer.enhance_all(train_data,dev_data,test_data,vocab)
+enhancer = CommonsenseEnhancer(
+    knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
+    cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/',
+    cache_file="enhanced_data",
+    reprocess=False,
+    load_conceptnet=True
+)
+# enhancer = ConceptNetEnhancer(
+#         knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
+#         cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data',
+#         reprocess=False
+#     )
+#
+# enhanced_train_dict,enhanced_dev_dict,enhanced_test_dict = enhancer.enhance_all(train_data,dev_data,test_data,vocab)
+enhanced_train_dict, enhanced_dev_dict, enhanced_test_dict = enhancer.enhance_all(train_data, dev_data, test_data,
+                                                                                  vocab, return_metapath=True)
 
 processor = OpenBookQAForSafeProcessor(
     plm="roberta-large",
