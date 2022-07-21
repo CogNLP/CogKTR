@@ -379,9 +379,9 @@ class Trainer:
                         self.early_stopping(evaluate_result[self.early_stopping.metric_name])
                         if self.early_stopping.early_stop:
                             self.early_stop = True
-                            logger.info("Early Stop with patience={} and threshold={} on metric {}.".format(
+                            logger.info("Early Stop with patience={},threshold={} on metric {} and the best value is {}.".format(
                                 self.early_stopping.patience, self.early_stopping.threshold,
-                                self.early_stopping.metric_name
+                                self.early_stopping.metric_name,self.early_stopping.best_value,
                             ))
                             break
 

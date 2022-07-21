@@ -4,7 +4,6 @@ from cogktr import *
 from cogktr.utils.io_utils import save_pickle,load_pickle
 from cogktr.utils.general_utils import init_cogktr
 from cogktr.data.processor.openbookqa_processors.openbookqa_for_safe_processor import OpenBookQAForSafeProcessor
-from cogktr.enhancers.conceptnet_enhancer import ConceptNetEnhancer
 from cogktr.models.safe_model import SAFEModel
 from transformers import get_constant_schedule
 from cogktr.enhancers.commonsense_enhancer import CommonsenseEnhancer

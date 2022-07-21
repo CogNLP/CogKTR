@@ -13,25 +13,28 @@ from cogktr.utils.io_utils import save_pickle,load_pickle
 
 
 class ConcetNetLinker(BaseLinker):
-    def __init__(self, path, reprocess=False):
+    def __init__(self, path):
         super(ConcetNetLinker, self).__init__()
+        if not os.path.exists(path):
+            raise ValueError("Path {} does not exits!".format(path))
         self.pattern_path = os.path.join(path, "matcher_patterns.json")
         self.vocab_path = os.path.join(path, "concept.txt")
+        self.conceptnet_path = os.path.join(path,"conceptnet-assertions-5.6.0.csv")
+        self.concetnet_en_path = os.path.join(path,"conceptnet.en.csv")
+        self.pruned_graph_path = os.path.join(path,"conceptnet.en.pruned.graph")
+        self.unpruned_graph_path = os.path.join(path,"conceptnet.en.unpruned.graph")
+        if not os.path.exists(self.conceptnet_path):
+            raise FileNotFoundError("Original conceptnet file {} not found!".format(self.conceptnet_path))
 
         self.id2relation = MERGED_RELATIONS
         self.relation2id = {r: i for i, r in enumerate(self.id2relation)}
 
-        if reprocess:
+        if not os.path.exists(self.concetnet_en_path) or not os.path.exists(self.vocab_path):
             extract_english(
-                conceptnet_path=os.path.join(path, "conceptnet-assertions-5.6.0.csv"),
-                output_csv_path=os.path.join(path, "conceptnet.en.csv"),
+                conceptnet_path=self.conceptnet_path,
+                output_csv_path=self.concetnet_en_path,
                 output_vocab_path=self.vocab_path,
             )
-        else:
-            if not os.path.exists(os.path.join(path, "conceptnet.en.csv")):
-                raise FileNotFoundError(os.path.join(path, "conceptnet.en.csv") + " not found!")
-            if not os.path.exists(self.vocab_path):
-                raise FileNotFoundError(self.vocab_path + " not found!")
 
         with open(self.vocab_path, "r", encoding="utf8") as fin:
             self.id2concept = [w.strip() for w in fin]
@@ -43,19 +46,21 @@ class ConcetNetLinker(BaseLinker):
             "concept2id": self.concept2id,
         }
 
-        if reprocess:
+        if not os.path.exists(self.unpruned_graph_path):
             construct_graph(
-                cpnet_csv_path=os.path.join(path, "conceptnet.en.csv"),
+                cpnet_csv_path=self.concetnet_en_path,
                 cpnet_vocab=self.vocab,
-                output_path=os.path.join(path, "conceptnet.en.unpruned.graph"),
+                output_path=self.unpruned_graph_path,
                 prune=False,
             )
+        if not os.path.exists(self.pruned_graph_path):
             construct_graph(
-                cpnet_csv_path=os.path.join(path, "conceptnet.en.csv"),
+                cpnet_csv_path=self.concetnet_en_path,
                 cpnet_vocab=self.vocab,
-                output_path=os.path.join(path, "conceptnet.en.pruned.graph"),
+                output_path=self.pruned_graph_path,
                 prune=True,
             )
+        if not os.path.exists(self.pattern_path):
             create_matcher_patterns(
                 cpnet_vocab=self.vocab,
                 output_path=self.pattern_path,
@@ -67,7 +72,7 @@ class ConcetNetLinker(BaseLinker):
         except:
             self.nlp.add_pipe('sentencizer')
 
-        self.matcher = load_matcher(self.nlp, self.pattern_path,reprocess,cache_file=os.path.join(path,"conceptnet_matcher.pkl"))
+        self.matcher = load_matcher(self.nlp, self.pattern_path)
         self.conceptnet = nx.read_gpickle(os.path.join(path, "conceptnet.en.pruned.graph"))
         conceptnet_simple = nx.Graph()
         for u, v, data in self.conceptnet.edges(data=True):
@@ -86,20 +91,16 @@ class ConcetNetLinker(BaseLinker):
         return concepts
 
 
-def load_matcher(nlp, pattern_path, reprocess,cache_file):
+def load_matcher(nlp, pattern_path):
     logger.info("Creating matcher...")
-    reprocess=True
-    if reprocess:
-        with open(pattern_path, "r", encoding="utf8") as fin:
-            all_patterns = json.load(fin)
-        matcher = Matcher(nlp.vocab)
-        for concept, pattern in tqdm(all_patterns.items()):
-            # matcher.add(concept, None, pattern) # old spacy versions less than v3.0
-            matcher.add(concept, [pattern])
-        save_pickle(matcher,cache_file)
-    else:
-        matcher = load_pickle(cache_file)
-        logger.info("Load matcher from cached file {}.".format(cache_file))
+
+    with open(pattern_path, "r", encoding="utf8") as fin:
+        all_patterns = json.load(fin)
+    matcher = Matcher(nlp.vocab)
+    for concept, pattern in tqdm(all_patterns.items()):
+        # matcher.add(concept, None, pattern) # old spacy versions less than v3.0
+        matcher.add(concept, [pattern])
+
     return matcher
 
 def prune(concepts, vocab):
@@ -385,11 +386,10 @@ def lemmatize(nlp, concept):
 
 
 if __name__ == '__main__':
-    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',
-                                        reprocess=False)
+    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',)
     # sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
     # answer = "the mountains seem very close"
-    sentence = "Bert likes reading in the Sesame Street Library."
+    sentence = "In Follow That Bird, Ernie and Bert search for Big Bird by plane."
     concepts = conceptnet_linker.link(sentence)
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']

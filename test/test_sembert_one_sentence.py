@@ -8,14 +8,15 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.models.old_sembert_model import BertForSequenceClassificationTag
 from argparse import Namespace
 from cogktr.models.sembert_model import SembertForSequenceClassification
+from cogktr.modules.encoder.sembert import SembertEncoder
 
 device, output_path = init_cogktr(
-    device_id=3,
+    device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result/",
-    folder_tag="old_sembert",
+    folder_tag="sembert_with_tag",
 )
 
-reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+reader = Sst2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
@@ -28,13 +29,11 @@ enhanced_train_dict = enhancer.enhance_train(train_data,enhanced_key_1="sentence
 enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence")
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence")
 
-#
-processor = Sst2SembertProcessor(plm="bert-base-uncased", max_token_len=128, vocab=vocab,debug=False)
+
+processor = Sst2SembertProcessor(plm="bert-large-uncased", max_token_len=128, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
-# test_dataset = processor.process_test(test_data,enhanced_test_dict)
-#
-#
+
 tag_config = {
    "tag_vocab_size":len(vocab["tag_vocab"]),
    "hidden_size":10,
@@ -43,34 +42,24 @@ tag_config = {
    "num_aspect":3
 }
 tag_config = Namespace(**tag_config)
+
+plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=tag_config)
+# plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=None)
 model = SembertForSequenceClassification(
     vocab=vocab,
-    plm="bert-base-uncased",
-    tag_config=tag_config
+    plm=plm,
 )
-# model = BertForSequenceClassificationTag.from_pretrained(
-#     "bert-base-uncased",
-#     cache_dir="/data/hongbang/.pytorch_pretrained_bert/distributed_-1",
-#     num_labels=2,
-#     tag_config=tag_config,
-# )
-# # model = BertForSequenceClassificationTag(
-#     vocab=vocab,
-#     plm="bert-base-uncased",
-#     tag_config=tag_config,
-# )
 
-
-# model = BaseSentencePairClassificationModel(plm="bert-base-cased", vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=2e-5)
+early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.0001,threshold_mode="abs",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=64,
+                  batch_size=32,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
@@ -85,6 +74,7 @@ trainer = Trainer(model,
                   # checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
                   validate_steps=500,  # validation setting
                   save_steps=None,  # when to save model result
+                  early_stopping=early_stopping,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
