@@ -26,7 +26,7 @@ class CommonsenseEnhancer(BaseEnhancer):
         self.cache_path_file = os.path.join(cache_path, cache_file)
 
         if self.load_conceptnet:
-            self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path, reprocess=False)
+            self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path)
             self.meta_paths_set = set()
 
     def enhance_sentence(self, sentence):
