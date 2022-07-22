@@ -124,6 +124,7 @@ def prune(concepts, vocab):
             if not stop and concept in vocab:
                 prune_concepts_per_sample.append(concept)
         if len(prune_concepts_per_sample) != 0:
+            result["concepts"] = prune_concepts_per_sample
             prune_concepts.append(result)
     return prune_concepts
 
