@@ -286,7 +286,6 @@ def ground_mentioned_concepts(nlp, matcher, s):
 
         span_to_concepts[span].update(original_concept_set)
 
-    exact_match2span = {}
     for span, concepts in span_to_concepts.items():
         concepts_sorted = list(concepts)
         concepts_sorted.sort(key=len)
@@ -301,10 +300,8 @@ def ground_mentioned_concepts(nlp, matcher, s):
             intersect = lcs.intersection(shortest)
             if len(intersect) > 0:
                 mentioned_concepts.add(list(intersect)[0])
-                exact_match2span[list(intersect)[0]] = span
             else:
                 mentioned_concepts.add(c)
-                exact_match2span[c] = span
 
         # if a mention exactly matches with a concept
 
@@ -312,7 +309,6 @@ def ground_mentioned_concepts(nlp, matcher, s):
 
         assert len(exact_match) < 2
         mentioned_concepts.update(exact_match)
-        exact_match2span[list(exact_match)[0]] = span
 
     results = []
     for span,concepts in span_to_concepts.items():
@@ -428,7 +424,7 @@ if __name__ == '__main__':
     # sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
     # answer = "the mountains seem very close"
     # sentence = "In Follow That Bird, Ernie and Bert search for Big Bird by plane."
-    sentence = "Bert likes reading in sesame street library"
+    sentence = "a manifying flass would enhance the smell of a viewed specimen"
     results = conceptnet_linker.link(sentence)
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']
