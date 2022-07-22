@@ -1,4 +1,4 @@
-from cogktr.enhancers.linker import BaseLinker
+from cogktr.enhancers.tagger import BaseTagger
 from cogktr.utils.constant.conceptnet_constants.constants import *
 from tqdm import tqdm
 import json
@@ -12,9 +12,9 @@ from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.io_utils import save_pickle,load_pickle
 
 
-class ConcetNetLinker(BaseLinker):
+class ConcetNetTagger(BaseTagger):
     def __init__(self, path):
-        super(ConcetNetLinker, self).__init__()
+        super(ConcetNetTagger, self).__init__()
         if not os.path.exists(path):
             raise ValueError("Path {} does not exits!".format(path))
         self.pattern_path = os.path.join(path, "matcher_patterns.json")
@@ -46,20 +46,6 @@ class ConcetNetLinker(BaseLinker):
             "concept2id": self.concept2id,
         }
 
-        if not os.path.exists(self.unpruned_graph_path):
-            construct_graph(
-                cpnet_csv_path=self.concetnet_en_path,
-                cpnet_vocab=self.vocab,
-                output_path=self.unpruned_graph_path,
-                prune=False,
-            )
-        if not os.path.exists(self.pruned_graph_path):
-            construct_graph(
-                cpnet_csv_path=self.concetnet_en_path,
-                cpnet_vocab=self.vocab,
-                output_path=self.pruned_graph_path,
-                prune=True,
-            )
         if not os.path.exists(self.pattern_path):
             create_matcher_patterns(
                 cpnet_vocab=self.vocab,
@@ -73,24 +59,21 @@ class ConcetNetLinker(BaseLinker):
             self.nlp.add_pipe('sentencizer')
 
         self.matcher = load_matcher(self.nlp, self.pattern_path)
-        self.conceptnet = nx.read_gpickle(os.path.join(path, "conceptnet.en.pruned.graph"))
-        conceptnet_simple = nx.Graph()
-        for u, v, data in self.conceptnet.edges(data=True):
-            w = data['weight'] if 'weight' in data else 1.0
-            if conceptnet_simple.has_edge(u, v):
-                conceptnet_simple[u][v]['weight'] += w
-            else:
-                conceptnet_simple.add_edge(u, v, weight=w)
-        self.conceptnet_simple = conceptnet_simple
 
-    def link(self, sentence):
+
+    def tag(self, sentence):
         concepts,docs = ground_mentioned_concepts(self.nlp, self.matcher, sentence)
         if len(concepts) == 0:
             concepts = hard_ground(self.nlp, sentence, self.vocab["id2concept"])
         concepts = prune(concepts, self.vocab["id2concept"])
+        tag_results = [{
+            "mention":sample["mention"],
+            "start":sample["start"],
+            "end":sample["end"],
+        } for sample in concepts]
         result = {
             "words":[doc.text for doc in docs],
-            "knowledge":concepts,
+            "knowledge":tag_results,
         }
         return result
 
@@ -424,12 +407,12 @@ def lemmatize(nlp, concept):
 
 
 if __name__ == '__main__':
-    conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',)
+    conceptnet_tagger = ConcetNetTagger(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',)
     # sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
     # answer = "the mountains seem very close"
-    # sentence = "In Follow That Bird, Ernie and Bert search for Big Bird by plane."
-    sentence = "Bert likes reading in sesame street library"
-    results = conceptnet_linker.link(sentence)
+    sentence = "In following That Bird, Ernie and Bert search for Big Bird by plane."
+    # sentence = "Bert likes reading in Sesame street library with elmo."
+    tag_result = conceptnet_tagger.tag(sentence)
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']
     # all_concepts = conceptnet_linker.link(sentence)
@@ -438,6 +421,4 @@ if __name__ == '__main__':
     # qc = set(ans_concepts)
     # print(qc)
     # print(ac)
-    for result in results["knowledge"]:
-        for concept in result["concepts"]:
-            print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
+
