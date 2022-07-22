@@ -62,7 +62,7 @@ class ConcetNetTagger(BaseTagger):
 
 
     def tag(self, sentence):
-        concepts = ground_mentioned_concepts(self.nlp, self.matcher, sentence)
+        concepts,docs = ground_mentioned_concepts(self.nlp, self.matcher, sentence)
         if len(concepts) == 0:
             concepts = hard_ground(self.nlp, sentence, self.vocab["id2concept"])
         concepts = prune(concepts, self.vocab["id2concept"])
@@ -71,7 +71,11 @@ class ConcetNetTagger(BaseTagger):
             "start":sample["start"],
             "end":sample["end"],
         } for sample in concepts]
-        return tag_results
+        result = {
+            "words":[doc.text for doc in docs],
+            "knowledge":tag_results,
+        }
+        return result
 
 
 def load_matcher(nlp, pattern_path):
@@ -305,7 +309,7 @@ def ground_mentioned_concepts(nlp, matcher, s):
             "concepts":concepts,
         })
 
-    return results
+    return results,doc
 
 
 def hard_ground(nlp, s, cpnet_vocab):
