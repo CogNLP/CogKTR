@@ -11,7 +11,6 @@ class SyntaxTagger(BaseTagger):
         self.tool = tool
         self.knowledge_type = "syntaxtagger"
 
-
         print("Loading SyntaxTagger...")
         if self.tool == "stanza":
             # download stanza use:

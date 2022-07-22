@@ -32,23 +32,27 @@ class WorldEnhancer(BaseEnhancer):
         self.reprocess = reprocess
 
         self.root_path = knowledge_graph_path
-        self.wikipedia_linker_tool = "cogie"
-        self.wikipedia_linker = WikipediaLinker(tool=self.wikipedia_linker_tool)
 
-        if load_entity_desc:
-            self.wikipedia_searcher_tool = "blink"
-            self.wikipedia_searcher_path = os.path.join(self.root_path, "wikipedia/entity.jsonl")
-            self.wikipedia_searcher = WikipediaSearcher(tool=self.wikipedia_searcher_tool,
-                                                        path=self.wikipedia_searcher_path)
+        if self.reprocess:
+            if load_entity_desc or load_entity_embedding or load_entity_kg:
+                self.wikipedia_linker_tool = "cogie"
+                self.wikipedia_linker = WikipediaLinker(tool=self.wikipedia_linker_tool)
 
-        if load_entity_embedding:
-            self.wikipedia_embedder_tool = "wikipedia2vec"
-            self.wikipedia_embedder_path = os.path.join(self.root_path, "wikipedia2vec/enwiki_20180420_win10_100d.pkl")
-            self.wikipedia_embedder = WikipediaEmbedder(tool=self.wikipedia_embedder_tool,
-                                                        path=self.wikipedia_embedder_path)
+            if load_entity_desc:
+                self.wikipedia_searcher_tool = "blink"
+                self.wikipedia_searcher_path = os.path.join(self.root_path, "wikipedia/entity.jsonl")
+                self.wikipedia_searcher = WikipediaSearcher(tool=self.wikipedia_searcher_tool,
+                                                            path=self.wikipedia_searcher_path)
 
-        if load_entity_kg:
-            self.wikidata_searcher = WikidataSearcher()
+            if load_entity_embedding:
+                self.wikipedia_embedder_tool = "wikipedia2vec"
+                self.wikipedia_embedder_path = os.path.join(self.root_path,
+                                                            "wikipedia2vec/enwiki_20180420_win10_100d.pkl")
+                self.wikipedia_embedder = WikipediaEmbedder(tool=self.wikipedia_embedder_tool,
+                                                            path=self.wikipedia_embedder_path)
+
+            if load_entity_kg:
+                self.wikidata_searcher = WikidataSearcher()
 
     def enhance_sentence(self, sentence,
                          return_entity_desc=False,
@@ -182,16 +186,17 @@ class WorldEnhancer(BaseEnhancer):
                                   return_entity_embedding=return_entity_embedding,
                                   return_entity_kg=return_entity_kg)
 
+
 if __name__ == "__main__":
     from cogktr.data.reader.sst2_reader import Sst2Reader
 
     enhancer = WorldEnhancer(knowledge_graph_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph",
-                 cache_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/enhanced_data",
-                 cache_file="world_data",
-                 reprocess=False,
-                 load_entity_desc=True,
-                 load_entity_embedding=False,
-                 load_entity_kg=False)
+                             cache_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/enhanced_data",
+                             cache_file="world_data",
+                             reprocess=False,
+                             load_entity_desc=True,
+                             load_entity_embedding=False,
+                             load_entity_kg=False)
 
     enhanced_sentence_dict_1 = enhancer.enhance_sentence(sentence="Bert likes reading in the Sesame Street Library.",
                                                          return_entity_desc=True,

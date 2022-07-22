@@ -5,6 +5,7 @@ from .tagger import *
 from .enhancer import *
 from .base_enhancer import *
 from .linguistics_enhancer import *
+from .world_enhancer import *
 
 __all__ = [
     # embedder
@@ -31,4 +32,5 @@ __all__ = [
     "BaseEnhancer",
     "Enhancer",
     "LinguisticsEnhancer",
+    "WorldEnhancer",
 ]

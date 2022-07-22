@@ -7,6 +7,7 @@ from cogktr.data.processor.qnli_processors import *
 from cogktr.data.processor.semcor_processors import *
 from cogktr.data.processor.squad2_processors import *
 from cogktr.data.processor.sst2_processors import *
+from cogktr.data.processor.sst5_processors import *
 from cogktr.data.processor.stsb_processors import *
 
 __all__ = [
@@ -29,7 +30,7 @@ __all__ = [
     "QnliProcessor",
     "QnliSembertProcessor",
 
-    #semcorprocessor
+    # semcorprocessor
     "SemcorProcessor",
     "TSemcorProcessor",
     "BSemcorProcessor",
@@ -44,6 +45,10 @@ __all__ = [
     "Sst2ForKtembProcessor",
     "Sst2ForSyntaxAttentionProcessor",
     "Sst2SembertProcessor",
+
+    # sst5processor
+    "Sst5Processor",
+    "Sst5ForKtattProcessor",
 
     # stsbprocessor
     "StsbProcessor",
