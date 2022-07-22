@@ -84,11 +84,15 @@ class ConcetNetLinker(BaseLinker):
         self.conceptnet_simple = conceptnet_simple
 
     def link(self, sentence):
-        concepts = ground_mentioned_concepts(self.nlp, self.matcher, sentence)
+        concepts,docs = ground_mentioned_concepts(self.nlp, self.matcher, sentence)
         if len(concepts) == 0:
             concepts = hard_ground(self.nlp, sentence, self.vocab["id2concept"])
         concepts = prune(concepts, self.vocab["id2concept"])
-        return concepts
+        result = {
+            "words":[doc.text for doc in docs],
+            "knowledge":concepts,
+        }
+        return result
 
 
 def load_matcher(nlp, pattern_path):
@@ -105,18 +109,22 @@ def load_matcher(nlp, pattern_path):
 
 def prune(concepts, vocab):
     prune_concepts = []
-    for concept in concepts:
-        if concept[-2:] == 'er' and concept[:-2] in concepts:
-            continue
-        if concept[-1:] == 'e' and concept[:1] in concepts:
-            continue
-        stop = False
-        for t in concept.split("_"):
-            if t in NLTK_STOPWORDS:
-                stop = True
-                break
-        if not stop and concept in vocab:
-            prune_concepts.append(concept)
+    for result in concepts:
+        prune_concepts_per_sample = []
+        for concept in result["concepts"]:
+            if concept[-2:] == 'er' and concept[:-2] in concepts:
+                continue
+            if concept[-1:] == 'e' and concept[:1] in concepts:
+                continue
+            stop = False
+            for t in concept.split("_"):
+                if t in NLTK_STOPWORDS:
+                    stop = True
+                    break
+            if not stop and concept in vocab:
+                prune_concepts_per_sample.append(concept)
+        if len(prune_concepts_per_sample) != 0:
+            prune_concepts.append(result)
     return prune_concepts
 
 
@@ -263,8 +271,10 @@ def ground_mentioned_concepts(nlp, matcher, s):
     mentioned_concepts = set()
     span_to_concepts = {}
 
+    span_to_location = {}
     for match_id, start, end in matches:
         span = doc[start:end].text  # the matched span
+        span_to_location[span] = (start,end)
         original_concept = nlp.vocab.strings[match_id]
         original_concept_set = set()
         original_concept_set.add(original_concept)
@@ -276,6 +286,7 @@ def ground_mentioned_concepts(nlp, matcher, s):
 
         span_to_concepts[span].update(original_concept_set)
 
+    exact_match2span = {}
     for span, concepts in span_to_concepts.items():
         concepts_sorted = list(concepts)
         concepts_sorted.sort(key=len)
@@ -290,8 +301,10 @@ def ground_mentioned_concepts(nlp, matcher, s):
             intersect = lcs.intersection(shortest)
             if len(intersect) > 0:
                 mentioned_concepts.add(list(intersect)[0])
+                exact_match2span[list(intersect)[0]] = span
             else:
                 mentioned_concepts.add(c)
+                exact_match2span[c] = span
 
         # if a mention exactly matches with a concept
 
@@ -299,8 +312,21 @@ def ground_mentioned_concepts(nlp, matcher, s):
 
         assert len(exact_match) < 2
         mentioned_concepts.update(exact_match)
+        exact_match2span[list(exact_match)[0]] = span
 
-    return mentioned_concepts
+    results = []
+    for span,concepts in span_to_concepts.items():
+        mention = span
+        start,end = span_to_location[span]
+        concepts = [concept for concept in concepts if concept in mentioned_concepts]
+        results.append({
+            "mention":mention,
+            "start":start,
+            "end":end,
+            "concepts":concepts,
+        })
+
+    return results,doc
 
 
 def hard_ground(nlp, s, cpnet_vocab):
@@ -316,17 +342,29 @@ def hard_ground(nlp, s, cpnet_vocab):
         raise ValueError("Only str of list of str is supported but got {}!".format(type(s)))
 
     res = set()
-    for t in doc:
+    mention2location = {}
+    concept2mention = {}
+    for idx,t in enumerate(doc):
         if t.lemma_ in cpnet_vocab:
             res.add(t.lemma_)
+            mention2location[t.text] = (idx,idx+1)
+            concept2mention[t.lemma_] = t.text
     sent = "_".join([t.text for t in doc])
     if sent in cpnet_vocab:
         res.add(sent)
+        mention2location[doc.text] = (0,len(doc))
+        concept2mention[sent] = doc.text
     try:
         assert len(res) > 0
     except Exception:
         logger.info(f"for {sent}, concept not found in hard grounding.")
-    return res
+    return [{
+        'mention':concept2mention[concept],
+        "start":mention2location[concept2mention[concept]][0],
+        "end":mention2location[concept2mention[concept]][1],
+        "concepts":[concept],
+    } for concept in list(res)]
+    # return res
 
 
 def load_merge_relation():
@@ -389,8 +427,9 @@ if __name__ == '__main__':
     conceptnet_linker = ConcetNetLinker(path='/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet/',)
     # sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
     # answer = "the mountains seem very close"
-    sentence = "In Follow That Bird, Ernie and Bert search for Big Bird by plane."
-    concepts = conceptnet_linker.link(sentence)
+    # sentence = "In Follow That Bird, Ernie and Bert search for Big Bird by plane."
+    sentence = "Bert likes reading in sesame street library"
+    results = conceptnet_linker.link(sentence)
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']
     # all_concepts = conceptnet_linker.link(sentence)
@@ -399,5 +438,6 @@ if __name__ == '__main__':
     # qc = set(ans_concepts)
     # print(qc)
     # print(ac)
-    for concept in concepts:
-        print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))
+    for result in results["knowledge"]:
+        for concept in result["concepts"]:
+            print("{}: {}".format(concept,"http://conceptnet.io/c/en/"+concept))

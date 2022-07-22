@@ -9,9 +9,9 @@ from transformers import get_constant_schedule
 from cogktr.enhancers.commonsense_enhancer import CommonsenseEnhancer
 
 device, output_path = init_cogktr(
-    device_id=9,
+    device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="commonsense_enhancer",
+    folder_tag="test_safe",
 )
 
 reader = OpenBookQAReader(
@@ -65,6 +65,7 @@ grouped_parameters = [
 ]
 optimizer = optim.RAdam(grouped_parameters)
 scheduler = get_constant_schedule(optimizer)
+early_stopping = EarlyStopping(mode="max",patience=10,threshold=0.001,threshold_mode="abs",metric_name="Acc")
 
 trainer = Trainer(model,
                   train_dataset,
@@ -82,6 +83,8 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
+                  save_by_metric="Acc",
+                  early_stopping=early_stopping,
                   validate_steps=None,
                   save_steps=None,
                   output_path=output_path,
