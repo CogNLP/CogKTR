@@ -1,12 +1,10 @@
-import torch
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.data.processor.sst2_processors.sst2_for_ktatt_processor import Sst2ForKtattProcessor
+from cogktr.enhancers.world_enhancer import WorldEnhancer
 from cogktr.utils.general_utils import init_cogktr
-from cogktr.utils.constant.kbert_constants.constants import *
-from cogktr.data.processor.sst2_processors.sst2_for_kbert_processor import *
-from cogktr.models.kbert_model import KBertForSequenceClassification
+from cogktr.data.reader.sst2_reader import Sst2Reader
 
 # initiate
 device, output_path = init_cogktr(
@@ -15,21 +13,41 @@ device, output_path = init_cogktr(
     folder_tag="simple_test",
 )
 
-# Load the data
 reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-# processor
-processor = Sst2ForKtattProcessor(plm="bert-base-uncased",
-                                      knowledge_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl",
-                                      max_token_len=256)
+enhancer = WorldEnhancer(knowledge_graph_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph",
+                         cache_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/enhanced_data",
+                         cache_file="world_data",
+                         reprocess=True,
+                         load_entity_desc=True,
+                         load_entity_embedding=False,
+                         load_entity_kg=False)
+enhanced_train_dict = enhancer.enhance_train(datable=train_data,
+                                         enhanced_key_1="sentence",
+                                         return_entity_desc=True,
+                                         return_entity_embedding=False,
+                                         return_entity_kg=False)
+enhanced_dev_dict = enhancer.enhance_dev(datable=dev_data,
+                                         enhanced_key_1="sentence",
+                                         return_entity_desc=True,
+                                         return_entity_embedding=False,
+                                         return_entity_kg=False)
+enhanced_test_dict = enhancer.enhance_test(datable=test_data,
+                                         enhanced_key_1="sentence",
+                                         return_entity_desc=True,
+                                         return_entity_embedding=False,
+                                         return_entity_kg=False)
+# print("finish enhancer")
 
+processor = Sst2ForKtattProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(train_data)
-dev_dataset = processor.process_dev(dev_data)
+dev_dataset = processor.process_dev(data=dev_data, enhanced_dict=enhanced_dev_dict)
 test_dataset = processor.process_test(test_data)
 
-model = BaseTextClassificationModel(plm="bert-base-uncased", vocab=vocab)
+plm = PlmBertModel(pretrained_model_name="bert-base-cased")
+model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)

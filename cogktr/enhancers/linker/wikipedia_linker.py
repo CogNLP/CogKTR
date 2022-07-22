@@ -1,4 +1,7 @@
-from cogktr.enhancers.linker import BaseLinker
+import sys
+sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
+
+from cogktr.enhancers.linker.base_linker import BaseLinker
 import tagme
 from cogie.toolkit.ner.ner_toolkit import NerToolkit
 from cogie.toolkit.tokenize.tokenize_toolkit import TokenizeToolkit
@@ -44,8 +47,8 @@ class WikipediaLinker(BaseLinker):
         span_list = []
         for item in el_result:
             span_dict = {}
-            span_dict["start_loc"] = item["start"]
-            span_dict["end_loc"] = item["end"]
+            span_dict["start"] = item["start"]
+            span_dict["end"] = item["end"]
             # span_dict["mention"] = item["mention"]
             span_dict["entity_title"]=item["title"]
             span_dict["wikipedia_id"] = int(item["id"])
@@ -60,8 +63,8 @@ class WikipediaLinker(BaseLinker):
         for entity in entities.get_annotations(threshold):
             link_dict = {}
             mention = entity.mention
-            link_dict["start_loc"] = entity.begin
-            link_dict["end_loc"] = entity.end
+            link_dict["start"] = entity.begin
+            link_dict["end"] = entity.end
             link_dict["wikipedia_id"] = entity.entity_id
             link_dict["entity_title"] = entity.entity_title
             # link_dict["score"] = entity.score
@@ -74,8 +77,8 @@ class WikipediaLinker(BaseLinker):
 if __name__ == "__main__":
     # TODO:Interface inconsistency
 
-    linker_1 = WikipediaLinker(tool="tagme")
-    link_list_1 = linker_1.link("Bert likes reading in the Sesame Street Library.")
+    # linker_1 = WikipediaLinker(tool="tagme")
+    # link_list_1 = linker_1.link("Bert likes reading in the Sesame Street Library.")
 
     linker_2 = WikipediaLinker(tool="cogie")
     link_list_2 = linker_2.link(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
