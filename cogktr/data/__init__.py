@@ -23,6 +23,8 @@ __all__ = [
     "Sst2ForKtembProcessor",
     "Sst2ForSyntaxAttentionProcessor",
     "Sst2SembertProcessor",
+    "Sst5Processor",
+    "Sst5ForKtattProcessor",
     "StsbProcessor",
 
     # reader
@@ -35,6 +37,7 @@ __all__ = [
     "SemcorReader",
     "Squad2Reader",
     "Sst2Reader",
+    "Sst5Reader",
     "StsbReader",
     "TSemcorReader",
 

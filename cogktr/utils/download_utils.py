@@ -113,6 +113,13 @@ class Downloader:
                             dataset_list=dataset_list,
                             zip_name=zip_name)
 
+    def download_sst5_raw_data(self, output_file):
+        dataset_list = ["sst_train.txt", "sst_dev.txt", "sst_test.txt"]
+        zip_name = "RAW_SST5.zip"
+        self._download_data(output_file=output_file,
+                            dataset_list=dataset_list,
+                            zip_name=zip_name)
+
 
 if __name__ == "__main__":
     downloader = Downloader()
@@ -133,3 +140,5 @@ if __name__ == "__main__":
         "/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/raw_data")
     downloader.download_semcor_raw_data(
         "/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/raw_data")
+    downloader.download_sst5_raw_data(
+        "/data/mentianyi/code/CogKTR/datapath/text_classification/SST_5/raw_data")
