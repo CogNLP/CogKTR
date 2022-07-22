@@ -5,13 +5,14 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
 
 class BaseClassificationMetric(BaseMetric):
-    def __init__(self, mode):
+    def __init__(self, mode, default_metric_name="F1"):
         super().__init__()
         if mode not in ["binary", "multi"]:
             raise ValueError("Please choose mode in binary or multi")
         self.mode = mode
         self.label_list = list()
         self.pre_list = list()
+        self.default_metric_name = default_metric_name
 
     def evaluate(self, pred, label):
         self.label_list = self.label_list + label.cpu().tolist()

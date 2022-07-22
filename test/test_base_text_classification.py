@@ -4,9 +4,9 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=8,
+    device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result",
-    folder_tag="classification",
+    folder_tag="test_print_metric",
 )
 
 reader = Sst2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/raw_data")
@@ -28,7 +28,7 @@ early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mo
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
-                  n_epochs=20,
+                  n_epochs=1,
                   batch_size=50,
                   loss=loss,
                   optimizer=optimizer,
@@ -43,7 +43,7 @@ trainer = Trainer(model,
                   scheduler_steps=None,
                   validate_steps=100,
                   save_steps=None,
-                  save_by_metric="F1",
+                  # save_by_metric="F1",
                   early_stopping=early_stopping,
                   output_path=output_path,
                   grad_norm=1,
