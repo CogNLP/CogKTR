@@ -42,8 +42,11 @@ class CommonsenseEnhancer(BaseEnhancer):
         enhanced_dict[sentence] = {}
         enhanced_dict[sentence]["words"] = words
 
-        concepts = self.conceptnet_linker.link(words)
-        enhanced_dict[sentence]["concepts"] = concepts
+        result = self.conceptnet_linker.link(words)
+        enhanced_dict[sentence]["knowledge"] = result["knowledge"]
+
+        # concepts = self.conceptnet_linker.link(words)
+        # enhanced_dict[sentence]["concepts"] = concepts
 
         return enhanced_dict
 
@@ -58,8 +61,9 @@ class CommonsenseEnhancer(BaseEnhancer):
         enhanced_dict[(sentence_key, sentence_pair_key)]["sentence_pair"] = enhanced_sentence_pair_dict[sentence_pair_key]
         enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"] = {}
         if return_metapath:
-            all_concepts = enhanced_sentence_dict[sentence]["concepts"]
-            answer_concepts = enhanced_sentence_pair_dict[sentence_pair]["concepts"]
+            f = lambda x:[concept for sample in x for concept in sample["concepts"]]
+            all_concepts = f(enhanced_sentence_dict[sentence]["knowledge"])
+            answer_concepts = f(enhanced_sentence_pair_dict[sentence_pair]["knowledge"])
             all_ids = set(self.conceptnet_linker.concept2id[c] for c in all_concepts)
             answer_ids = set(self.conceptnet_linker.concept2id[c] for c in answer_concepts)
             question_ids = all_ids - answer_ids
@@ -284,7 +288,7 @@ if __name__ == '__main__':
         knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
         cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/',
         cache_file="enhanced_data",
-        reprocess=False,
+        reprocess=True,
         load_conceptnet=True
     )
     from cogktr import OpenBookQAReader

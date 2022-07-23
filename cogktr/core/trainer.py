@@ -114,8 +114,14 @@ class Trainer:
         self.output_path = output_path
         self.rank = rank
         self.save_by_metric = save_by_metric
+
         if save_by_metric is not None:
-            self.best_metric = {self.save_by_metric: 0, "global_step": -1, }
+            self.metric_name = self.save_by_metric
+        elif hasattr(self.metrics, "default_metric_name"):
+            self.metric_name = self.metrics.default_metric_name
+        else:
+            raise ValueError("Please specified default metric name in the metrics!")
+        self.best_metric = {"evaluate_result":None,"global_step":-1}
 
         if self.rank in [-1, 0]:
             if self.output_path:
@@ -349,29 +355,92 @@ class Trainer:
                         #     "Global Step":global_step,
                         #     **evaluate_result,
                         # })
-                    if self.save_by_metric is not None:
-                        curr_metric = {self.save_by_metric:evaluate_result[self.save_by_metric],"global_step":global_step}
-                        if curr_metric[self.save_by_metric] > self.best_metric[self.save_by_metric]:
-                            prev_step = self.best_metric["global_step"]
-                            curr_step = curr_metric["global_step"]
-                            if prev_step != -1:
-                                prev_output_dir = os.path.join(self.save_best_model_path,"checkpoint-{}".format(prev_step))
-                                shutil.rmtree(prev_output_dir)
-                            output_dir = os.path.join(self.save_best_model_path,"checkpoint-{}".format(curr_step))
+                    if self.best_metric["evaluate_result"] is None:
+                        self.best_metric = {
+                            "evaluate_result":evaluate_result,
+                            "global_step":global_step,
+                        }
+                        if self.save_by_metric:
+                            output_dir = os.path.join(self.save_best_model_path, "checkpoint-{}".format(global_step))
                             if not os.path.exists(output_dir):
                                 os.makedirs(output_dir)
-                            logger.info("Metric {} rises from {:.3f} to {:.3f},save models checkpoint to {}".format(
-                                self.save_by_metric,
-                                self.best_metric[self.save_by_metric],
-                                curr_metric[self.save_by_metric],output_dir)
-                            )
                             model = self.model if self.rank == -1 else self.model.module
                             save_model(model=model, model_path=os.path.join(output_dir, "models.pt"))
                             if self.optimizer:
                                 torch.save(self.optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
                             if self.scheduler:
                                 torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                    else:
+                        if evaluate_result[self.metric_name] > self.best_metric["evaluate_result"][self.metric_name]:
+                            curr_metric = {"evaluate_result": evaluate_result, "global_step": global_step}
+                            prev_step = self.best_metric["global_step"]
+                            curr_step = curr_metric["global_step"]
+                            if self.save_by_metric is not None:
+                                prev_output_dir = os.path.join(self.save_best_model_path,
+                                                               "checkpoint-{}".format(prev_step))
+                                shutil.rmtree(prev_output_dir)
+                                output_dir = os.path.join(self.save_best_model_path, "checkpoint-{}".format(curr_step))
+                                if not os.path.exists(output_dir):
+                                    os.makedirs(output_dir)
+                                model = self.model if self.rank == -1 else self.model.module
+                                save_model(model=model, model_path=os.path.join(output_dir, "models.pt"))
+                                if self.optimizer:
+                                    torch.save(self.optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
+                                if self.scheduler:
+                                    torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                                logger.info("Metric {} rises from {:.3f} to {:.3f},save models checkpoint to {}".format(
+                                    self.metric_name,
+                                    self.best_metric["evaluate_result"][self.metric_name],
+                                    curr_metric["evaluate_result"][self.save_by_metric],
+                                    output_dir)
+                                )
+                            else:
+                                logger.info("Metric {} rises from {:.3f} to {:.3f}.".format(
+                                    self.metric_name,
+                                    self.best_metric["evaluate_result"][self.metric_name],
+                                    curr_metric["evaluate_result"][self.metric_name],
+                                ))
                             self.best_metric = curr_metric
+
+                    # curr_metric = {"evaluate_result":evaluate_result,global_step:global_step}
+                    #
+                    # if self.save_by_metric is not None:
+                    #     curr_metric = {self.save_by_metric:evaluate_result[self.save_by_metric],"global_step":global_step}
+                    #     if curr_metric[self.save_by_metric] > self.best_metric[self.save_by_metric]:
+                    #         prev_step = self.best_metric["global_step"]
+                    #         curr_step = curr_metric["global_step"]
+                    #         if prev_step != -1:
+                    #             prev_output_dir = os.path.join(self.save_best_model_path,"checkpoint-{}".format(prev_step))
+                    #             shutil.rmtree(prev_output_dir)
+                    #         output_dir = os.path.join(self.save_best_model_path,"checkpoint-{}".format(curr_step))
+                    #         if not os.path.exists(output_dir):
+                    #             os.makedirs(output_dir)
+                    #         if prev_step != -1:
+                    #             logger.info("Metric {} rises from {:.3f} to {:.3f},save models checkpoint to {}".format(
+                    #                 self.save_by_metric,
+                    #                 self.best_metric[self.save_by_metric],
+                    #                 curr_metric[self.save_by_metric],output_dir)
+                    #             )
+                    #         model = self.model if self.rank == -1 else self.model.module
+                    #         save_model(model=model, model_path=os.path.join(output_dir, "models.pt"))
+                    #         if self.optimizer:
+                    #             torch.save(self.optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
+                    #         if self.scheduler:
+                    #             torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                    #         self.best_metric = curr_metric
+                    # else:
+                    #     metric_name = self.metrics.default_metric_name
+                    #     curr_metric = {metric_name:evaluate_result[metric_name],"global_step":global_step}
+                    #     if curr_metric[metric_name] > self.best_metric[metric_name]:
+                    #         prev_step = self.best_metric["global_step"]
+                    #         curr_step = curr_metric["global_step"]
+                    #         if prev_step != -1:
+                    #             logger.info("Metric {} rises from {:.3f} to {:.3f}".format(
+                    #                 metric_name,
+                    #                 self.best_metric[metric_name],
+                    #                 curr_metric[metric_name])
+                    #             )
+                    #         self.best_metric = curr_metric
 
                     if self.early_stopping:
                         if not self.early_stopping.metric_name:
@@ -379,11 +448,15 @@ class Trainer:
                         self.early_stopping(evaluate_result[self.early_stopping.metric_name])
                         if self.early_stopping.early_stop:
                             self.early_stop = True
-                            logger.info("Early Stop with patience={},threshold={} on metric {} and the best value is {}.".format(
+                            logger.info("Early Stop with patience={},threshold={} on metric {}.".format(
                                 self.early_stopping.patience, self.early_stopping.threshold,
-                                self.early_stopping.metric_name,self.early_stopping.best_value,
+                                self.early_stopping.metric_name,
                             ))
                             break
 
             logger.info("Epoch loss = %f", epoch_loss)
+
+        logger.info("At global step {},the best evaluation results are:{}".format(
+            self.best_metric["global_step"],self.best_metric["evaluate_result"]
+        ))
         logger.info("End training")

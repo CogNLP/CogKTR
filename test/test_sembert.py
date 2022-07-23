@@ -15,9 +15,9 @@ from cogktr.modules.encoder.sembert import SembertEncoder
 
 
 device, output_path = init_cogktr(
-    device_id=8,
+    device_id=9,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="sembert_with_tag",
+    folder_tag="sembert_without_tag",
 )
 
 reader = QnliReader(raw_data_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/raw_data")
@@ -54,8 +54,8 @@ tag_config = Namespace(**tag_config)
 #     num_labels=2,
 #     tag_config=tag_config,
 # )
-plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=tag_config)
-# plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=None)
+# plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=tag_config)
+plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=None)
 model = SembertForSequenceClassification(
     vocab=vocab,
     plm=plm,
@@ -90,7 +90,7 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   # checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
-                  validate_steps=500,  # validation setting
+                  validate_steps=2000,  # validation setting
                   save_steps=None,  # when to save model result
                   output_path=output_path,
                   grad_norm=1,
