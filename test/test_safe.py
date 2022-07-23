@@ -11,7 +11,7 @@ from cogktr.enhancers.commonsense_enhancer import CommonsenseEnhancer
 device, output_path = init_cogktr(
     device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="test_safe",
+    folder_tag="test_safe_new_enhancer",
 )
 
 reader = OpenBookQAReader(

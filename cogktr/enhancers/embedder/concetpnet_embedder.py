@@ -46,6 +46,8 @@ class ConceptnetEmbedder(BaseEmbedder):
         }
 
     def embed(self,concept):
+        if concept not in self.concept2id:
+            raise ValueError("{} not found in conceptnet!".format(concept))
         return self.embedding[self.concept2id[concept]]
 
 
