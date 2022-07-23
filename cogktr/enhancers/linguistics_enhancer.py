@@ -45,20 +45,22 @@ class LinguisticsEnhancer(BaseEnhancer):
         self.wordnet_linker_tool = wordnet_linker_tool
         self.wordnet_searcher_tool = wordnet_searcher_tool
 
-        if self.load_ner:
-            self.ner_tagger = NerTagger(tool=self.ner_tool)
-        if self.load_srl:
-            self.srl_tagger = SrlTagger(tool=self.srl_tool)
-        if self.load_syntax:
-            self.syntax_tagger = SyntaxTagger(tool=self.syntax_tool)
-        if self.load_wordnet:
-            self.wordnet_linker = WordnetLinker(tool=self.wordnet_linker_tool)
-            self.wordnet_searcher = WordnetSearcher(tool=self.wordnet_searcher_tool,
-                                                    return_synset=True,
-                                                    return_synonym=True,
-                                                    return_hypernym=True,
-                                                    return_examples=True,
-                                                    return_definition=True)
+        if self.reprocess:
+
+            if self.load_ner:
+                self.ner_tagger = NerTagger(tool=self.ner_tool)
+            if self.load_srl:
+                self.srl_tagger = SrlTagger(tool=self.srl_tool)
+            if self.load_syntax:
+                self.syntax_tagger = SyntaxTagger(tool=self.syntax_tool)
+            if self.load_wordnet:
+                self.wordnet_linker = WordnetLinker(tool=self.wordnet_linker_tool)
+                self.wordnet_searcher = WordnetSearcher(tool=self.wordnet_searcher_tool,
+                                                        return_synset=True,
+                                                        return_synonym=True,
+                                                        return_hypernym=True,
+                                                        return_examples=True,
+                                                        return_definition=True)
 
     def enhance_sentence(self, sentence,
                          return_ner=False,

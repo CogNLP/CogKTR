@@ -20,7 +20,7 @@ addition = reader.read_addition()
 enhancer = LinguisticsEnhancer(load_wordnet=True,
                                cache_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/enhanced_data",
                                cache_file="linguistics_data",
-                               reprocess=True)
+                               reprocess=False)
 enhanced_train_dict = enhancer.enhance_train(datable=train_data,
                                              return_wordnet=True,
                                              enhanced_key_1="instance_list",

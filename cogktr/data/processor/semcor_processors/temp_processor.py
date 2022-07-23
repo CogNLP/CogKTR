@@ -25,45 +25,68 @@ class TSemcorProcessor(BaseProcessor):
 
     def _process(self, data, datatype=None, enhanced_dict=None):
         datable = DataTable()
-        wordnet_info_list = []
+        # wordnet_info_list = []
         print("Processing data...")
-        for sentence, tag_list, lemma_list, all_pos_list, sentence_id, pos_list, instance_list, instance_id_list in tqdm(
-                zip(data['sentence'], data['tag_list'], data['lemma_list'], data['pos_list'],
-                    data['sentence_id'], data["instance_pos_list"], data["instance_list"], data["instance_id_list"]),
-                total=len(data['sentence'])):
-            for index, instance_id in enumerate(instance_id_list):
-                instance_wordnet_dict = enhanced_dict[tuple(instance_list)]["wordnet"][index]["lemma_item_details"]
-                for instance_candidate, content in instance_wordnet_dict.items():
-                    wordnet_info_list.append(content)
+        # xx = 0
+        # yy = 0
+        # for sentence, tag_list, lemma_list, all_pos_list, sentence_id, pos_list, instance_list, instance_id_list in tqdm(
+        #         zip(data['sentence'], data['tag_list'], data['lemma_list'], data['pos_list'],
+        #             data['sentence_id'], data["instance_pos_list"], data["instance_list"], data["instance_id_list"]),
+        #         total=len(data['sentence'])):
+        #     for index, instance_id in enumerate(instance_id_list):
+        #         xx = xx + 1
+        #         instance_wordnet_dict = enhanced_dict[tuple(instance_list)]["wordnet"][index]["lemma_item_details"]
+        #         for instance_candidate, content in instance_wordnet_dict.items():
+        #             wordnet_info_list.append(content)
+        #             yy = yy + 1
+
+        # xx=[]
+        # for item,value in enhanced_dict.items():
+        #     for inner_item in value["wordnet"]:
+        #         for yy in inner_item['lemma_item_details']:
+        #             xx.append(yy)
 
         for index, item in enumerate(tqdm(self.addition[datatype]["example"])):
             instance_id = item[0]
+            instance_key = item[1]
             instance_label = item[3]
+            instance_list_item = enhanced_dict[tuple(item[4])]
+            item_index = int(item[0].split(".")[2][1:])
+            current_instance_item_list = instance_list_item["wordnet"][item_index]['lemma_item_details']
+            current_knowledge = None
+            for temp_key, temp_value in current_instance_item_list.items():
+                if instance_key == temp_value["lemma_key"]:
+                    current_knowledge = copy.deepcopy(temp_value)
 
             instance_loc = self.addition[datatype]["instance"][instance_id]["instance_loc"]
 
             sentence_id = instance_id.split(".")[0] + "." + instance_id.split(".")[1]
-            raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id])
+            raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id]["words"])
 
-            wordnet_info = wordnet_info_list[index]
+            # wordnet_info = wordnet_info_list[index]
             enhanced_data = []
             # synonym = wordnet_info["synonym"]
             # examples = []
             # if len(wordnet_info["examples"]) > 0:
             #     examples = wordnet_info["examples"][0].split()
-            definition = wordnet_info["definition"].split()
+            # definition = wordnet_info["definition"].split()
             # hypernym_examples = []
             # hypernym_definition = []
             # if wordnet_info["hypernym"]["definition"] is not None:
             #     hypernym_examples = wordnet_info["hypernym"]["definition"].split()
             #     if len(wordnet_info["hypernym"]["examples"]) > 0:
             #         hypernym_definition = wordnet_info["hypernym"]["examples"][0].split()
-            # enhanced_data.extend(synonym)
-            # enhanced_data.extend(examples)
-            enhanced_data.extend(definition)
-            # enhanced_data.extend(hypernym_examples)
-            # enhanced_data.extend(hypernym_definition)
-            enhanced_data = self._remove_stopwords(enhanced_data)
+            if current_knowledge is not None:
+                enhanced_data.extend(current_knowledge["synonym"])
+                enhanced_data.extend(current_knowledge["definition"].split())
+                for example in (current_knowledge["examples"]):
+                    enhanced_data.extend(example.split())
+                if current_knowledge['hypernym']["synset"] is not None:
+                    enhanced_data.extend(current_knowledge['hypernym']["definition"].split())
+                    for example in (current_knowledge['hypernym']["examples"]):
+                        enhanced_data.extend(example.split())
+
+                enhanced_data = self._remove_stopwords(enhanced_data)
 
             if self.plm == "roberta-large" and self.plm == "roberta-base":
                 raise ValueError("roberta will come so on!")
@@ -109,17 +132,6 @@ class TSemcorProcessor(BaseProcessor):
             else:
                 raise ValueError("other plm will come so on!")
 
-            # tokenized_data = self.tokenizer.encode_plus(text=" ".join(raw_sentence),
-            #                                             text_pair=" ".join(enhanced_data),
-            #                                             truncation='longest_first',
-            #                                             padding="max_length",
-            #                                             add_special_tokens=True,
-            #                                             max_length=self.max_token_len)
-            # datable("input_ids", tokenized_data["input_ids"])
-            # datable("attention_mask", tokenized_data["attention_mask"])
-            # if self.plm != "roberta-large" and self.plm != "roberta-base":
-            #     datable("token_type_ids", tokenized_data["token_type_ids"])
-            # datable("label", instance_label)
         return DataTableSet(datable)
 
     def process_train(self, data, datatype="train", enhanced_dict=None):

@@ -428,7 +428,7 @@ if __name__ == '__main__':
     # sentence = "When standing miles away from Mount Rushmore the mountains seem very close"
     # answer = "the mountains seem very close"
     # sentence = "In Follow That Bird, Ernie and Bert search for Big Bird by plane."
-    sentence = "Bert likes reading in sesame street library"
+    sentence = "A magnifying class would enhance the smell of a viewed specimen"
     results = conceptnet_linker.link(sentence)
     # words = ["The","sun","is","responsible","for","puppies","learning","new","tricks","."]
     # words = ['all','of','these']

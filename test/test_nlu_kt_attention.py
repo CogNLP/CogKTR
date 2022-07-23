@@ -49,13 +49,13 @@ plm = PlmBertModel(pretrained_model_name="bert-base-cased")
 model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(model.parameters(), lr=0.000001)
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=2000,
-                  batch_size=50,
+                  batch_size=100,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,

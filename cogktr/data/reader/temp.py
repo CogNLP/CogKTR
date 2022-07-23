@@ -53,6 +53,7 @@ class TSemcorReader(BaseReader):
         # read data
         root = ET.parse(path).getroot()
         sentences = root.findall('.//sentence')
+
         for sentence in sentences:
             word_list = []
             tag_list = []
@@ -71,7 +72,8 @@ class TSemcorReader(BaseReader):
                     instance_list.append(word.get("lemma"))
                     instance_pos_list.append(self.SEMCOR2WN_POS_TAG[word.get("pos")])
                     instance_id_list.append(word.get("id"))
-            self.addition[datatype]["sentence"][sentence.get("id")] = word_list
+            self.addition[datatype]["sentence"][sentence.get("id")]["words"] = word_list
+            self.addition[datatype]["sentence"][sentence.get("id")]["instances"] = instance_list
             datable("sentence_id", sentence.get("id"))
             datable("sentence", word_list)
             datable("tag_list", tag_list)
@@ -96,16 +98,18 @@ class TSemcorReader(BaseReader):
         self.addition[datatype]["segmentation"].append(0)
         instances = root.findall('.//instance')
         for instance in instances:
+            sentence_key = instance.get("id").split(".")[0] + "." + instance.get("id").split(".")[1]
+            instances = self.addition[datatype]["sentence"][sentence_key]["instances"]
             word_lemma_items = wn.lemmas(instance.get("lemma"), self.SEMCOR2WN_POS_TAG[instance.get("pos")])
             word_lemma_keys = [word_lemma_item.key() for word_lemma_item in word_lemma_items]
             gold_word_lemma_key = self.addition[datatype]["instance"][instance.get("id")]["instance_label"]
             for word_lemma_key, word_lemma_item in zip(word_lemma_keys, word_lemma_items):
                 if gold_word_lemma_key == word_lemma_key:
                     self.addition[datatype]["example"].append(
-                        (instance.get("id"), word_lemma_key, word_lemma_item._synset._definition, 1))
+                        (instance.get("id"), word_lemma_key, word_lemma_item.synset().definition(), 1, instances))
                 else:
                     self.addition[datatype]["example"].append(
-                        (instance.get("id"), word_lemma_key, word_lemma_item._synset._definition, 0))
+                        (instance.get("id"), word_lemma_key, word_lemma_item.synset().definition(), 0, instances))
             start += len(word_lemma_keys)
             self.addition[datatype]["segmentation"].append(start)
         return datable
