@@ -34,7 +34,7 @@ class BSemcorProcessor(BaseProcessor):
             instance_loc = self.addition[datatype]["instance"][instance_id]["instance_loc"]
 
             sentence_id = instance_id.split(".")[0] + "." + instance_id.split(".")[1]
-            raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id])
+            raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id]["words"])
 
             enhanced_data = []
 
