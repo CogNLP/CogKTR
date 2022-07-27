@@ -74,7 +74,6 @@ def _bio_tag_to_spans(tags, ignore_labels=None):
     spans = []
     prev_bio_tag = None
     for idx, tag in enumerate(tags):
-        tag = tag.lower()
         bio_tag, label = tag[:1], tag[2:]
         if bio_tag == 'b':
             spans.append((label, [idx, idx]))
@@ -90,7 +89,7 @@ def _bio_tag_to_spans(tags, ignore_labels=None):
 if __name__ == "__main__":
     tagger = SrlTagger(tool="allennlp")
     tagger_dict_1 = tagger.tag(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
-    tagger_dict_2 = tagger.tag("Bert likes reading in the Sesame Street Library.")
+    tagger_dict_2 = tagger.tag("The keys, which were needed to access the building, were locked in the car.")
     print(tagger_dict_1)
     print(tagger_dict_2)
     print("end")
