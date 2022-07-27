@@ -43,14 +43,49 @@ class SrlTagger(BaseTagger):
         else:
             pass
         token_list = tag_result["words"]
-        for item in tag_result["verbs"]:
-            label_dict[item["verb"]] = item["tags"]
+
+        frames = []
+        for result in tag_result["verbs"]:
+            frame_name = result["verb"]
+            spans = _bio_tag_to_spans(result["tags"])
+            mentions = []
+            for span in spans:
+                t,(start,end) = span
+                mentions.append({
+                    "mention":tag_result["words"][start:end],
+                    "start":start,
+                    "end":end,
+                    "type":t,
+                })
+            frames.append({
+                "frame_name":frame_name,
+                "mentions":mentions,
+                "tags":result["tags"],
+            })
 
         tag_dict["words"] = token_list
-        tag_dict["knowledge"] = label_dict
+        tag_dict["knowledge"] = frames
 
         return tag_dict
 
+def _bio_tag_to_spans(tags, ignore_labels=None):
+    ignore_labels = set(ignore_labels) if ignore_labels else set()
+
+    spans = []
+    prev_bio_tag = None
+    for idx, tag in enumerate(tags):
+        tag = tag.lower()
+        bio_tag, label = tag[:1], tag[2:]
+        if bio_tag == 'b':
+            spans.append((label, [idx, idx]))
+        elif bio_tag == 'i' and prev_bio_tag in ('b', 'i') and label == spans[-1][0]:
+            spans[-1][1][1] = idx
+        elif bio_tag == 'o':  # o tag does not count
+            pass
+        else:
+            spans.append((label, [idx, idx]))
+        prev_bio_tag = bio_tag
+    return [(span[0], (span[1][0], span[1][1] + 1)) for span in spans if span[0] not in ignore_labels]
 
 if __name__ == "__main__":
     tagger = SrlTagger(tool="allennlp")
