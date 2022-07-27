@@ -74,7 +74,9 @@ def _bio_tag_to_spans(tags, ignore_labels=None):
     spans = []
     prev_bio_tag = None
     for idx, tag in enumerate(tags):
+        # tag = tag.lower()
         bio_tag, label = tag[:1], tag[2:]
+        bio_tag = bio_tag.lower()
         if bio_tag == 'b':
             spans.append((label, [idx, idx]))
         elif bio_tag == 'i' and prev_bio_tag in ('b', 'i') and label == spans[-1][0]:
