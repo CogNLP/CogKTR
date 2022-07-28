@@ -338,7 +338,7 @@ class Trainer:
                     model = self.model if self.rank == -1 else self.model.module
                     model.eval()
                     if self.use_tqdm:
-                        progress = enumerate(tqdm(self.dev_dataloader, desc="Evaluating", leave=False), 1)
+                        progress = enumerate(tqdm(self.dev_dataloader, desc="Evaluating", leave=False, position=0), 1)
                     else:
                         progress = enumerate(self.dev_dataloader, 1)
                     with torch.no_grad():

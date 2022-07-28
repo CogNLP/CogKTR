@@ -1,15 +1,14 @@
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
-from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
     device_id=7,
-    output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result",
+    output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="test_print_metric",
 )
 
-reader = Sst2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/raw_data")
+reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
@@ -18,12 +17,11 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = PlmBertModel(pretrained_model_name="bert-base-cased")
+plm = PlmAutoModel(pretrained_model_name="bert-base-cased")
 model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
-early_stopping = EarlyStopping(mode="max",patience=3,threshold=0.01,threshold_mode="abs",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,
@@ -42,15 +40,10 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   validate_steps=100,
-                  save_steps=None,
-                  # save_by_metric="F1",
-                  early_stopping=early_stopping,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
                   device=device,
-                  callbacks=None,
-                  metric_key=None,
                   fp16=False,
                   fp16_opt_level='O1',
                   )
