@@ -81,7 +81,7 @@ if __name__ == "__main__":
     # link_list_1 = linker_1.link("Bert likes reading in the Sesame Street Library.")
 
     linker_2 = WikipediaLinker(tool="cogie")
-    link_list_2 = linker_2.link(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
+    link_list_2 = linker_2.link("Bert and Elmo is reading with US president Trump.")
     # linker_2 = WikipediaLinker(tool="cogie")
     # link_list_2 = linker_2.link("Bert likes reading in the Sesame Street Library.")
     print("end")

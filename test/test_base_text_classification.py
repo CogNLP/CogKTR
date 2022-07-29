@@ -4,11 +4,11 @@ from cogktr import *
 
 device, output_path = init_cogktr(
     device_id=7,
-    output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
+    output_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="test_print_metric",
 )
 
-reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")
+reader = Sst2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
@@ -39,7 +39,7 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
+                  validate_steps=10,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
