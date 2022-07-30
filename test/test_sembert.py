@@ -17,7 +17,7 @@ from cogktr.modules.encoder.sembert import SembertEncoder
 device, output_path = init_cogktr(
     device_id=9,
     output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-    folder_tag="sembert_without_tag",
+    folder_tag="sembert_without_tag_use_for_demo",
 )
 
 reader = QnliReader(raw_data_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/raw_data")
@@ -34,7 +34,7 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence",enha
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence",enhanced_key_2="question")
 
 
-processor = QnliSembertProcessor(plm="bert-large-uncased", max_token_len=256, vocab=vocab,debug=False)
+processor = QnliSembertProcessor(plm="bert-base-uncased", max_token_len=256, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 # test_dataset = processor.process_test(test_data,enhanced_test_dict)
@@ -55,7 +55,7 @@ tag_config = Namespace(**tag_config)
 #     tag_config=tag_config,
 # )
 # plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=tag_config)
-plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=None)
+plm = SembertEncoder.from_pretrained("bert-base-uncased",tag_config=None)
 model = SembertForSequenceClassification(
     vocab=vocab,
     plm=plm,

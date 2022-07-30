@@ -8,14 +8,16 @@ from cogktr.data.processor.squad2_processors.squad2_processor import Squad2Proce
 from cogktr.models.base_reading_comprehension_model import BaseReadingComprehensionModel
 
 device,output_path = init_cogktr(
-    device_id=6,
+    device_id=9,
     output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
-    folder_tag="mrc_baseline",
+    folder_tag="mrc_baseline_d",
 )
 
 reader = Squad2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
 train_data, dev_data, _ = reader.read_all()
 vocab = reader.read_vocab()
+
+
 
 processor = Squad2Processor(plm="bert-base-cased", max_token_len=512, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data)

@@ -43,6 +43,7 @@ class Trainer:
             output_path=None,
             save_steps=None,
             save_by_metric=None,
+            metric_mode='max',
             grad_norm=None,
             use_tqdm=True,
             device=None,
@@ -76,6 +77,7 @@ class Trainer:
         :param validate_steps:验证步数
         :param save_steps:保存步数
         :param save_by_metric:根据某个metric保存最佳模型
+        :param metric_mode: max指标越高越好 min指标越低越好
         :param grad_norm:梯度裁剪
         :param use_tqdm:是否使用tqdm
         :param device:设备
@@ -114,6 +116,9 @@ class Trainer:
         self.output_path = output_path
         self.rank = rank
         self.save_by_metric = save_by_metric
+        self.metric_mode = metric_mode
+        if self.metric_mode not in ["min","max"]:
+            raise ValueError("Metric mode must be min or max but gou {}!".format(self.metric_mode))
 
         if save_by_metric is not None:
             self.metric_name = self.save_by_metric
@@ -371,7 +376,11 @@ class Trainer:
                             if self.scheduler:
                                 torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
                     else:
-                        if evaluate_result[self.metric_name] > self.best_metric["evaluate_result"][self.metric_name]:
+                        if self.metric_mode == 'max':
+                            is_better = evaluate_result[self.metric_name] > self.best_metric["evaluate_result"][self.metric_name]
+                        else:
+                            is_better = evaluate_result[self.metric_name] < self.best_metric["evaluate_result"][self.metric_name]
+                        if is_better:
                             curr_metric = {"evaluate_result": evaluate_result, "global_step": global_step}
                             prev_step = self.best_metric["global_step"]
                             curr_step = curr_metric["global_step"]
@@ -388,15 +397,19 @@ class Trainer:
                                     torch.save(self.optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
                                 if self.scheduler:
                                     torch.save(self.scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
-                                logger.info("Metric {} rises from {:.3f} to {:.3f},save models checkpoint to {}".format(
+                                verb = "increases" if self.metric_mode == 'max' else 'decreases'
+                                logger.info("Metric {} {} from {:.3f} to {:.3f},save models checkpoint to {}".format(
                                     self.metric_name,
+                                    verb,
                                     self.best_metric["evaluate_result"][self.metric_name],
                                     curr_metric["evaluate_result"][self.save_by_metric],
                                     output_dir)
                                 )
                             else:
-                                logger.info("Metric {} rises from {:.3f} to {:.3f}.".format(
+                                verb = "increases" if self.metric_mode == 'max' else 'decreases'
+                                logger.info("Metric {} {} from {:.3f} to {:.3f}.".format(
                                     self.metric_name,
+                                    verb,
                                     self.best_metric["evaluate_result"][self.metric_name],
                                     curr_metric["evaluate_result"][self.metric_name],
                                 ))
