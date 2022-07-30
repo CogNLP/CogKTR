@@ -1,5 +1,5 @@
 # CUDA_VISIBLE_DEVICES="2,3,4,5"  python -m torch.distributed.launch --nproc_per_node 4 test_base_sentence_pair_classification.py
-# CUDA_VISIBLE_DEVICES="5,6,7,9"  python -m torch.distributed.launch --nproc_per_node 4 ddp_base_sembert.py
+# CUDA_VISIBLE_DEVICES="3,4"  python -m torch.distributed.launch --nproc_per_node 2 ddp_base_sembert.py
 
 import os
 import torch.distributed as dist
@@ -17,7 +17,7 @@ from cogktr.modules.encoder.sembert import SembertEncoder
 def main(local_rank):
     device,output_path = init_cogktr(
         output_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/",
-        folder_tag="sembert_wit_tag_multi_gpu",
+        folder_tag="sembert_without_tag_multi_gpu_for_demo",
         rank=local_rank,
         seed=1 + local_rank,
     )
@@ -53,7 +53,8 @@ def main(local_rank):
         "num_aspect": 3
     }
     tag_config = Namespace(**tag_config)
-    plm = SembertEncoder.from_pretrained("bert-base-uncased", tag_config=tag_config)
+    # plm = SembertEncoder.from_pretrained("bert-base-uncased", tag_config=tag_config)
+    plm = SembertEncoder.from_pretrained("bert-base-uncased", tag_config=None)
     model = SembertForSequenceClassification(
         vocab=vocab,
         plm=plm,
@@ -83,7 +84,7 @@ def main(local_rank):
                       num_workers=5,
                       print_every=None,
                       scheduler_steps=None,
-                      validate_steps=2000,      # validation setting
+                      validate_steps=1500,      # validation setting
                       save_steps=None,         # when to save model result
                       output_path=output_path,
                       grad_norm=1,
