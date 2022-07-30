@@ -1,12 +1,12 @@
 # The LAMA Dataset
 
 Download The LAMA Dataset from https://dl.fbaipublicfiles.com/LAMA/data.zip   
-Put the raw data in path`datapath/question_answering/LAMA/raw_data`.   
+Put the raw data in path`datapath/masked_language_model/LAMA/raw_data`.   
 Like the following form:
 
 ```angular2html
 datapath
-├─ question_answering
+├─ masked_language_model
 │  ├─ LAMA
 │  │  ├─ raw_data
 │  │  │  ├─ relations.jsonl

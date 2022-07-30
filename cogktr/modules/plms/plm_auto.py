@@ -8,6 +8,7 @@ class PlmAutoModel(nn.Module):
         self.pretrained_model_name = pretrained_model_name
         self._plm = AutoModel.from_pretrained(pretrained_model_name)
         self.hidden_dim = self._plm.embeddings.position_embeddings.embedding_dim
+        self.config=self._plm.config_class.from_pretrained(pretrained_model_name)
 
     def forward(self, batch):
         input_ids = batch["input_ids"]

@@ -1,9 +1,10 @@
 from .base_model import *
+from .base_masked_lm import *
+from .base_disambiguation_model import *
 from .base_question_answering_model import *
 from .base_sentence_pair_model import *
 from .base_text_classification_model import *
 from .base_sequence_labeling_model import *
-from .esr_model import *
 from .hlg_model import *
 from .kgemb_model import *
 from .ktemb_model import *
@@ -12,12 +13,13 @@ from .syntax_attention_model import *
 
 __all__ = [
     "BaseModel",
+    "BaseMaskedLM",
+    "BaseDisambiguationModel",
     "BaseQuestionAnsweringModel",
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
     "BaseTextClassificationModel",
     "BaseSequenceLabelingModel",
-    "EsrModel",
     "HLGModel",
     "KgembModel",
     "KtembModel",

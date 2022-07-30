@@ -6,7 +6,7 @@ device, output_path = init_cogktr(
     device_id=7,
     # output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",  # SST_2
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_5/experimental_result",  # SST_5
-    folder_tag="test_print_metric",
+    folder_tag="simple_test",
 )
 
 # reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/raw_data")  # SST_2
@@ -30,7 +30,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.00001)
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
-                  n_epochs=100,
+                  n_epochs=20,
                   batch_size=50,
                   loss=loss,
                   optimizer=optimizer,
@@ -44,7 +44,7 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   validate_steps=100,
-                  save_steps=100,
+                  save_steps=None,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,

@@ -12,8 +12,8 @@ class BaseQuestionAnsweringFillMaskModel(BaseModel):
         # self.input_size = self.plm.hidden_dim
         # self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 
-    def loss(self, batch, loss_function):
-        return self.plm(batch).loss
+    # def loss(self, batch, loss_function):
+    #     return self.plm(batch).loss
 
     def forward(self, batch):
         x = self.plm(batch).logits

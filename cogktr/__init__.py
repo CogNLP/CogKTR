@@ -9,6 +9,7 @@ from .utils import *
 __all__ = [
     # core
     "BaseMetric",
+    "BaseMaskedLMMetric",
     "BaseDisambiguationMetric",
     "BaseClassificationMetric",
     "BaseRegressionMetric",
@@ -21,6 +22,7 @@ __all__ = [
     "CommonsenseqaQagnnProcessor",
     "OpenBookQAReader",
     "Conll2003Processor",
+    "LamaProcessor",
     "MultisegchnsentibertProcessor",
     "QnliProcessor",
     "QnliSembertProcessor",
@@ -39,11 +41,11 @@ __all__ = [
     "CommonsenseqaReader",
     "CommonsenseqaQagnnReader",
     "Conll2003Reader",
+    "LamaReader",
     "MultisegchnsentibertReader",
     "QnliReader",
     "SemcorReader",
     "TSemcorProcessor",
-    "BSemcorProcessor",
     "Squad2Reader",
     "Sst2Reader",
     "Sst5Reader",
@@ -72,12 +74,13 @@ __all__ = [
 
     # models
     "BaseModel",
+    "BaseMaskedLM",
+    "BaseDisambiguationModel",
     "BaseQuestionAnsweringModel",
     "BaseSentencePairClassificationModel",
     "BaseSentencePairRegressionModel",
     "BaseSequenceLabelingModel",
     "BaseTextClassificationModel",
-    "EsrModel",
     "HLGModel",
     "KgembModel",
     "KtembModel",
