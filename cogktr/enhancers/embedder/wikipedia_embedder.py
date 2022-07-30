@@ -86,5 +86,5 @@ if __name__ == "__main__":
     embedder_2 = WikipediaEmbedder(tool="cogkge",
                                    path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/cogkge/Model.pkl",
                                    vocab_path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/cogkge/vocab.pkl")
-    embedder_dict_2 = embedder_2.embed(id=174924)
+    embedder_dict_2 = embedder_2.embed(id=18978754)
     print("end")
