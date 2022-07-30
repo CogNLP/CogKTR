@@ -31,7 +31,6 @@ class WikipediaSearcher(BaseSearcher):
                 self.id2title[wikipedia_id] = entity["title"]
                 self.id2desc[wikipedia_id] = entity["text"]
 
-    # TODO:use sparql to search neighbor node and more info
     def search(self, id):
         search_dict = {}
         if self.tool == "blink":
@@ -60,11 +59,7 @@ class WikipediaSearcher(BaseSearcher):
 
 
 if __name__ == "__main__":
-    # searcher = WikipediaSearcher(tool="blink",
-    #                              path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
-    # search_dict = searcher.search(18978754)
     searcher = WikipediaSearcher(tool="blink",
-                                 path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikipedia/entity.jsonl")
+                                 path="/data/mentianyi/code/CogKTR/datapath/knowledge_graph/wikipedia_desc/entity.jsonl")
     search_dict = searcher.search(174924)
-    search_dict_2 = searcher.search(48064)
     print("end")

@@ -19,6 +19,8 @@ __all__ = [
 
     # searcher
     "BaseSearcher",
+    "ConcetNetSearcher",
+    "WikidataSearcher",
     "WikipediaSearcher",
     "WordnetSearcher",
 

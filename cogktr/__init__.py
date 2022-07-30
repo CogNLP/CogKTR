@@ -61,6 +61,8 @@ __all__ = [
     "WikipediaLinker",
     "WordnetLinker",
     "BaseSearcher",
+    "ConcetNetSearcher",
+    "WikidataSearcher",
     "WikipediaSearcher",
     "WordnetSearcher",
     "BaseTagger",
