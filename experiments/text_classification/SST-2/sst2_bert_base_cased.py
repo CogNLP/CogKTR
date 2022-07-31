@@ -3,7 +3,7 @@ import torch.optim as optim
 from cogktr import *
 
 device, output_path = init_cogktr(
-    device_id=5,
+    device_id=7,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )
@@ -12,21 +12,14 @@ reader = Sst2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_cla
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-enhancer = Enhancer(reprocess=False,
-                    save_file_name="kgemb",
-                    datapath="/data/mentianyi/code/CogKTR/datapath",
-                    enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data")
-enhanced_train_dict = enhancer.enhance_train(train_data)
-enhanced_dev_dict = enhancer.enhance_dev(dev_data)
-enhanced_test_dict = enhancer.enhance_test(test_data)
+processor = Sst2Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+train_dataset = processor.process_train(train_data)
+dev_dataset = processor.process_dev(dev_data)
+test_dataset = processor.process_test(test_data)
 
-processor = Sst2ForKgembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
-train_dataset = processor.process_train(data=train_data, enhanced_dict=enhanced_train_dict)
-dev_dataset = processor.process_dev(data=dev_data, enhanced_dict=enhanced_dev_dict)
-test_dataset = processor.process_test(data=test_data, enhanced_dict=enhanced_test_dict)
-
-model = KgembModel(plm="bert-base-cased", vocab=vocab)
-metric = BaseClassificationMetric(mode="binary")
+plm = PlmAutoModel(pretrained_model_name="bert-base-cased")
+model = BaseTextClassificationModel(plm=plm, vocab=vocab)
+metric = BaseClassificationMetric(mode="binary")  # SST_2
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
@@ -47,17 +40,13 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   validate_steps=100,
-                  save_steps=100,
+                  save_steps=None,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,
                   device=device,
-                  callbacks=None,
-                  metric_key=None,
                   fp16=False,
                   fp16_opt_level='O1',
-                  collate_fn=train_dataset.to_dict,
-                  dev_collate_fn=dev_dataset.to_dict,
                   )
 trainer.train()
 print("end")
