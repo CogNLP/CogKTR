@@ -19,7 +19,7 @@ test_dataset = processor.process_test(test_data)
 
 plm = PlmAutoModel(pretrained_model_name="bert-base-cased")
 model = BaseTextClassificationModel(plm=plm, vocab=vocab)
-metric = BaseClassificationMetric(mode="binary")  # SST_2
+metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
