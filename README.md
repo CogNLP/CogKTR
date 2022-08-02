@@ -1,7 +1,11 @@
-<div align="center">
-<img src="./docs/source/figures/KTR-02-clip.png" width="350px" >
+
+
+<div align="center"><img src="./docs/source/figures/KTR-02-clip.png" width="350px" ></div>
+
 
 <center><b>A Knowledge Enhanced Text Representation Toolkit for Natural Language Understanding</b></center>
+
+
 ------------------
 
 
@@ -9,12 +13,18 @@
 ## Description
 
 <div align=center><img width="450" height="250" src="./docs/source/figures/knowledge.png"/></div>
+
+
 **CogKTR** is a **K**nowledge-enhanced **T**ext **R**epresentation toolkit for natural language understanding and has the following functions: 
 
 + CogKTR provides user-friendly knowledge acquisition interfaces. Users can use our toolkit to enhance the given texts with one click.
+
 + CogKTR supports various knowledge embeddings that can be used directly.  And we also implement plenty of knowledge-enhanced methods so researchers can quickly reproduce these models.
+
 + CogKTR supports many built-in NLU tasks to evaluate the effectiveness of knowledge-enhanced methods. In our paradigm, users can easily conduct their research via a pipeline.
+
 + We also release an [online demo](http://cognlp.com/cogktr/) to show the process of knowledge acquisition and the effect of knowledge enhancement. 
+
 + A short introduction video is available [here](https://youtu.be/SrvXrXdDiVY).
 
 
@@ -190,6 +200,5 @@ trainer = Trainer(model,
                   fp16_opt_level='O1',
                   )
 trainer.train()
-
 ```
 
