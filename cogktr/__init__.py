@@ -88,6 +88,8 @@ __all__ = [
     "KtembModel",
     "QAGNNModel",
     "SyntaxAttentionModel",
+    "KgembKModel",
+    "KtembKModel",
 
     # modules
     "PlmBertModel",

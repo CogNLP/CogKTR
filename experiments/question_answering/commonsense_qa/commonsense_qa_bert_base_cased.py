@@ -1,25 +1,26 @@
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import init_cogktr, Sst5Reader, Sst5Processor
-from cogktr import PlmAutoModel, BaseTextClassificationModel, BaseClassificationMetric, Trainer
+from cogktr import init_cogktr, CommonsenseqaReader, CommonsenseqaProcessor
+from cogktr import PlmAutoModel, BaseQuestionAnsweringModel, BaseClassificationMetric, Trainer
 
 device, output_path = init_cogktr(
-    device_id=8,
-    output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_5/experimental_result",
+    device_id=9,
+    output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/experimental_result/",
     folder_tag="simple_test",
 )
 
-reader = Sst5Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_5/raw_data")
+reader = CommonsenseqaReader(
+    raw_data_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
-processor = Sst5Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+processor = CommonsenseqaProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab, mode="concatenate")
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
 plm = PlmAutoModel(pretrained_model_name="bert-base-cased")
-model = BaseTextClassificationModel(plm=plm, vocab=vocab)
+model = BaseQuestionAnsweringModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
@@ -28,7 +29,7 @@ trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=50,
+                  batch_size=10,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,

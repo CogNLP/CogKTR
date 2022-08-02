@@ -118,6 +118,7 @@ class WorldEnhancer(BaseEnhancer):
                       return_entity_kg=False):
         enhanced_dict = {}
         if not self.reprocess and os.path.exists(os.path.join(self.cache_path_file, dict_name)):
+            print("Loading enhancd data...")
             enhanced_dict = load_pickle(os.path.join(self.cache_path_file, dict_name))
         else:
             print("Enhancing data...")

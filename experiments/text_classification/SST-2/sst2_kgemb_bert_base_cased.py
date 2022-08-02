@@ -1,11 +1,7 @@
-import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = "4"
-
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import init_cogktr, Sst2Reader, WorldEnhancer, Sst2ForKtembProcessor
-from cogktr import KtembKModel, BaseTextClassificationModel, BaseClassificationMetric, Trainer
+from cogktr import init_cogktr, Sst2Reader, WorldEnhancer, Sst2ForKgembProcessor
+from cogktr import KgembKModel, BaseTextClassificationModel, BaseClassificationMetric, Trainer
 
 device, output_path = init_cogktr(
     device_id=0,
@@ -40,12 +36,12 @@ enhanced_test_dict = enhancer.enhance_test(datable=test_data,
                                            return_entity_embedding=True,
                                            return_entity_kg=False)
 
-processor = Sst2ForKtembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
+processor = Sst2ForKgembProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(data=train_data, enhanced_dict=enhanced_train_dict)
 dev_dataset = processor.process_dev(data=dev_data, enhanced_dict=enhanced_dev_dict)
 test_dataset = processor.process_test(data=test_data, enhanced_dict=enhanced_test_dict)
 
-kmodel = KtembKModel(pretrained_model_name="bert-base-cased")
+kmodel = KgembKModel(pretrained_model_name="bert-base-cased")
 tmodel = BaseTextClassificationModel(plm=kmodel, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()

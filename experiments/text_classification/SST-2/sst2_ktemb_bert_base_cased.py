@@ -1,7 +1,3 @@
-import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = "4"
-
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import init_cogktr, Sst2Reader, WorldEnhancer, Sst2ForKtembProcessor

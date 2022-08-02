@@ -21,10 +21,10 @@ class Sst2ForKtembProcessor(BaseProcessor):
         datable = DataTable()
         print("Processing data...")
         for sentence, label in tqdm(zip(data['sentence'], data['label']), total=len(data['sentence'])):
-            words = enhanced_dict[sentence]["wikipedia"]["words"]
+            words = enhanced_dict[sentence]["words"]
             input_tokens = []
             input_ids = []
-            attention_masks = []
+            attention_mask = []
             segment_ids = []
             valid_masks = []
 
@@ -44,21 +44,21 @@ class Sst2ForKtembProcessor(BaseProcessor):
                     valid_masks.append(1 if i == 0 else 0)
             input_ids = self.tokenizer.convert_tokens_to_ids(input_tokens)
 
-            attention_masks = [1] * len(input_ids)
+            attention_mask = [1] * len(input_ids)
             segment_ids = [0] * len(input_ids)
 
             input_ids = input_ids[0:self.max_token_len]
-            attention_masks = attention_masks[0:self.max_token_len]
+            attention_mask = attention_mask[0:self.max_token_len]
             segment_ids = segment_ids[0:self.max_token_len]
             valid_masks = valid_masks[0:self.max_token_len]
 
             input_ids += [0 for _ in range(self.max_token_len - len(input_ids))]
-            attention_masks += [0 for _ in range(self.max_token_len - len(attention_masks))]
+            attention_mask += [0 for _ in range(self.max_token_len - len(attention_mask))]
             segment_ids += [0 for _ in range(self.max_token_len - len(segment_ids))]
             valid_masks += [0 for _ in range(self.max_token_len - len(valid_masks))]
 
             entity_span_list = []
-            for entity in enhanced_dict[sentence]["wikipedia"]["spans"]:
+            for entity in enhanced_dict[sentence]["entities"]:
                 if entity["desc"] is not None:
                     entity_token = self.tokenizer.encode(text=entity["desc"], truncation=True, padding="max_length",
                                                          add_special_tokens=True,
@@ -72,7 +72,7 @@ class Sst2ForKtembProcessor(BaseProcessor):
                         entity_dict["entity_mask"][i] = 1
                     entity_span_list.append(entity_dict)
             datable("input_ids", input_ids)
-            datable("attention_masks", attention_masks)
+            datable("attention_mask", attention_mask)
             datable("segment_ids", segment_ids)
             datable("valid_masks", valid_masks)
             datable("label", self.vocab["label_vocab"].label2id(label))
@@ -89,10 +89,10 @@ class Sst2ForKtembProcessor(BaseProcessor):
         datable = DataTable()
         print("Processing data...")
         for sentence in tqdm(data['sentence'], total=len(data['sentence'])):
-            words = enhanced_dict[sentence]["wikipedia"]["words"]
+            words = enhanced_dict[sentence]["words"]
             input_tokens = []
             input_ids = []
-            attention_masks = []
+            attention_mask = []
             segment_ids = []
             valid_masks = []
 
@@ -112,21 +112,21 @@ class Sst2ForKtembProcessor(BaseProcessor):
                     valid_masks.append(1 if i == 0 else 0)
             input_ids = self.tokenizer.convert_tokens_to_ids(input_tokens)
 
-            attention_masks = [1] * len(input_ids)
+            attention_mask = [1] * len(input_ids)
             segment_ids = [0] * len(input_ids)
 
             input_ids = input_ids[0:self.max_token_len]
-            attention_masks = attention_masks[0:self.max_token_len]
+            attention_mask = attention_mask[0:self.max_token_len]
             segment_ids = segment_ids[0:self.max_token_len]
             valid_masks = valid_masks[0:self.max_token_len]
 
             input_ids += [0 for _ in range(self.max_token_len - len(input_ids))]
-            attention_masks += [0 for _ in range(self.max_token_len - len(attention_masks))]
+            attention_mask += [0 for _ in range(self.max_token_len - len(attention_mask))]
             segment_ids += [0 for _ in range(self.max_token_len - len(segment_ids))]
             valid_masks += [0 for _ in range(self.max_token_len - len(valid_masks))]
 
             entity_span_list = []
-            for entity in enhanced_dict[sentence]["wikipedia"]["spans"]:
+            for entity in enhanced_dict[sentence]["entities"]:
                 if entity["desc"] is not None:
                     entity_token = self.tokenizer.encode(text=entity["desc"], truncation=True, padding="max_length",
                                                          add_special_tokens=True,
@@ -140,7 +140,7 @@ class Sst2ForKtembProcessor(BaseProcessor):
                         entity_dict["entity_mask"][i] = 1
                     entity_span_list.append(entity_dict)
             datable("input_ids", input_ids)
-            datable("attention_masks", attention_masks)
+            datable("attention_mask", attention_mask)
             datable("segment_ids", segment_ids)
             datable("valid_masks", valid_masks)
             datable("entity_span_list", entity_span_list)

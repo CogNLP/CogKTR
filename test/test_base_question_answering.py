@@ -3,7 +3,7 @@ import torch.optim as optim
 from cogktr import *
 
 device, output_path = init_cogktr(
-    device_id=7,
+    device_id=9,
     output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA/experimental_result/",
     folder_tag="simple_test",
 )

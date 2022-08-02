@@ -20,6 +20,7 @@ class Sst2Reader(BaseReader):
         self.label_vocab = Vocabulary()
 
     def _read_data(self, path):
+        print("Reading data...")
         datable = DataTable()
         with open(path) as file:
             lines = file.readlines()
@@ -39,6 +40,7 @@ class Sst2Reader(BaseReader):
         return self._read_data(path)
 
     def _read_test(self, path):
+        print("Reading data...")
         datable = DataTable()
         with open(path) as file:
             lines = file.readlines()
