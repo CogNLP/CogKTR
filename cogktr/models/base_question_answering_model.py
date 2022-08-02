@@ -40,3 +40,9 @@ class BaseQuestionAnsweringModel(BaseModel):
         pred = F.softmax(pred, dim=1)
         pred = torch.max(pred, dim=1)[1]
         return pred
+
+    def analyze(self,batch):
+        pred = self.forward(batch)
+        pred = F.softmax(pred, dim=1)
+        pred = torch.max(pred, dim=1)[0]
+        return pred
