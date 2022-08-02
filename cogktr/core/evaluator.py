@@ -1,7 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-import time
 import os
 import logging
 from cogktr.utils.io_utils import load_model
@@ -12,9 +11,9 @@ class Evaluator:
     def __init__(
             self,
             model,
-            checkpoint_path,
             dev_data,
             metrics,
+            checkpoint_path="",
             sampler=None,
             collate_fn=None,
             drop_last=False,
@@ -26,9 +25,9 @@ class Evaluator:
         """
         在指定数据据上验证模型指标
         :param model: 待验证模型
-        :param checkpoint_path: 模型参数文件所在目录
         :param dev_data: 验证数据集
         :param metrics: 验证指标
+        :param checkpoint_path: 模型参数文件所在目录
         :param sampler: 验证数据集对应的采样器
         :param collate_fn: 拼接为batch的函数
         :param drop_last: 是否丢掉最后一个数据
@@ -59,7 +58,7 @@ class Evaluator:
         if os.path.isfile(model_file):
             self.model = load_model(self.model,model_file)
         else:
-            raise ValueError("Pretrained model file {} does not exist!".format(model_file))
+            print("Pretrained model file {} does not exist!".format(model_file))
 
         self.model.to(self.device)
 

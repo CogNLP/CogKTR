@@ -2,6 +2,7 @@ from .base_processor import *
 from cogktr.data.processor.commonsenseqa_processors import *
 from cogktr.data.processor.commonsenseqa_qagnn_processors import *
 from cogktr.data.processor.conll2003_processors import *
+from cogktr.data.processor.lama_processors import *
 from cogktr.data.processor.multisegchnsentibert_processors import *
 from cogktr.data.processor.qnli_processors import *
 from cogktr.data.processor.semcor_processors import *
@@ -23,6 +24,9 @@ __all__ = [
     # conll2003processor
     "Conll2003Processor",
 
+    # lamaprocessor
+    "LamaProcessor",
+
     # multisegchnsentibertprocessor
     "MultisegchnsentibertProcessor",
 
@@ -33,7 +37,6 @@ __all__ = [
     # semcorprocessor
     "SemcorProcessor",
     "TSemcorProcessor",
-    "BSemcorProcessor",
 
     # squad2processor
     "Squad2Processor",

@@ -1,11 +1,12 @@
 import sys
+
 sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
 
-import time
 from cogktr.enhancers.searcher.kilt_searcher import KiltSearcher
 from cogktr.enhancers.searcher import BaseSearcher
 from qwikidata.sparql import (get_subclasses_of_item,
                               return_sparql_query_results)
+
 
 class WikidataSearcher(BaseSearcher):
 
@@ -93,9 +94,9 @@ class WikidataSearcher(BaseSearcher):
         else:
             raise Exception("Step_num should not be more than 2.")
 
-if __name__ == "__main__":
 
-    g1 = WikidataSearcher()
-    result1 = g1.search(wikipedia_id=18978754, step_num=1, result_num=2)
+if __name__ == "__main__":
+    searcher = WikidataSearcher()
+    result1 = searcher.search(wikipedia_id=18978754, step_num=1, result_num=2)
     print(result1)
     print("end")

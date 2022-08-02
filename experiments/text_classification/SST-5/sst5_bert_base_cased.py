@@ -1,35 +1,33 @@
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
-from torch.utils.data import SequentialSampler
 
 device, output_path = init_cogktr(
-    device_id=6,
-    output_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/experimental_result/",
+    device_id=8,
+    output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_5/experimental_result",
     folder_tag="simple_test",
 )
 
-reader = SemcorReader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/raw_data")
+reader = Sst5Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_5/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
-addition = reader.read_addition()
 
-processor = SemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
+processor = Sst5Processor(plm="bert-base-cased", max_token_len=128, vocab=vocab)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
-dev_sampler = SequentialSampler(dev_dataset)
+test_dataset = processor.process_test(test_data)
 
 plm = PlmAutoModel(pretrained_model_name="bert-base-cased")
-model = BaseDisambiguationModel(plm=plm, vocab=vocab)
-metric = BaseDisambiguationMetric(segment_list=addition["dev"]["segmentation"])
+model = BaseTextClassificationModel(plm=plm, vocab=vocab)
+metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,
-                  dev_dataset,
+                  train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,
-                  batch_size=25,
+                  batch_size=50,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,

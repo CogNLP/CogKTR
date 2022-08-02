@@ -6,6 +6,9 @@ class BaseProcessor:
         self.debug = debug
         pass
 
+    def procss_one(self, sentence):
+        pass
+
     def _process(self, data):
         pass
 

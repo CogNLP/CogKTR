@@ -6,7 +6,6 @@
 
 from pymongo import MongoClient
 import requests
-from urllib.parse import unquote
 import urllib.request
 from bs4 import BeautifulSoup
 import urllib.parse as urlparse
@@ -170,8 +169,6 @@ class KiltSearcher:
 
 
 if __name__ == "__main__":
-    from cogktr.enhancers.searcher.kilt_searcher import KiltSearcher
-
     # get the knowledge souce
     ks = KiltSearcher()
 
@@ -182,9 +179,7 @@ if __name__ == "__main__":
     page = ks.get_page_by_id(174924)
     page_1 = ks.get_page_by_id(48064)
 
-    # desc = ks.get_page_by_id(18581264)["wikidata_info"]["description"]
-
     # get pages by title
-    # page = ks.get_page_by_title("Michael Jordan")
+    page_2 = ks.get_page_by_title("Michael Jordan")
 
     print("end")

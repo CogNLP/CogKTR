@@ -1,8 +1,6 @@
-import torch
 import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
-from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
     device_id=5,
@@ -15,7 +13,7 @@ train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
 enhancer = Enhancer(reprocess=False,
-                    save_file_name="pre_enhanced_data",
+                    save_file_name="kgemb",
                     datapath="/data/mentianyi/code/CogKTR/datapath",
                     enhanced_data_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/enhanced_data")
 enhanced_train_dict = enhancer.enhance_train(train_data)

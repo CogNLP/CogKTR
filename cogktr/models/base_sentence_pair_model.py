@@ -62,10 +62,3 @@ class BaseSentencePairRegressionModel(BaseModel):
         pred = self.forward(batch)
         pred = pred.squeeze()  # shape:(B,1)->(B)
         return pred
-
-    def get_batch(self, batch):
-        input_ids = batch["input_ids"]
-        token_type_ids = batch["token_type_ids"]
-        attention_mask = batch["attention_mask"]
-        label = batch["score"]
-        return input_ids, token_type_ids, attention_mask, label

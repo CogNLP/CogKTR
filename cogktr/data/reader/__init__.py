@@ -2,6 +2,7 @@ from .base_reader import *
 from .commonsenseqa_reader import *
 from .commonsenseqa_qagnn_reader import *
 from .conll2003_reader import *
+from .lama_reader import *
 from .multisegchnsentibert_reader import *
 from .qnli_reader import *
 from .semcor_reader import *
@@ -18,6 +19,7 @@ __all__ = [
     "CommonsenseqaQagnnReader",
     "OpenBookQAReader",
     "Conll2003Reader",
+    "LamaReader",
     "MultisegchnsentibertReader",
     "QnliReader",
     "SemcorReader",

@@ -10,7 +10,7 @@ import copy
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class BSemcorProcessor(BaseProcessor):
+class SemcorProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab, addition):
         super().__init__()
         self.plm = plm
@@ -96,7 +96,7 @@ class BSemcorProcessor(BaseProcessor):
         return self._process(data, datatype=datatype, enhanced_dict=enhanced_dict)
 
     def process_test(self, data, datatype="test", enhanced_dict=None):
-        return self._process(data, datatype=datatype, enhanced_dict=enhanced_dict)
+        return None
 
 
 if __name__ == "__main__":
@@ -108,6 +108,6 @@ if __name__ == "__main__":
     vocab = reader.read_vocab()
     addition = reader.read_addition()
 
-    processor = BSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
+    processor = SemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
     dev_dataset = processor.process_dev(dev_data)
     print("end")

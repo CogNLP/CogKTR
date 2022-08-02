@@ -1,6 +1,3 @@
-import sys
-sys.path.append("/home/chenyuheng/zhouyuyang/CogKTR")
-
 from cogktr.enhancers.linker.base_linker import BaseLinker
 import tagme
 from cogie.toolkit.ner.ner_toolkit import NerToolkit
@@ -12,7 +9,6 @@ class WikipediaLinker(BaseLinker):
     def __init__(self, tool, lang="en"):
         super().__init__()
         if tool not in ["tagme", "cogie"]:
-        # if tool not in ["cogie"]:
             raise ValueError("{} in WikipediaLinker is not supported!".format(tool))
         if tool == "cogie":
             self.ner_toolkit = NerToolkit(corpus="conll2003")
@@ -33,9 +29,9 @@ class WikipediaLinker(BaseLinker):
         return link_list
 
     def _cogie_link(self, sentence):
-        if isinstance(sentence,str):
+        if isinstance(sentence, str):
             words = self.tokenize_toolkit.run(sentence)
-        elif isinstance(sentence,list):
+        elif isinstance(sentence, list):
             words = sentence
         else:
             raise ValueError("Sentence must be str or a list of words!")
@@ -49,9 +45,8 @@ class WikipediaLinker(BaseLinker):
             span_dict = {}
             span_dict["start"] = item["start"]
             span_dict["end"] = item["end"]
-            # span_dict["mention"] = item["mention"]
-            span_dict["entity_title"]=item["title"]
-            span_dict["wikipedia_id"] = int(item["id"])
+            span_dict["entity_title"] = item["title"]
+            span_dict["wikipedia_id"] = int(item["url"].split("=")[1])
             span_list.append(span_dict)
         link_dict["spans"] = span_list
         return link_dict
@@ -62,26 +57,20 @@ class WikipediaLinker(BaseLinker):
         entities = tagme.annotate(sentence, lang=self.lang)
         for entity in entities.get_annotations(threshold):
             link_dict = {}
-            mention = entity.mention
             link_dict["start"] = entity.begin
             link_dict["end"] = entity.end
             link_dict["wikipedia_id"] = entity.entity_id
             link_dict["entity_title"] = entity.entity_title
-            # link_dict["score"] = entity.score
-            # link_dict["mention"] = mention
             link_list.append(link_dict)
 
         return link_list
 
 
 if __name__ == "__main__":
-    # TODO:Interface inconsistency
-
-    # linker_1 = WikipediaLinker(tool="tagme")
-    # link_list_1 = linker_1.link("Bert likes reading in the Sesame Street Library.")
+    linker_1 = WikipediaLinker(tool="tagme")
+    link_list_1 = linker_1.link("Bert likes reading in the Sesame Street Library.")
 
     linker_2 = WikipediaLinker(tool="cogie")
-    link_list_2 = linker_2.link("Bert and Elmo is reading with US president Trump.")
-    # linker_2 = WikipediaLinker(tool="cogie")
-    # link_list_2 = linker_2.link("Bert likes reading in the Sesame Street Library.")
+    link_list_2 = linker_2.link("Bert likes reading in the Sesame Street Library.")
+    link_list_3 = linker_2.link(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
     print("end")

@@ -10,6 +10,7 @@ class BaseRegressionMetric(BaseMetric):
         super().__init__()
         self.pre_list = list()
         self.label_list = list()
+        self.default_metric_name = "r2"
 
     def evaluate(self, pred, label):
         self.pre_list = self.pre_list + pred.cpu().tolist()
@@ -21,11 +22,11 @@ class BaseRegressionMetric(BaseMetric):
         r2 = r2_score(self.pre_list, self.label_list)
         mse = mean_squared_error(self.pre_list, self.label_list)
         mae = mean_absolute_error(self.pre_list, self.label_list)
-        pear=pearsonr(self.pre_list,self.label_list)[0]
+        pear = pearsonr(self.pre_list, self.label_list)[0]
         evaluate_result = {"r2": r2,
                            "mse": mse,
                            "mae": mae,
-                           "pear":pear,
+                           "pear": pear,
                            }
         if reset:
             self.pre_list = list()
