@@ -61,7 +61,6 @@ class Predictor:
         self.model.to(self.device)
 
     def predict(self):
-        #TODO:check code
         logger.info("Start Predicting...")
         self.model.eval()
         if self.use_tqdm:
