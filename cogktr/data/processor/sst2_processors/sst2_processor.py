@@ -20,9 +20,16 @@ class Sst2Processor(BaseProcessor):
         datable = DataTable()
         print("Processing data...")
         for sentence, label in tqdm(zip(data['sentence'], data['label']), total=len(data['sentence'])):
-            token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
-                                          max_length=self.max_token_len)
-            datable("input_ids", token)
+            # token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
+            #                               max_length=self.max_token_len)
+            # datable("input_ids", token)
+            tokenized_data = self.tokenizer.encode_plus(text=sentence,
+                                                        padding="max_length",
+                                                        add_special_tokens=True,
+                                                        max_length=self.max_token_len)
+            datable("input_ids", tokenized_data["input_ids"])
+            datable("token_type_ids", tokenized_data["token_type_ids"])
+            datable("attention_mask", tokenized_data["attention_mask"])
             datable("label", self.vocab["label_vocab"].label2id(label))
         return DataTableSet(datable)
 
@@ -38,7 +45,13 @@ class Sst2Processor(BaseProcessor):
         for sentence in tqdm(zip(data['sentence']), total=len(data['sentence'])):
             token = self.tokenizer.encode(text=sentence, truncation=True, padding="max_length", add_special_tokens=True,
                                           max_length=self.max_token_len)
-            datable("input_ids", token)
+            tokenized_data = self.tokenizer.encode_plus(text=sentence,
+                                                        padding="max_length",
+                                                        add_special_tokens=True,
+                                                        max_length=self.max_token_len)
+            datable("input_ids", tokenized_data["input_ids"])
+            datable("token_type_ids", tokenized_data["token_type_ids"])
+            datable("attention_mask", tokenized_data["attention_mask"])
         return DataTableSet(datable)
 
 

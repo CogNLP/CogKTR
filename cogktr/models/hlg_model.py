@@ -28,8 +28,7 @@ class HLGModel(BaseModel):
         self.hidden_size = hidden_size
         self.hidden_dropout_prob = hidden_dropout_prob
 
-        self.bert = BertModel.from_pretrained(plm)
-        self.input_size = 768
+        self.input_size = self.plm.hidden_dim
         self.classes_num = len(vocab["label_vocab"])
         self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
 
