@@ -4,7 +4,7 @@ from tqdm import tqdm
 import os
 from cogktr.utils.io_utils import load_model
 from cogktr.utils.log_utils import logger
-
+from cogktr.utils.general_utils import move_dict_value_to_device
 
 class Predictor:
     def __init__(
@@ -12,6 +12,7 @@ class Predictor:
             model,
             checkpoint_path,
             dev_data,
+            vocab,
             sampler=None,
             collate_fn=None,
             drop_last=False,
@@ -45,6 +46,7 @@ class Predictor:
         self.batch_size = batch_size
         self.device = device
         self.use_tqdm = user_tqdm
+        self.vocab = vocab
 
         self.dev_dataloader = DataLoader(dataset=self.dev_data, batch_size=self.batch_size,
                                          sampler=self.sampler, drop_last=self.drop_last,
@@ -66,6 +68,12 @@ class Predictor:
             progress = enumerate(tqdm(self.dev_dataloader, desc="Evaluating", leave=False), 1)
         else:
             progress = enumerate(self.dev_dataloader, 1)
+        predict_results = []
         with torch.no_grad():
             for step, batch in progress:
-                self.model.predict(batch)
+                move_dict_value_to_device(batch, device=self.device)
+                result_tensor = self.model.predict(batch)
+                result_list = list(result_tensor.cpu().numpy())
+                result_list = list(map(self.vocab["label_vocab"].id2label_dict.get,result_list)) # map id to labels
+                predict_results.append(result_list)
+        return [item for sublist in predict_results for item in sublist]
