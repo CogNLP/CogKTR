@@ -5,6 +5,9 @@ from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.download_utils import Downloader
 import json
 import csv
+from transformers import BertTokenizer
+from operator import add
+from functools import reduce
 
 
 class MultisegchnsentibertReader(BaseReader):
@@ -13,6 +16,7 @@ class MultisegchnsentibertReader(BaseReader):
         self.raw_data_path = raw_data_path
         downloader = Downloader()
         downloader.download_multisegchnsentibert_raw_data(raw_data_path)
+        self.tokenizer = BertTokenizer.from_pretrained("bert-base-chinese")
         self.train_file = 'train.tsv'
         self.dev_file = 'dev.tsv'
         self.test_file = 'test.tsv'
@@ -29,11 +33,16 @@ class MultisegchnsentibertReader(BaseReader):
                 if i == 0:
                     continue
                 sentence = json.loads(line[0])
+                raw_sentence_list = self.tokenizer.convert_ids_to_tokens(sentence)
+                raw_sentence_str = reduce(add,
+                                          self.tokenizer.convert_ids_to_tokens(ids=sentence, skip_special_tokens=True))
                 thulac_word_length = json.loads(line[1])
                 nlpir_word_length = json.loads(line[2])
                 hanlp_word_length = json.loads(line[3])
                 label = json.loads(line[4])
                 datable("sentence", sentence)
+                datable("raw_sentence_list", raw_sentence_list)
+                datable("raw_sentence_str", raw_sentence_str)
                 datable("thulac_word_length", thulac_word_length)
                 datable("nlpir_word_length", nlpir_word_length)
                 datable("hanlp_word_length", hanlp_word_length)
