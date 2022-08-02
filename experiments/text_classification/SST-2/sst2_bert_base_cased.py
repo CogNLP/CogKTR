@@ -1,9 +1,10 @@
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import *
+from cogktr import init_cogktr, Sst2Reader, Sst2Processor
+from cogktr import PlmAutoModel, BaseTextClassificationModel, BaseClassificationMetric, Trainer
 
 device, output_path = init_cogktr(
-    device_id=7,
+    device_id=3,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="simple_test",
 )

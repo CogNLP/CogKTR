@@ -5,7 +5,7 @@ from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
 
 device, output_path = init_cogktr(
-    device_id=3,
+    device_id=9,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/MultiSegChnSentiBERT/experimental_result",
     folder_tag="simple_test",
 )
@@ -20,12 +20,13 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = HLGModel(plm="bert-base-cased", vocab=vocab, hidden_size=768, hidden_dropout_prob=0.1)
+plm = PlmAutoModel(pretrained_model_name="bert-base-chinese")
+kmodel = HLGModel(plm=plm, vocab=vocab, hidden_size=768, hidden_dropout_prob=0.1)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(kmodel.parameters(), lr=0.00001)
 
-trainer = Trainer(model,
+trainer = Trainer(kmodel,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,

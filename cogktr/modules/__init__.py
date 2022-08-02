@@ -4,4 +4,6 @@ __all__ = [
     #plms
     "PlmBertModel",
     "PlmAutoModel",
+    "KgembKModel",
+    "KtembKModel",
 ]

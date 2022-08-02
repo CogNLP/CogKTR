@@ -45,45 +45,29 @@ class HLGModel(BaseModel):
         # self.apply(self.init_bert_weights)
 
     def loss(self, batch, loss_function):
-        input_ids, c2w, w2s, character_mask, word_mask, sentence_mask, input_mask, label = self.get_batch(batch)
-        pred = self.forward(input_ids=input_ids, input_mask=input_mask, c2w=c2w, w2s=w2s,
-                            character_mask=character_mask, word_mask=word_mask, sentence_mask=sentence_mask)
-        loss = loss_function(pred, label)
+        pred = self.forward(batch)
+        loss = loss_function(pred, batch["label"])
         return loss
 
-    def forward(self, input_ids, input_mask, c2w, w2s, character_mask, word_mask, sentence_mask):
-        x = self.bert(input_ids=input_ids, attention_mask=input_mask).last_hidden_state
-        char_reps = F.pad(x, [0, 0, 0, c2w.size(1) - x.size(1)])
-        w1 = self.c1_to_w1(torch.transpose(c2w, -1, -2), char_reps, character_mask)
-        s1 = self.w1_to_s1(torch.transpose(w2s, -1, -2), w1, word_mask)
-        w2_1 = self.s1_to_w2(w2s, s1, sentence_mask)
+    def forward(self, batch):
+        x = self.plm(batch).last_hidden_state
+        char_reps = F.pad(x, [0, 0, 0, batch["c2w"].size(1) - x.size(1)])
+        w1 = self.c1_to_w1(torch.transpose(batch["c2w"], -1, -2), char_reps, batch["character_mask"])
+        s1 = self.w1_to_s1(torch.transpose(batch["w2s"], -1, -2), w1, batch["word_mask"])
+        w2_1 = self.s1_to_w2(batch["w2s"], s1, batch["sentence_mask"])
         w2_2 = self.relu(self.w1_to_w2(w1))
-        c2_1 = self.w2_to_c2(c2w, w2_1 + w2_2, word_mask)
+        c2_1 = self.w2_to_c2(batch["c2w"], w2_1 + w2_2, batch["word_mask"])
         c2_2 = self.relu(self.c1_to_c2(char_reps))
         x = torch.sum(c2_1 + c2_2, dim=1)
         x = self.linear(x)
         return x
 
     def evaluate(self, batch, metric_function):
-        input_ids, c2w, w2s, character_mask, word_mask, sentence_mask, input_mask, label = self.get_batch(batch)
-        pred = self.predict(input_ids=input_ids, input_mask=input_mask, c2w=c2w, w2s=w2s,
-                            character_mask=character_mask, word_mask=word_mask, sentence_mask=sentence_mask)
-        metric_function.evaluate(pred, label)
+        pred = self.predict(batch)
+        metric_function.evaluate(pred, batch["label"])
 
-    def predict(self, input_ids, input_mask, c2w, w2s, character_mask, word_mask, sentence_mask):
-        pred = self.forward(input_ids=input_ids, input_mask=input_mask, c2w=c2w, w2s=w2s,
-                            character_mask=character_mask, word_mask=word_mask, sentence_mask=sentence_mask)
+    def predict(self, batch):
+        pred = self.forward(batch)
         pred = F.softmax(pred, dim=1)
         pred = torch.max(pred, dim=1)[1]
         return pred
-
-    def get_batch(self, batch):
-        input_ids = batch["input_ids"]
-        c2w = batch["c2w"]
-        w2s = batch["w2s"]
-        character_mask = batch["character_mask"]
-        word_mask = batch["word_mask"]
-        sentence_mask = batch["sentence_mask"]
-        input_mask = batch["input_mask"]
-        label = batch["label"]
-        return input_ids, c2w, w2s, character_mask, word_mask, sentence_mask, input_mask, label
