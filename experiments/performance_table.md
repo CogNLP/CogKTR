@@ -25,7 +25,8 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
 | bert-base-chinese | 0 | 0 | 0 | 0 | 0 |
-| HLG | 0 | 0 | 0 | 0 | 0 |
+| HLG+bert-base-chinese+jieba | 0 | 0 | 0 | 0 | 0 |
+| HLG+bert-base-chinese+pre-seg | 0 | 0 | 0 | 0 | 0 |
 
 ## 2.Sentence Pair
 
