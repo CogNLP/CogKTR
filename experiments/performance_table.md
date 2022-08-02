@@ -17,15 +17,15 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0.48319 | 0.48319 | 0.48319 | 0.48459 | 0.46527 | 0.47156 | 0.48319 | sst5_bert_base_cased.py | 
-| KT-Emb+bert-base-cased | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 | 
-| KG-Emb+bert-base-cased | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 |
+| KT-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 
+| KG-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ### 1.3 MultiSegChnSentiBERT
 
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
 | bert-base-chinese | 0 | 0 | 0 | 0 | 0 |
-| HLG | 8 | 9 | 6 | 6 | 0 |
+| HLG | 0 | 0 | 0 | 0 | 0 |
 
 ## 2.Sentence Pair
 
@@ -34,16 +34,16 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
 | bert-base-cased | 0.90824 | 0.91416 | 0.91119 | 0.90993 | qnli_bert_base_cased.py |
-| KT-Emb+bert-base-cased | 8 | 9 | 6 | 6 | 6 |
-| KG-Emb+bert-base-cased | 8 | 9 | 6 | 6 | 6 |
+| KT-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 |
+| KG-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 |
 
 ### 2.2 STS-B (DEV)
 
 | Model | r2↑(key) | mse↓(key) | mae | pear | code |
 |---|---|---|---|---|---|
 | bert-base-cased | 0.76615 | 0.51084 | 0.53663 | 0.88735 | stsb_bert_base_cased.py | 
-| KT-Emb+bert-base-cased | 8 | 6 | 5 | 6 | 6 | 
-| KG-Emb+bert-base-cased | 8 | 6 | 5 | 6 | 6 |
+| KT-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 | 
+| KG-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 |
 
 ## 3.Sequence Labeling
 
@@ -52,8 +52,8 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
 | bert-base-cased | 0.94923 | 0.95658 | 0.95289 | 0.91002 | conll2003_bert_base_cased.py |
-| KT-Emb+bert-base-cased | 8 | 9 | 6 | 6 | 6 |
-| KG-Emb+bert-base-cased | 8 | 9 | 6 | 6 | 6 |
+| KT-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 |
+| KG-Emb+bert-base-cased | 0 | 0 | 0 | 0 | 0 |
 
 ## 4.Question Answering
 
@@ -62,16 +62,16 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0.55855 | 0.55855 | 0.55855 | 0.55858 | 0.55801 |  0.55816 | 0.55855 | commonsense_qa_bert_base_cased.py | 
-| QAGNN | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 | 
-| SAFE | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 |
+| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ### 4.2 OpenbookQA (DEV)
 
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 
-| QAGNN | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 | 
-| SAFE | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 |
+| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 
 ## 5.Disambiguation
@@ -80,8 +80,8 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
-| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 
-| ESR | 8 | 9 | 4 | 5 | 6 | 5 | 6 | 6 |
+| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| ESR | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 
 ## 6.Reading Comprehension
