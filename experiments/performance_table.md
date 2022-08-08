@@ -8,9 +8,10 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
-| bert-base-cased | 0.92427 | 0.93468 | 0.92945 | 0.92775 | sst2_bert_base_cased.py |
 | KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841 | 0.92660 | sst2_ktemb_bert_base_cased.py |
 | KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792 | 0.92660 | sst2_kgemb_bert_base_cased.py |
+
+[comment]: <> (| bert-base-cased | 0.92427 | 0.93468 | 0.92945 | 0.92775 | sst2_bert_base_cased.py |)
 
 ### 1.2 SST-5 (DEV)
 
@@ -22,7 +23,7 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
-| bert-base-chinese(paper) | \ | \ | \ | \ | multisegchnsentibert_bert_base_chinese.py |
+| bert-base-chinese(paper) | \ | \ | 0.9472 | \ | multisegchnsentibert_bert_base_chinese.py |
 | HLG+bert-base-chinese+pre-seg | 0.97444 | 0.94078 | 0.95732 | 0.9575 | multisegchnsentibert_hlg_pre_seg_bert_base_chinese.py |
 
 [comment]: <> (| HLG+bert-base-chinese | 0 | 0 | 0 | 0 | 0 |)
