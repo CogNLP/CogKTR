@@ -64,10 +64,11 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 [comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
-### 4.2 OpenbookQA (DEV)
+[comment]: <> (### 4.2 OpenbookQA &#40;DEV&#41;)
 
-| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
-|---|---|---|---|---|---|---|---|---|
+[comment]: <> (| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑&#40;key&#41; | Acc↑ | code |)
+
+[comment]: <> (|---|---|---|---|---|---|---|---|---|)
 
 [comment]: <> (| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | )
 
@@ -76,12 +77,13 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 [comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
 
-## 5.Disambiguation
+[comment]: <> (## 5.Disambiguation)
 
-### 5.1 Semcor (semeval2007)
+[comment]: <> (### 5.1 Semcor &#40;semeval2007&#41;)
 
-| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
-|---|---|---|---|---|---|---|---|---|
+[comment]: <> (| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑&#40;key&#41; | Acc↑ | code |)
+
+[comment]: <> (|---|---|---|---|---|---|---|---|---|)
 
 [comment]: <> (| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
