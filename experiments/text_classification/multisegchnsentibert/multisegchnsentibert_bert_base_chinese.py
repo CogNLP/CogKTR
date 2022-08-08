@@ -7,6 +7,7 @@ device, output_path = init_cogktr(
     device_id=9,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/MultiSegChnSentiBERT/experimental_result",
     folder_tag="simple_test",
+    seed=1,
 )
 
 reader = MultisegchnsentibertReader(
@@ -27,7 +28,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.00001)
 
 trainer = Trainer(model,
                   train_dataset,
-                  dev_data=dev_dataset,
+                  dev_data=test_dataset,
                   n_epochs=20,
                   batch_size=50,
                   loss=loss,

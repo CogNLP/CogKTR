@@ -18,13 +18,14 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0.48319 | 0.48319 | 0.48319 | 0.48459 | 0.46527 | 0.47156 | 0.48319 | sst5_bert_base_cased.py |
 
-### 1.3 MultiSegChnSentiBERT
+### 1.3 MultiSegChnSentiBERT (TEST)
 
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
-| bert-base-chinese | 0.94763 | 0.94603 | 0.94683 | 0.94750 | multisegchnsentibert_bert_base_chinese.py |
-| HLG+bert-base-chinese+pre-seg | 0.92647 | 0.95615 | 0.94107 | 0.94083 | multisegchnsentibert_hlg_pre_seg_bert_base_chinese.py |
-| HLG+bert-base-chinese | 0 | 0 | 0 | 0 | 0 |
+| bert-base-chinese(paper) | \ | \ | \ | \ | multisegchnsentibert_bert_base_chinese.py |
+| HLG+bert-base-chinese+pre-seg | 0.97444 | 0.94078 | 0.95732 | 0.9575 | multisegchnsentibert_hlg_pre_seg_bert_base_chinese.py |
+
+[comment]: <> (| HLG+bert-base-chinese | 0 | 0 | 0 | 0 | 0 |)
 
 
 ## 2.Sentence Pair
@@ -56,16 +57,21 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0.55855 | 0.55855 | 0.55855 | 0.55858 | 0.55801 |  0.55816 | 0.55855 | commonsense_qa_bert_base_cased.py | 
-| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+[comment]: <> (| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+
+[comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
 ### 4.2 OpenbookQA (DEV)
 
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
-| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 
-| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+[comment]: <> (| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | )
+
+[comment]: <> (| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+
+[comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
 
 ## 5.Disambiguation
@@ -74,8 +80,10 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
-| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| ESR | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+[comment]: <> (| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+
+[comment]: <> (| ESR | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
 
 ## 6.Reading Comprehension

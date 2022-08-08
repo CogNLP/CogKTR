@@ -1,6 +1,5 @@
 from cogktr.models.base_model import BaseModel
 import torch.nn as nn
-from transformers import BertModel
 import torch.nn.functional as F
 import torch
 
@@ -21,19 +20,17 @@ class GCNLayer(nn.Module):
 
 
 class HLGModel(BaseModel):
-    def __init__(self, vocab, plm, hidden_size, hidden_dropout_prob):
+    def __init__(self, vocab, plm, hidden_dropout_prob):
         super().__init__()
         self.vocab = vocab
         self.plm = plm
-        self.hidden_size = hidden_size
+        self.hidden_size = self.plm.hidden_dim
         self.hidden_dropout_prob = hidden_dropout_prob
 
-        self.input_size = self.plm.hidden_dim
         self.classes_num = len(vocab["label_vocab"])
-        self.linear = nn.Linear(in_features=self.input_size, out_features=self.classes_num)
+        self.linear = nn.Linear(in_features=self.hidden_size, out_features=self.classes_num)
 
         self.dropout = nn.Dropout(self.hidden_dropout_prob)
-        self.classifier = nn.Linear(self.hidden_size, self.classes_num)
         self.c1_to_w1 = GCNLayer(self.hidden_size)
         self.c1_to_c2 = nn.Linear(self.hidden_size, self.hidden_size)
         self.w1_to_s1 = GCNLayer(self.hidden_size)
@@ -41,7 +38,7 @@ class HLGModel(BaseModel):
         self.s1_to_w2 = GCNLayer(self.hidden_size)
         self.w2_to_c2 = GCNLayer(self.hidden_size)
         self.relu = nn.ReLU()
-        # self.apply(self.init_bert_weights)
+        self.apply(self.init_bert_weights)
 
     def loss(self, batch, loss_function):
         pred = self.forward(batch)

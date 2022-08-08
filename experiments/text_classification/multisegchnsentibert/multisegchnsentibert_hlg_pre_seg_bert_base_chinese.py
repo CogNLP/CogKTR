@@ -7,6 +7,7 @@ device, output_path = init_cogktr(
     device_id=8,
     output_path="/data/mentianyi/code/CogKTR/datapath/text_classification/MultiSegChnSentiBERT/experimental_result",
     folder_tag="simple_test",
+    seed=1,
 )
 
 reader = MultisegchnsentibertReader(
@@ -20,14 +21,14 @@ dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
 plm = PlmAutoModel(pretrained_model_name="bert-base-chinese")
-kmodel = HLGModel(plm=plm, vocab=vocab, hidden_size=768, hidden_dropout_prob=0.1)
+kmodel = HLGModel(plm=plm, vocab=vocab, hidden_dropout_prob=0.1)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(kmodel.parameters(), lr=0.00001)
 
 trainer = Trainer(kmodel,
                   train_dataset,
-                  dev_data=dev_dataset,
+                  dev_data=test_dataset,
                   n_epochs=20,
                   batch_size=50,
                   loss=loss,
@@ -50,7 +51,7 @@ trainer = Trainer(kmodel,
                   fp16=False,
                   fp16_opt_level='O1',
                   collate_fn=processor.train_collate,
-                  dev_collate_fn=processor.dev_collate,
+                  dev_collate_fn=processor.test_collate,
                   )
 trainer.train()
 print("end")
