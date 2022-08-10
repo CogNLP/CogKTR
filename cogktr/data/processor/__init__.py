@@ -29,6 +29,7 @@ __all__ = [
 
     # multisegchnsentibertprocessor
     "MultisegchnsentibertProcessor",
+    "MultisegchnsentibertForHLGProcessor",
     "MultisegchnsentibertForHLGPresegProcessor",
 
     # qnliprocessor

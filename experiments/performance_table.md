@@ -1,5 +1,5 @@
+# Performance Table
 
-#  Performance Table
 Note:For the first time to run the program, please set the Enhancer reprocess parameters as True.
 
 ## 1.Text Classification
@@ -25,10 +25,8 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
 | bert-base-chinese(paper) | \ | \ | 0.9472 | \ | multisegchnsentibert_bert_base_chinese.py |
-| HLG+bert-base-chinese+pre-seg | 0.97444 | 0.94078 | 0.95732 | 0.9575 | multisegchnsentibert_hlg_pre_seg_bert_base_chinese.py |
-
-[comment]: <> (| HLG+bert-base-chinese | 0 | 0 | 0 | 0 | 0 |)
-
+| HLG+bert-base-chinese+jieba | 0.96795 | 0.94407 | 0.95587 | 0.95583 | multisegchnsentibert_hlg_bert_base_chinese.py |
+| HLG+bert-base-chinese+pre-seg | 0.97762 | 0.93421 | 0.95542 | 0.95583 | multisegchnsentibert_hlg_pre_seg_bert_base_chinese.py |
 
 ## 2.Sentence Pair
 

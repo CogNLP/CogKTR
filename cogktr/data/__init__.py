@@ -12,6 +12,7 @@ __all__ = [
     "Conll2003Processor",
     "LamaProcessor",
     "MultisegchnsentibertProcessor",
+    "MultisegchnsentibertForHLGProcessor",
     "MultisegchnsentibertForHLGPresegProcessor",
     "QnliProcessor",
     "QnliSembertProcessor",

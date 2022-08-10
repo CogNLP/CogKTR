@@ -38,7 +38,7 @@ class HLGModel(BaseModel):
         self.s1_to_w2 = GCNLayer(self.hidden_size)
         self.w2_to_c2 = GCNLayer(self.hidden_size)
         self.relu = nn.ReLU()
-        self.apply(self.init_bert_weights)
+        # self.apply(self.init_bert_weights)
 
     def loss(self, batch, loss_function):
         pred = self.forward(batch)
