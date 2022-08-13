@@ -75,17 +75,14 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 [comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
 
 
-[comment]: <> (## 5.Disambiguation)
+## 5.Disambiguation
 
-[comment]: <> (### 5.1 Semcor &#40;semeval2007&#41;)
+### 5.1 Semcor (semeval2007)
 
-[comment]: <> (| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑&#40;key&#41; | Acc↑ | code |)
-
-[comment]: <> (|---|---|---|---|---|---|---|---|---|)
-
-[comment]: <> (| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
-
-[comment]: <> (| ESR | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+| Model | macro_F1↑(key) | code |
+|---|---|---|
+| bert-base-cased+defination | 73.40659 | semcor_bert_base_cased.py |
+| bert-base-cased+defination+hypernyms | 74.72527 | semcor_esr_bert_base_cased.py |
 
 
 [comment]: <> (## 6.Reading Comprehension)

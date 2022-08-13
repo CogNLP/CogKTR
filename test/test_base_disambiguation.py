@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import *
+from cogktr import init_cogktr, SemcorReader, SemcorProcessor
+from cogktr import PlmAutoModel, BaseDisambiguationModel, BaseDisambiguationMetric, Trainer
 from torch.utils.data import SequentialSampler
 
 device, output_path = init_cogktr(
@@ -28,7 +29,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.00001)
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
-                  n_epochs=20,
+                  n_epochs=5,
                   batch_size=25,
                   loss=loss,
                   optimizer=optimizer,
@@ -41,7 +42,7 @@ trainer = Trainer(model,
                   num_workers=5,
                   print_every=None,
                   scheduler_steps=None,
-                  validate_steps=100,
+                  validate_steps=300,
                   save_steps=None,
                   output_path=output_path,
                   grad_norm=1,

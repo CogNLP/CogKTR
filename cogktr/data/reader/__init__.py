@@ -11,7 +11,6 @@ from .sst2_reader import *
 from .sst5_reader import *
 from .stsb_reader import *
 from .openbookqa_reader import *
-from .temp import *
 
 __all__ = [
     "BaseReader",
@@ -27,5 +26,4 @@ __all__ = [
     "Sst2Reader",
     "Sst5Reader",
     "StsbReader",
-    "TSemcorReader",
 ]

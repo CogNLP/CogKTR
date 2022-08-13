@@ -47,12 +47,11 @@ __all__ = [
     "MultisegchnsentibertReader",
     "QnliReader",
     "SemcorReader",
-    "TSemcorProcessor",
+    "SemcorForEsrProcessor",
     "Squad2Reader",
     "Sst2Reader",
     "Sst5Reader",
     "StsbReader",
-    "TSemcorReader",
     "DataTable",
     "DataTableSet",
 

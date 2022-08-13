@@ -1,15 +1,11 @@
-import os
-
-os.environ['CUDA_VISIBLE_DEVICES'] = "8"
-
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import init_cogktr, SemcorReader, LinguisticsEnhancer, TSemcorProcessor
+from cogktr import init_cogktr, SemcorReader, LinguisticsEnhancer, SemcorForEsrProcessor
 from cogktr import PlmAutoModel, BaseDisambiguationModel, BaseDisambiguationMetric, Trainer
 from torch.utils.data import SequentialSampler
 
 device, output_path = init_cogktr(
-    device_id=0,
+    device_id=7,
     output_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/experimental_result/",
     folder_tag="simple_test",
 )
@@ -33,7 +29,7 @@ enhanced_dev_dict = enhancer.enhance_dev(datable=dev_data,
                                          enhanced_key_1="instance_list",
                                          pos_key="instance_pos_list")
 
-processor = TSemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
+processor = SemcorForEsrProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
 train_dataset = processor.process_train(train_data, enhanced_dict=enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data, enhanced_dict=enhanced_dev_dict)
 dev_sampler = SequentialSampler(dev_dataset)
@@ -47,7 +43,7 @@ optimizer = optim.Adam(kmodel.parameters(), lr=0.00001)
 trainer = Trainer(kmodel,
                   train_dataset,
                   dev_data=dev_dataset,
-                  n_epochs=20,
+                  n_epochs=5,
                   batch_size=25,
                   loss=loss,
                   optimizer=optimizer,

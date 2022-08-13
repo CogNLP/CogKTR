@@ -38,7 +38,7 @@ __all__ = [
 
     # semcorprocessor
     "SemcorProcessor",
-    "TSemcorProcessor",
+    "SemcorForEsrProcessor",
 
     # squad2processor
     "Squad2Processor",

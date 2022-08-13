@@ -10,7 +10,7 @@ import copy
 transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
-class SemcorProcessor(BaseProcessor):
+class SemcorForEsrProcessor(BaseProcessor):
     def __init__(self, plm, max_token_len, vocab, addition):
         super().__init__()
         self.plm = plm
@@ -28,8 +28,15 @@ class SemcorProcessor(BaseProcessor):
         print("Processing data...")
         for index, item in enumerate(tqdm(self.addition[datatype]["example"])):
             instance_id = item[0]
-            instance_defination = item[2].split()
+            instance_key = item[1]
             instance_label = item[3]
+            instance_list_item = enhanced_dict[tuple(item[4])]
+            item_index = int(item[0].split(".")[2][1:])
+            current_instance_item_list = instance_list_item["wordnet"][item_index]['lemma_item_details']
+            current_knowledge = None
+            for temp_key, temp_value in current_instance_item_list.items():
+                if instance_key == temp_value["lemma_key"]:
+                    current_knowledge = copy.deepcopy(temp_value)
 
             instance_loc = self.addition[datatype]["instance"][instance_id]["instance_loc"]
 
@@ -37,18 +44,25 @@ class SemcorProcessor(BaseProcessor):
             raw_sentence = copy.deepcopy(self.addition[datatype]["sentence"][sentence_id]["words"])
 
             enhanced_data = []
+            if current_knowledge is not None:
+                enhanced_data.extend(current_knowledge["synonym"])
+                enhanced_data.extend(current_knowledge["definition"].split())
+                for example in (current_knowledge["examples"]):
+                    enhanced_data.extend(example.split())
+                if current_knowledge['hypernym']["synset"] is not None:
+                    enhanced_data.extend(current_knowledge['hypernym']["definition"].split())
+                    for example in (current_knowledge['hypernym']["examples"]):
+                        enhanced_data.extend(example.split())
 
-
-            enhanced_data.extend(instance_defination)
-            enhanced_data = self._remove_stopwords(enhanced_data)
+                enhanced_data = self._remove_stopwords(enhanced_data)
 
             if self.plm == "roberta-large" and self.plm == "roberta-base":
                 raise ValueError("roberta will come so on!")
             elif self.plm == "bert-base-cased" or self.plm == "bert-base-uncased":
                 input_tokens = []
+                instance_mask = []
                 raw_sentence.insert(0, '[CLS]')
                 raw_sentence.append('[SEP]')
-                instance_mask = []
                 for index, word in enumerate(raw_sentence):
                     token = self.tokenizer.tokenize(word)
                     input_tokens.extend(token)
@@ -86,7 +100,6 @@ class SemcorProcessor(BaseProcessor):
             else:
                 raise ValueError("other plm will come so on!")
 
-
         return DataTableSet(datable)
 
     def process_train(self, data, datatype="train", enhanced_dict=None):
@@ -96,18 +109,33 @@ class SemcorProcessor(BaseProcessor):
         return self._process(data, datatype=datatype, enhanced_dict=enhanced_dict)
 
     def process_test(self, data, datatype="test", enhanced_dict=None):
-        return None
+        return self._process(data, datatype=datatype, enhanced_dict=enhanced_dict)
 
 
 if __name__ == "__main__":
-    from cogktr.data.reader.temp import TSemcorReader
+    from cogktr.data.reader.semcor_reader import SemcorReader
+    from cogktr.enhancers.linguistics_enhancer import LinguisticsEnhancer
 
-    reader = TSemcorReader(
+    reader = SemcorReader(
         raw_data_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
     addition = reader.read_addition()
 
-    processor = SemcorProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
-    dev_dataset = processor.process_dev(dev_data)
+    enhancer = LinguisticsEnhancer(load_wordnet=True,
+                                   cache_path="/data/mentianyi/code/CogKTR/datapath/word_sense_disambiguation/SemCor/enhanced_data",
+                                   cache_file="linguistics_data",
+                                   reprocess=False)
+    # enhanced_train_dict = enhancer.enhance_train(datable=train_data,
+    #                                              return_wordnet=True,
+    #                                              enhanced_key_1="instance_list",
+    #                                              pos_key="instance_pos_list")
+    enhanced_dev_dict = enhancer.enhance_dev(datable=dev_data,
+                                             return_wordnet=True,
+                                             enhanced_key_1="instance_list",
+                                             pos_key="instance_pos_list")
+
+    processor = SemcorForEsrProcessor(plm="bert-base-cased", max_token_len=512, vocab=vocab, addition=addition)
+    # train_dataset = processor.process_train(train_data, enhanced_dict=enhanced_train_dict)
+    dev_dataset = processor.process_dev(dev_data, enhanced_dict=enhanced_dev_dict)
     print("end")

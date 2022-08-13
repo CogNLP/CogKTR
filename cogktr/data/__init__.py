@@ -17,7 +17,7 @@ __all__ = [
     "QnliProcessor",
     "QnliSembertProcessor",
     "SemcorProcessor",
-    "TSemcorProcessor",
+    "SemcorForEsrProcessor",
     "Squad2Processor",
     "Squad2SembertProcessor",
     "Sst2Processor",
@@ -42,7 +42,6 @@ __all__ = [
     "Sst2Reader",
     "Sst5Reader",
     "StsbReader",
-    "TSemcorReader",
 
     # datable
     "DataTable",
