@@ -11,7 +11,7 @@ from cogktr.enhancers.commonsense_enhancer import CommonsenseEnhancer
 device, output_path = init_cogktr(
     device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="test_safe_new_enhancer",
+    folder_tag="debug_new_safe",
 )
 
 reader = OpenBookQAReader(
@@ -26,28 +26,21 @@ enhancer = CommonsenseEnhancer(
     reprocess=False,
     load_conceptnet=True
 )
-# enhancer = ConceptNetEnhancer(
-#         knowledge_graph_path="/data/hongbang/CogKTR/datapath/knowledge_graph/conceptnet",
-#         cache_path='/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/enhanced_data',
-#         reprocess=False
-#     )
-#
-# enhanced_train_dict,enhanced_dev_dict,enhanced_test_dict = enhancer.enhance_all(train_data,dev_data,test_data,vocab)
+
 enhanced_train_dict, enhanced_dev_dict, enhanced_test_dict = enhancer.enhance_all(train_data, dev_data, test_data,
                                                                                   vocab, return_metapath=True)
 
 processor = OpenBookQAForSafeProcessor(
     plm="roberta-large",
     max_token_len=100,
-    vocab=vocab
+    vocab=vocab,debug=False,
 )
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_train(dev_data,enhanced_dev_dict)
 
 
-# plm = PlmAutoModel(pretrained_model_name="roberta-large")
-# model = SAFEModel(plm="roberta-large",vocab=None)
-model = SAFEModel()
+plm = PlmAutoModel(pretrained_model_name="roberta-large")
+model = SAFEModel(plm=plm)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
 
