@@ -12,7 +12,7 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841 | 0.92660 | sst2_ktemb_bert_base_cased.py |
 | KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792 | 0.92660 | sst2_kgemb_bert_base_cased.py |
 
-[comment]: <> (| bert-base-cased | 0.92427 | 0.93468 | 0.92945 | 0.92775 | sst2_bert_base_cased.py |)
+[comment]: <> "| bert-base-cased | 0.92427 | 0.93468 | 0.92945 | 0.92775 | sst2_bert_base_cased.py |"
 
 ### 1.2 SST-5 (DEV)
 
@@ -56,23 +56,22 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
-| bert-base-cased | 0.55855 | 0.55855 | 0.55855 | 0.55858 | 0.55801 |  0.55816 | 0.55855 | commonsense_qa_bert_base_cased.py | 
+| bert-base-cased | 0.55855 | 0.55855 | 0.55855 | 0.55858 | 0.55801 |  0.55816 | 0.55855 | commonsense_qa_bert_base_cased.py |
 
-[comment]: <> (| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+[comment]: <> "| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
 
-[comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+[comment]: <> "| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
 
-[comment]: <> (### 4.2 OpenbookQA &#40;DEV&#41;)
+### 4.2 OpenbookQA &#40;DEV&#41;
 
-[comment]: <> (| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑&#40;key&#41; | Acc↑ | code |)
+| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
+|---|---|---|---|---|---|---|---|---|
+| roberta-large | 0.644 | 0.644 | 0.644 | 0.6443   | 0.6442 | 0.6426 | 0.644 | openbook_qa_roberta_large.py |
+| SAFE | 0.664 | 0.664 | 0.664 | 0.6647 | 0.6657 | 0.6636 | 0.664 | openbook_qa_safe.py |
 
-[comment]: <> (|---|---|---|---|---|---|---|---|---|)
+[comment]: <> "| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
 
-[comment]: <> (| bert-base-cased | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | )
-
-[comment]: <> (| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
-
-[comment]: <> (| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |)
+ 
 
 
 ## 5.Disambiguation
@@ -85,11 +84,11 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | bert-base-cased+defination+hypernyms | 74.72527 | semcor_esr_bert_base_cased.py |
 
 
-[comment]: <> (## 6.Reading Comprehension)
+[comment]: <> "## 6.Reading Comprehension"
 
-[comment]: <> (### 6.1 NULL)
+[comment]: <> "### 6.1 NULL"
 
 
-[comment]: <> (## 7.Masked LM)
+[comment]: <> "## 7.Masked LM"
 
-[comment]: <> (### 7.1 NULL)
+[comment]: <> "### 7.1 NULL"

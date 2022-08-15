@@ -5,9 +5,9 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.data.processor.openbookqa_processors.openbookqa_processor import OpenBookQAProcessor
 
 device, output_path = init_cogktr(
-    device_id=8,
+    device_id=9,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="test_obqa_base",
+    folder_tag="test_obqa_roberta_large",
 )
 
 reader = OpenBookQAReader(
@@ -24,12 +24,6 @@ processor = OpenBookQAProcessor(
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_train(dev_data)
 
-
-# processor = CommonsenseqaProcessor(plm="roberta-large", max_token_len=100, vocab=vocab, mode="concatenate")
-# train_dataset = processor.process_train(train_data)
-# dev_dataset = processor.process_dev(dev_data)
-# test_dataset = processor.process_test(test_data)
-# #
 plm = PlmAutoModel(pretrained_model_name="roberta-large")
 model = BaseQuestionAnsweringModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="multi")
