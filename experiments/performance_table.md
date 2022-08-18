@@ -57,10 +57,11 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0.55855 | 0.55855 | 0.55855 | 0.55858 | 0.55801 |  0.55816 | 0.55855 | commonsense_qa_bert_base_cased.py |
+| roberta-large | 0.75184 | 0.75184 | 0.75184 | 0.75204 | 0.78954 | 0.75169 | 0.75184 | commonsense_qa_roberta_large.py |
+| SAFE | 0.7633 | 0.7633 | 0.7633 | 0.7631 | 0.7628 | 0.7629 | 0.76331 | commonsense_qa_safe.py |
 
 [comment]: <> "| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
 
-[comment]: <> "| SAFE | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
 
 ### 4.2 OpenbookQA &#40;DEV&#41;
 
