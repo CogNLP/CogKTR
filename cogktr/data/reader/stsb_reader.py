@@ -86,7 +86,7 @@ class StsbReader(BaseReader):
         return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
 
     def read_vocab(self):
-        return None
+        return {}
 
 
 if __name__ == "__main__":
