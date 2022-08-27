@@ -61,10 +61,17 @@ class QnliSembertProcessor(BaseProcessor):
 def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhanced_data_dict):
 
     # text_a_tag_dict = tagger.tag(text_a)
-    text_a_tag_dict = enhanced_data_dict[text_a]["srl"]
+    # text_a_tag_dict = enhanced_data_dict[text_a]["srl"]
     tok_to_orig_index_a = [] # tokens -> words
     tokens_a = []
-    tokens_a_org = text_a_tag_dict["words"]
+    # tokens_a_org = text_a_tag_dict["words"]
+    # tokens_a_org = enhanced_data_dict[text_a]["words"]
+
+    key = (text_a,text_b) if text_b else text_a
+    if text_b:
+        tokens_a_org = enhanced_data_dict[key]["sentence"]["words"]
+    else:
+        tokens_a_org = enhanced_data_dict[key]["words"]
     tok_to_orig_index_a.append(0) # [CLS]
 
     for (i,token) in enumerate(tokens_a_org):
@@ -75,11 +82,11 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhance
 
     tok_to_orig_index_b = [] # tokens -> words
     tokens_b = []
-    text_b_tag_dict = {}
+    # text_b_tag_dict = {}
     if text_b:
         # text_b_tag_dict = tagger.tag(text_b)
-        text_b_tag_dict = enhanced_data_dict[text_b]["srl"]
-        tokens_b_orig = text_b_tag_dict["words"]
+        # text_b_tag_dict = enhanced_data_dict[text_b]["srl"]
+        tokens_b_orig = enhanced_data_dict[key]["sentence_pair"]["words"]
         for (i,token) in enumerate(tokens_b_orig):
             sub_tokens = tokenizer.tokenize(token)
             for sub_token in sub_tokens:
@@ -155,14 +162,20 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhance
 
     # aspect padding
     input_tag_ids = []
-    sent_tags_list_a = list(text_a_tag_dict["labels"].values())
+    if text_b:
+        sent_tags_list_a = [item["tags"] for item in enhanced_data_dict[key]["sentence"]["srl"]]
+    else:
+        sent_tags_list_a = [item["tags"] for item in enhanced_data_dict[key]["srl"]]
     if len(sent_tags_list_a) == 0:
-        sent_tags_list_a = ["O"] * len(text_a_tag_dict["words"])
+        if text_b:
+            sent_tags_list_a = ["O"] * len(enhanced_data_dict[key]["sentence"]["words"])
+        else:
+            sent_tags_list_a = ["O"] * len(enhanced_data_dict[key]["words"])
     tag_ids_list_a = convert_tags_to_ids(sent_tags_list_a,vocab)
     if text_b:
-        sent_tags_list_b = list(text_b_tag_dict["labels"].values())
+        sent_tags_list_b = [item["tags"] for item in enhanced_data_dict[key]["sentence_pair"]["srl"]]
         if len(sent_tags_list_b) == 0:
-            sent_tags_list_b = ["O"] * len(text_b_tag_dict["words"])
+            sent_tags_list_b = ["O"] * len(enhanced_data_dict[key]["sentence_pair"]["words"])
         tag_ids_list_b = convert_tags_to_ids(sent_tags_list_b,vocab)
         input_que_tag_ids = []
         for idx, query_tag_ids in enumerate(tag_ids_list_a):
@@ -195,7 +208,143 @@ def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhance
         "start_end_idx":orig_to_token_split_idx,
         "label":label_id,
     }
-
+# def process_sembert(text_a,text_b,label,tokenizer,vocab,max_token_length,enhanced_data_dict):
+#
+#     # text_a_tag_dict = tagger.tag(text_a)
+#     text_a_tag_dict = enhanced_data_dict[text_a]["srl"]
+#     tok_to_orig_index_a = [] # tokens -> words
+#     tokens_a = []
+#     tokens_a_org = text_a_tag_dict["words"]
+#     tok_to_orig_index_a.append(0) # [CLS]
+#
+#     for (i,token) in enumerate(tokens_a_org):
+#         sub_tokens = tokenizer.tokenize(token)
+#         for sub_token in sub_tokens:
+#             tok_to_orig_index_a.append(i+1)
+#             tokens_a.append(sub_token)
+#
+#     tok_to_orig_index_b = [] # tokens -> words
+#     tokens_b = []
+#     text_b_tag_dict = {}
+#     if text_b:
+#         # text_b_tag_dict = tagger.tag(text_b)
+#         text_b_tag_dict = enhanced_data_dict[text_b]["srl"]
+#         tokens_b_orig = text_b_tag_dict["words"]
+#         for (i,token) in enumerate(tokens_b_orig):
+#             sub_tokens = tokenizer.tokenize(token)
+#             for sub_token in sub_tokens:
+#                 tok_to_orig_index_b.append(i)
+#                 tokens_b.append(sub_token)
+#
+#         # [CLS] text_A [SEP] text_B [SEP]
+#         if len(tokens_a + tokens_b) > max_token_length - 3:
+#             print("Too Long!", len(tokens_a + tokens_b), len(tokens_a), len(tokens_b))
+#
+#         # 这里是不是应该到减去3？好像还是减去2？ 确实是3
+#         _truncate_seq_pair(tokens_a,tokens_b,tok_to_orig_index_a,tok_to_orig_index_b,max_token_length - 3)
+#
+#     else:
+#         if len(tokens_a) > max_token_length - 2:
+#             print("Too Long!",len(tokens_a))
+#             tokens_a = tokens_a[:(max_token_length - 2)]
+#             tok_to_orig_index_a = tok_to_orig_index_a[:max_token_length - 1]
+#     tok_to_orig_index_a.append(tok_to_orig_index_a[-1] + 1) # [SEP]
+#     over_tok_to_orig_index = tok_to_orig_index_a
+#     if text_b:
+#         tok_to_orig_index_b.append(tok_to_orig_index_b[-1] + 1) # [SEP]
+#         offset = tok_to_orig_index_a[-1]
+#         for org_ix in tok_to_orig_index_b:
+#             over_tok_to_orig_index.append(offset + org_ix + 1)
+#
+#     tokens = [tokenizer.cls_token] + tokens_a + [tokenizer.sep_token]
+#     token_type_ids = [0] * len(tokens)
+#     len_seq_a = tok_to_orig_index_a[len(tokens) - 1] + 1
+#     len_seq_b = None
+#     if text_b:
+#         tokens += tokens_b + [tokenizer.sep_token]
+#         len_seq_b = tok_to_orig_index_b[len(tokens_b)] + 1
+#         token_type_ids += [1] * (len(tokens_b) + 1)
+#
+#     input_ids = tokenizer.convert_tokens_to_ids(tokens)
+#     pre_ix = -1
+#     start_split_ix = -1
+#     over_token_to_orig_map_org = []
+#     for value in over_tok_to_orig_index:
+#         over_token_to_orig_map_org.append(value)
+#     orig_to_token_split_idx = []
+#     for token_ix, org_ix in enumerate(over_token_to_orig_map_org):
+#         if org_ix != pre_ix:
+#             pre_ix = org_ix
+#             end_split_ix = token_ix - 1
+#             if start_split_ix != -1:
+#                 orig_to_token_split_idx.append((start_split_ix, end_split_ix))
+#             start_split_ix = token_ix
+#     if start_split_ix != -1:
+#         orig_to_token_split_idx.append((start_split_ix, token_ix))
+#     while len(orig_to_token_split_idx) < max_token_length:
+#         orig_to_token_split_idx.append((-1, -1))
+#     # The mask has 1 for real tokens and 0 for padding tokens. Only real
+#     # tokens are attended to.
+#     input_mask = [1] * len(input_ids)
+#
+#
+#     # Zero-pad up to the sequence length.
+#     padding = [0] * (max_token_length - len(input_ids))
+#     input_ids += padding
+#     input_mask += padding
+#     token_type_ids += padding
+#
+#     assert len(input_ids) == max_token_length
+#     assert len(input_mask) == max_token_length
+#     assert len(token_type_ids) == max_token_length
+#
+#     if vocab and "label_vocab" in vocab and label is not None:
+#         label_id = vocab["label_vocab"].label2id(label)
+#     else:
+#         label_id = None
+#
+#     # aspect padding
+#     input_tag_ids = []
+#     sent_tags_list_a = list(text_a_tag_dict["labels"].values())
+#     if len(sent_tags_list_a) == 0:
+#         sent_tags_list_a = ["O"] * len(text_a_tag_dict["words"])
+#     tag_ids_list_a = convert_tags_to_ids(sent_tags_list_a,vocab)
+#     if text_b:
+#         sent_tags_list_b = list(text_b_tag_dict["labels"].values())
+#         if len(sent_tags_list_b) == 0:
+#             sent_tags_list_b = ["O"] * len(text_b_tag_dict["words"])
+#         tag_ids_list_b = convert_tags_to_ids(sent_tags_list_b,vocab)
+#         input_que_tag_ids = []
+#         for idx, query_tag_ids in enumerate(tag_ids_list_a):
+#             query_tag_ids = [1] + query_tag_ids[:len_seq_a - 2] + [2]  # CLS and SEP
+#             input_que_tag_ids.append(query_tag_ids)
+#             # construct input doc tag ids with same length as input ids
+#         for idx, doc_tag_ids in enumerate(tag_ids_list_b):
+#             tmp_input_tag_ids = input_que_tag_ids[idx]
+#             doc_input_tag_ids = doc_tag_ids[:len_seq_b - 1] + [2]  # SEP
+#             input_tag_id = tmp_input_tag_ids + doc_input_tag_ids
+#             while len(input_tag_id) < max_token_length:
+#                 input_tag_id.append(0)
+#             assert len(input_tag_id) == len(input_ids)
+#             input_tag_ids.append(input_tag_id)
+#
+#     else:
+#         for idx,query_tag_ids in enumerate(tag_ids_list_a):
+#             query_tag_ids = [1] + query_tag_ids[:len_seq_a-2] + [2]
+#             input_tag_id = query_tag_ids
+#             while len(input_tag_id) < max_token_length:
+#                 input_tag_id.append(0)
+#             assert len(input_tag_id) == len(input_ids)
+#             input_tag_ids.append(input_tag_id)
+#
+#     return {
+#         "input_ids":input_ids,
+#         "input_mask":input_mask,
+#         "token_type_ids":token_type_ids,
+#         "input_tag_ids":input_tag_ids,
+#         "start_end_idx":orig_to_token_split_idx,
+#         "label":label_id,
+#     }
 
 
 def _truncate_seq_pair(tokens_a, tokens_b, tok_to_orig_index_a, tok_to_orig_index_b, max_length):
