@@ -17,6 +17,7 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from cogktr.utils.file_utils import cached_path
 from allennlp.nn.util import masked_softmax
+from argparse import Namespace
 logger = logging.getLogger(__name__)
 
 
@@ -1093,6 +1094,8 @@ class SembertEncoder(BertPreTrainedModel):
 
         if tag_config is not None:
             self.use_tag = True
+            if isinstance(tag_config,dict):
+                tag_config = Namespace(**tag_config)
         else:
             self.use_tag = False
 

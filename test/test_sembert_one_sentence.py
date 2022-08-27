@@ -30,7 +30,7 @@ enhanced_dev_dict = enhancer.enhance_dev(dev_data,enhanced_key_1="sentence")
 enhanced_test_dict = enhancer.enhance_test(test_data,enhanced_key_1="sentence")
 
 
-processor = Sst2SembertProcessor(plm="bert-large-uncased", max_token_len=128, vocab=vocab,debug=False)
+processor = Sst2SembertProcessor(plm="bert-base-cased", max_token_len=128, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_dev(dev_data,enhanced_dev_dict)
 
@@ -41,9 +41,9 @@ tag_config = {
    "dropout_prob":0.1,
    "num_aspect":3
 }
-tag_config = Namespace(**tag_config)
+# tag_config = Namespace(**tag_config)
 
-plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=tag_config)
+plm = SembertEncoder.from_pretrained("bert-base-cased",tag_config=tag_config)
 # plm = SembertEncoder.from_pretrained("bert-large-uncased",tag_config=None)
 model = SembertForSequenceClassification(
     vocab=vocab,
@@ -72,7 +72,7 @@ trainer = Trainer(model,
                   print_every=None,
                   scheduler_steps=None,
                   # checkpoint_path="/data/hongbang/CogKTR/datapath/sentence_pair/QNLI/experimental_result/simple_test1--2022-05-30--13-02-12.95/model/checkpoint-300",
-                  validate_steps=500,  # validation setting
+                  validate_steps=100,  # validation setting
                   save_steps=None,  # when to save model result
                   early_stopping=early_stopping,
                   output_path=output_path,
