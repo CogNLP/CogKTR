@@ -10,7 +10,7 @@ class BaseRegressionMetric(BaseMetric):
         super().__init__()
         self.pre_list = list()
         self.label_list = list()
-        self.default_metric_name = "r2"
+        self.default_metric_name = "mse"
 
     def evaluate(self, pred, label):
         self.pre_list = self.pre_list + pred.cpu().tolist()
