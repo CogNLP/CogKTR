@@ -1,21 +1,19 @@
-import torch
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import *
+from cogktr import Sst2Reader, Sst2ForKbertProcessor, BaseClassificationMetric, PlmAutoModel, BaseTextClassificationModel, Trainer
 from cogktr.utils.general_utils import init_cogktr
-from cogktr.utils.constant.kbert_constants.constants import *
-from cogktr.data.processor.sst2_processors.sst2_for_kbert_processor import *
-from cogktr.models.kbert_model import KBertForSequenceClassification
+from cogktr.modules.plms.kbert_kmodel import KbertKModel
 
 # initiate
 device, output_path = init_cogktr(
-    device_id=0,
+    device_id=4,
     output_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/experimental_result",
-    folder_tag="simple_test",
+    folder_tag="experiment",
 )
 # device = torch.device("cpu")
+print(device)
 
-# Load the data
+# reader
 reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
 train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
@@ -29,7 +27,8 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-model = KBertForSequenceClassification(plm="bert-base-uncased", vocab=vocab)
+plm = KbertKModel(pretrained_model_name="bert-base-uncased", device=device)
+model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
