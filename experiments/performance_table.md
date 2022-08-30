@@ -12,13 +12,13 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841 | 0.92660 | sst2_ktemb_bert_base_cased.py |
 | KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792 | 0.92660 | sst2_kgemb_bert_base_cased.py |
 
-[comment]: <> "| bert-base-cased | 0.92427 | 0.93468 | 0.92945 | 0.92775 | sst2_bert_base_cased.py |"
 
 ### 1.2 SST-5 (DEV)
 
 | Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|---|---|---|
 | bert-base-cased | 0.48319 | 0.48319 | 0.48319 | 0.48459 | 0.46527 | 0.47156 | 0.48319 | sst5_bert_base_cased.py |
+| sembert | 0.49137 | 0.49137 | 0.49137 | 0.5108 | 0.47076 | 0.47388 | 0.49137 | sst5_sembert.py |
 
 ### 1.3 MultiSegChnSentiBERT (TEST)
 
