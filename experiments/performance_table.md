@@ -18,9 +18,10 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 ### 1.2 SST-5 (DEV)
 
-| Model | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑ | code |
-|---|---|---|---|---|---|---|---|---|
-| bert-base-cased | 0.48319 | 0.48319 | 0.48319 | 0.48459 | 0.46527 | 0.47156 | 0.48319 | sst5_bert_base_cased.py |
+| Model                  | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑    | code                          |
+|------------------------|----------|----------|-----------|----------|----------|----------------|---------|-------------------------------|
+| bert-base-cased        | 0.48319  | 0.48319  | 0.48319   | 0.48459  | 0.46527  | 0.47156        | 0.48319 | sst5_bert_base_cased.py       |
+| KT-Att+bert-base-cased | 0.47321  | 0.47321  | 0.47321   | 0.47372  | 0.45257  | 0.45612        | 0.47321 | sst5_ktatt_bert_base_cased.py |
 
 ### 1.3 MultiSegChnSentiBERT (TEST)
 
