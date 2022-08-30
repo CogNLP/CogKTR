@@ -14,7 +14,6 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | Kbert+bert-base-uncased | 0.93779 | 0.91667 | 0.92711  | 0.92661 | sst2_kbert_bert_base_uncased.py |
 | Kbert+bert-base-cased | 0.92377 | 0.92793 | 0.92586  | 0.92431 | sst2_kbert_bert_base_cased.py |
 
-[comment]: <> "| bert-base-cased | 0.92427 | 0.93468 | 0.92945 | 0.92775 | sst2_bert_base_cased.py |"
 
 ### 1.2 SST-5 (DEV)
 
@@ -22,6 +21,7 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 |------------------------|----------|----------|-----------|----------|----------|----------------|---------|-------------------------------|
 | bert-base-cased        | 0.48319  | 0.48319  | 0.48319   | 0.48459  | 0.46527  | 0.47156        | 0.48319 | sst5_bert_base_cased.py       |
 | KT-Att+bert-base-cased | 0.47321  | 0.47321  | 0.47321   | 0.47372  | 0.45257  | 0.45612        | 0.47321 | sst5_ktatt_bert_base_cased.py |
+| sembert | 0.49137 | 0.49137 | 0.49137 | 0.5108 | 0.47076 | 0.47388 | 0.49137 | sst5_sembert.py |
 
 ### 1.3 MultiSegChnSentiBERT (TEST)
 
