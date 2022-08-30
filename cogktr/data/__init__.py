@@ -23,6 +23,7 @@ __all__ = [
     "Sst2Processor",
     "Sst2ForKgembProcessor",
     "Sst2ForKtembProcessor",
+    "Sst2ForKbertProcessor",
     "Sst2ForSyntaxAttentionProcessor",
     "Sst2SembertProcessor",
     "Sst5Processor",

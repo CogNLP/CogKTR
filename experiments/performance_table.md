@@ -6,11 +6,13 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 ### 1.1 SST-2 (DEV)
 
-| Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
-|---|---|---|---|---|---|
-| bert-base-cased(paper) | \ | \ | \ | 0.922 | sst2_bert_base_cased.py |
-| KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841 | 0.92660 | sst2_ktemb_bert_base_cased.py |
-| KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792 | 0.92660 | sst2_kgemb_bert_base_cased.py |
+| Model                 | P↑      | R↑      | F1↑(key) | Acc↑    | code                          |
+|-----------------------|---------|---------|----------|---------|-------------------------------|
+| bert-base-cased(paper) | \       | \       | \        | 0.922   | sst2_bert_base_cased.py       |
+| KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841  | 0.92660 | sst2_ktemb_bert_base_cased.py |
+| KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792  | 0.92660 | sst2_kgemb_bert_base_cased.py |
+| Kbert+bert-base-uncased | 0.93779 | 0.91667 | 0.92711  | 0.92661 | sst2_kbert_bert_base_uncased.py |
+| Kbert+bert-base-cased | 0.92377 | 0.92793 | 0.92586  | 0.92431 | sst2_kbert_bert_base_cased.py |
 
 
 ### 1.2 SST-5 (DEV)

@@ -10,8 +10,6 @@ device, output_path = init_cogktr(
     output_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/experimental_result",
     folder_tag="experiment",
 )
-# device = torch.device("cpu")
-print(device)
 
 # reader
 reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
@@ -27,13 +25,13 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = KbertKModel(pretrained_model_name="bert-base-uncased", device=device)
-model = BaseTextClassificationModel(plm=plm, vocab=vocab)
+kmodel = KbertKModel(pretrained_model_name="bert-base-uncased", device=device)
+tmodel = BaseTextClassificationModel(plm=kmodel, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+optimizer = optim.Adam(tmodel.parameters(), lr=0.00001)
 
-trainer = Trainer(model,
+trainer = Trainer(tmodel,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=20,

@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.optim as optim
-from cogktr import Sst2Reader, Sst2ForKbertProcessor, BaseClassificationMetric, PlmAutoModel, BaseTextClassificationModel, Trainer
+from cogktr import Sst2Reader, Sst2ForKbertProcessor, BaseClassificationMetric, BaseTextClassificationModel, Trainer
 from cogktr.utils.general_utils import init_cogktr
 from cogktr.modules.plms.kbert_kmodel import KbertKModel
 
@@ -11,7 +11,7 @@ device, output_path = init_cogktr(
     folder_tag="experiment",
 )
 # device = torch.device("cpu")
-print(device)
+# print(device)
 
 # reader
 reader = Sst2Reader(raw_data_path="/home/chenyuheng/zhouyuyang/CogKTR/datapath/text_classification/SST_2/raw_data")
@@ -19,7 +19,7 @@ train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 
 # processor
-processor = Sst2ForKbertProcessor(plm="bert-base-uncased",
+processor = Sst2ForKbertProcessor(plm="bert-base-cased",
                                       spo_file_paths=["/home/chenyuheng/zhouyuyang/CogKTR/datapath/knowledge_graph/wikidata/wikidata.spo"],
                                       max_token_len=256)
 
@@ -27,7 +27,7 @@ train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
-plm = KbertKModel(pretrained_model_name="bert-base-uncased", device=device)
+plm = KbertKModel(pretrained_model_name="bert-base-cased", device=device)
 model = BaseTextClassificationModel(plm=plm, vocab=vocab)
 metric = BaseClassificationMetric(mode="binary")
 loss = nn.CrossEntropyLoss()

@@ -3,6 +3,7 @@
 KnowledgeGraph
 """
 import os
+import torch
 import sys
 import numpy as np
 from cogktr.data.processor.base_processor import BaseProcessor
@@ -19,7 +20,7 @@ class KnowledgeGraph(object):
         self.lookup_table = self._create_lookup_table()
         # self.segment_vocab = list(self.lookup_table.keys()) + NEVER_SPLIT_TAG
         # self.tokenizer = pkuseg.pkuseg(model_name="default", postag=False, user_dict=self.segment_vocab)
-        self.tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+        self.tokenizer = BertTokenizer.from_pretrained("bert-base-cased")
         self.special_tags = set(NEVER_SPLIT_TAG)
 
     def _create_lookup_table(self):
@@ -175,11 +176,11 @@ class Sst2ForKbertProcessor(BaseProcessor):
                 token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
                 mask = [1 if t != PAD_TOKEN else 0 for t in tokens]
 
-                datable("token_ids", token_ids)
+                datable("input_ids", token_ids)
                 datable("label", label)
                 datable("mask", mask)
-                datable("pos", pos)
-                datable("vm", vm)
+                datable("position_ids", pos)
+                datable("attention_mask", vm)
             except:
                 print("Error line: ", sentence_id)
 
@@ -208,14 +209,15 @@ class Sst2ForKbertProcessor(BaseProcessor):
                 tokens = tokens[0]
                 pos = pos[0]
                 vm = vm[0]
+                # vm = torch.cuda.FloatTensor(vm)
 
                 token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
                 mask = [1 if t != PAD_TOKEN else 0 for t in tokens]
 
-                datable("token_ids", token_ids)
+                datable("input_ids", token_ids)
                 datable("mask", mask)
-                datable("pos", pos)
-                datable("vm", vm)
+                datable("position_ids", pos)
+                datable("attention_mask", vm)
             except:
                 print("Error line: ", sentence_id)
 
