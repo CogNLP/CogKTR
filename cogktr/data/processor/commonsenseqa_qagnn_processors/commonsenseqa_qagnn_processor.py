@@ -11,8 +11,8 @@ transformers.logging.set_verbosity_error()  # set transformers logging level
 
 
 class CommonsenseqaQagnnProcessor(BaseProcessor):
-    def __init__(self, plm, max_token_len, vocab, addition):
-        super().__init__()
+    def __init__(self, plm, max_token_len, vocab, addition,debug=False):
+        super().__init__(debug)
         self.plm = plm
         self.max_token_len = max_token_len
         self.vocab = vocab
@@ -22,6 +22,7 @@ class CommonsenseqaQagnnProcessor(BaseProcessor):
 
     def _process(self, data, datatype=None):
         datable = DataTable()
+        data = self.debug_process(data)
         print("Processing data...")
         if self.use_cache:
             for edge_index, edge_type, concept_id, node_type_id, node_score, adj_length in tqdm(
