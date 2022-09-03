@@ -504,14 +504,13 @@ from cogktr.models.base_model import BaseModel
 
 
 class QAGNNModel(BaseModel):
-    def __init__(self, vocab, plm, addition,
+    def __init__(self, vocab, plm, pretrained_concept_emb,
                  k=5, n_ntype=4, n_etype=38, n_concept=799273, concept_dim=200,
                  concept_in_dim=1024, n_attention_head=2, fc_dim=200, n_fc_layer=0,
                  p_emb=0.2, p_gnn=0.2, p_fc=0.2, freeze_ent_emb=True, init_range=0.02):
         super().__init__()
         self.vocab = vocab
         self.plm = plm
-        self.addition = addition
 
         self.k = k
         self.n_ntype = n_ntype
@@ -528,7 +527,12 @@ class QAGNNModel(BaseModel):
         self.freeze_ent_emb = freeze_ent_emb
         self.init_range = init_range
 
-        self.pretrained_concept_emb = addition["cp_emb"]
+        if not isinstance(pretrained_concept_emb,torch.Tensor):
+            try:
+                pretrained_concept_emb = torch.tensor(pretrained_concept_emb)
+            except:
+                raise ValueError("Pretrained conceptnet embeddings must be able to be converted to tensor!")
+        self.pretrained_concept_emb = pretrained_concept_emb
         self.input_size = self.plm.hidden_dim
         self.decoder = QAGNN(self.k, self.n_ntype, self.n_etype, self.input_size,
                              self.n_concept, self.concept_dim, self.concept_in_dim, self.n_attention_head,
