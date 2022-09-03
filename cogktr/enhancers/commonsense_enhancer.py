@@ -27,7 +27,13 @@ class CommonsenseEnhancer(BaseEnhancer):
 
         if self.load_conceptnet:
             self.conceptnet_linker = ConcetNetLinker(path=knowledge_graph_path)
+            self.concet_embedding_path = os.path.join(knowledge_graph_path, "tzw.ent.npy")
+            self.embedding = np.load(self.concet_embedding_path)
             self.meta_paths_set = set()
+
+    def get_conceptnet_embedding(self):
+        return self.embedding
+
 
     def enhance_sentence(self, sentence):
         enhanced_dict = {}
@@ -50,7 +56,7 @@ class CommonsenseEnhancer(BaseEnhancer):
 
         return enhanced_dict
 
-    def enhance_sentence_pair(self, sentence, sentence_pair, return_metapath=True):
+    def enhance_sentence_pair(self, sentence, sentence_pair, return_metapath=False, return_subgraph=False):
         enhanced_dict = {}
         enhanced_sentence_dict = self.enhance_sentence(sentence)
         enhanced_sentence_pair_dict = self.enhance_sentence(sentence_pair)
@@ -88,9 +94,43 @@ class CommonsenseEnhancer(BaseEnhancer):
             enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["meta_paths_list"] = meta_paths_list
             enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["meta_paths_set"] = meta_paths_set
 
+        if return_subgraph:
+            f = lambda x:[concept for sample in x for concept in sample["concepts"]]
+            all_concepts = f(enhanced_sentence_dict[sentence]["knowledge"])
+            answer_concepts = f(enhanced_sentence_pair_dict[sentence_pair]["knowledge"])
+            all_ids = set(self.conceptnet_linker.concept2id[c] for c in all_concepts)
+            answer_ids = set(self.conceptnet_linker.concept2id[c] for c in answer_concepts)
+            question_ids = all_ids - answer_ids
+            qc_ids = sorted(question_ids)
+            ac_ids = sorted(answer_ids)
+
+            cpnet_simple = self.conceptnet_linker.conceptnet_simple
+
+            qa_nodes = set(qc_ids) | set(ac_ids)
+            extra_nodes = set()
+            for qid in qa_nodes:
+                for aid in qa_nodes:
+                    if qid != aid and qid in cpnet_simple.nodes and aid in cpnet_simple.nodes:
+                        extra_nodes |= set(cpnet_simple[qid]) & set(cpnet_simple[aid])
+            extra_nodes = extra_nodes - qa_nodes
+            qc_ids,ac_ids,extra_nodes = sorted(qc_ids),sorted(ac_ids),sorted(extra_nodes)
+
+            schema_graph = qc_ids + ac_ids + extra_nodes  # score: from high to low
+            arange = np.arange(len(schema_graph))
+            qmask = arange < len(qc_ids)
+            amask = (arange >= len(qc_ids)) & (arange < (len(qc_ids) + len(ac_ids)))
+            adj, concepts = self.concepts2adj(schema_graph)
+
+            # update enhanced data dict
+            enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["adj"] = adj
+            enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["concept"] = concepts
+            enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["concept_names"] = [self.conceptnet_linker.id2concept[c] for c in concepts]
+            enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["qmask"] = qmask
+            enhanced_dict[(sentence_key, sentence_pair_key)]["interaction"]["amask"] = amask
+
         return enhanced_dict
 
-    def _enhance_data(self,datable,dict_name=None,enhanced_key_1=None,enhanced_key_2=None,return_metapath=False):
+    def _enhance_data(self,datable,dict_name=None,enhanced_key_1=None,enhanced_key_2=None,return_metapath=False,return_subgraph=False):
         enhanced_dict = {}
         if not self.reprocess and os.path.exists(os.path.join(self.cache_path_file, dict_name)):
             enhanced_dict = load_pickle(os.path.join(self.cache_path_file, dict_name))
@@ -106,7 +146,8 @@ class CommonsenseEnhancer(BaseEnhancer):
                                                     total=len(datable[enhanced_key_1])):
                     enhanced_sentence_pair = self.enhance_sentence_pair(sentence=sentence,
                                                                         sentence_pair=sentence_pair,
-                                                                        return_metapath=return_metapath)
+                                                                        return_metapath=return_metapath,
+                                                                        return_subgraph=return_subgraph)
                     enhanced_dict.update(enhanced_sentence_pair)
                 save_pickle(enhanced_dict, os.path.join(self.cache_path_file, dict_name))
         return enhanced_dict
@@ -116,10 +157,13 @@ class CommonsenseEnhancer(BaseEnhancer):
                       enhanced_key_1="sentence",
                       enhanced_key_2=None,
                       return_metapath=False,
+                      return_subgraph=False,
                       ):
         tags = []
         if return_metapath:
             tags.append("metapath")
+        if return_subgraph:
+            tags.append("subgraph")
         if len(tags) == 0:
             dict_name = "enhanced_train"
         else:
@@ -128,17 +172,21 @@ class CommonsenseEnhancer(BaseEnhancer):
                                   dict_name=dict_name,
                                   enhanced_key_1=enhanced_key_1,
                                   enhanced_key_2=enhanced_key_2,
-                                  return_metapath=return_metapath)
+                                  return_metapath=return_metapath,
+                                  return_subgraph=return_subgraph)
 
     def enhance_dev(self,
                     datable,
                     enhanced_key_1="sentence",
                     enhanced_key_2=None,
                     return_metapath=False,
+                    return_subgraph=False,
                     ):
         tags = []
         if return_metapath:
             tags.append("metapath")
+        if return_subgraph:
+            tags.append("subgraph")
         if len(tags) == 0:
             dict_name = "enhanced_dev"
         else:
@@ -147,17 +195,22 @@ class CommonsenseEnhancer(BaseEnhancer):
                                   dict_name=dict_name,
                                   enhanced_key_1=enhanced_key_1,
                                   enhanced_key_2=enhanced_key_2,
-                                  return_metapath=return_metapath)
+                                  return_metapath=return_metapath,
+                                  return_subgraph=return_subgraph)
+
 
     def enhance_test(self,
                      datable,
                      enhanced_key_1="sentence",
                      enhanced_key_2=None,
                      return_metapath=False,
+                     return_subgraph=False,
                      ):
         tags = []
         if return_metapath:
             tags.append("metapath")
+        if return_subgraph:
+            tags.append("subgraph")
         if len(tags) == 0:
             dict_name = "enhanced_test"
         else:
@@ -166,14 +219,27 @@ class CommonsenseEnhancer(BaseEnhancer):
                                   dict_name=dict_name,
                                   enhanced_key_1=enhanced_key_1,
                                   enhanced_key_2=enhanced_key_2,
-                                  return_metapath=return_metapath)
+                                  return_metapath=return_metapath,
+                                  return_subgraph=return_subgraph)
 
-    def enhance_all(self,train_data,dev_data,test_data,vocab=None,return_metapath=False):
-        enhanced_train_dict = self.enhance_train(train_data, enhanced_key_1="statement",enhanced_key_2="answer_text",return_metapath=return_metapath)
-        enhanced_dev_dict = self.enhance_dev(dev_data, enhanced_key_1="statement", enhanced_key_2="answer_text",return_metapath=return_metapath)
-        enhanced_test_dict = self.enhance_test(test_data, enhanced_key_1="statement",enhanced_key_2="answer_text",return_metapath=return_metapath)
+    def enhance_all(self,train_data,dev_data,test_data,vocab=None,return_metapath=False,return_subgraph=False):
+        enhanced_train_dict = self.enhance_train(train_data,
+                                                 enhanced_key_1="statement",
+                                                 enhanced_key_2="answer_text",
+                                                 return_metapath=return_metapath,
+                                                 return_subgraph=return_subgraph,)
+        enhanced_dev_dict = self.enhance_dev(dev_data,
+                                             enhanced_key_1="statement",
+                                             enhanced_key_2="answer_text",
+                                             return_metapath=return_metapath,
+                                             return_subgraph=return_subgraph)
+        enhanced_test_dict = self.enhance_test(test_data,
+                                               enhanced_key_1="statement",
+                                               enhanced_key_2="answer_text",
+                                               return_metapath=return_metapath,
+                                               return_subgraph=return_subgraph)
 
-        if isinstance(vocab,dict):
+        if isinstance(vocab,dict) and return_metapath:
             if self.reprocess:
                 meta_paths_set =self.meta_paths_set
             else:
