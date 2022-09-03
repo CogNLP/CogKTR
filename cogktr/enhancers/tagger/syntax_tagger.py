@@ -64,6 +64,15 @@ if __name__ == "__main__":
     tagger = SyntaxTagger(tool="stanza")
     tagger_dict_1 = tagger.tag(["Bert", "likes", "reading", "in the Sesame", "Street", "Library."])
     tagger_dict_2 = tagger.tag("Bert likes reading in the Sesame Street Library.")
+    tagger_dict_3 = tagger.tag("The Normans (Norman: Nourmands; French: Normands; Latin: Normanni) were the people who in the 10th and 11th centuries gave their name to Normandy, a region in France.")
+    tagger_dict_4 = tagger.tag(["Through", "generations", "of", "assimilation", "and", "mixing", "with", "the", "native", "Frankish", "and", "Roman-Gaulish", "populations,", "their", "descendants", "would", "gradually", "merge", "with", "the", "Carolingian-based", "cultures", "of", "West", "Francia."])
+    passage = [["The", "Normans", "(Norman:", "Nourmands;", "French:", "Normands;", "Latin:", "Normanni)", "were", "the", "people", "who", "in", "the", "10th", "and", "11th", "centuries", "gave", "their", "name", "to", "Normandy,", "a", "region", "in", "France."], ["They", "were", "descended", "from", "Norse", "(\"Norman\"", "comes", "from", "\"Norseman\")", "raiders", "and", "pirates", "from", "Denmark,", "Iceland", "and", "Norway", "who,", "under", "their", "leader", "Rollo,", "agreed", "to", "swear", "fealty", "to", "King", "Charles", "III", "of", "West", "Francia."], ["Through", "generations", "of", "assimilation", "and", "mixing", "with", "the", "native", "Frankish", "and", "Roman-Gaulish", "populations,", "their", "descendants", "would", "gradually", "merge", "with", "the", "Carolingian-based", "cultures", "of", "West", "Francia."], ["The", "distinct", "cultural", "and", "ethnic", "identity", "of", "the", "Normans", "emerged", "initially", "in", "the", "first", "half", "of", "the", "10th", "century,", "and", "it", "continued", "to", "evolve", "over", "the", "succeeding", "centuries."]]
+    all_doc_heads = []
+    for sentence in passage:
+        single_result = tagger.tag(" ".join(sentence))
+        all_doc_heads.append(single_result["knowledge"]["heads"])
+
+
     print(tagger_dict_1)
     print(tagger_dict_2)
     print("end")

@@ -33,7 +33,7 @@ enhanced_train_dict, enhanced_dev_dict, enhanced_test_dict = enhancer.enhance_al
 processor = OpenBookQAForSafeProcessor(
     plm="roberta-large",
     max_token_len=100,
-    vocab=vocab,debug=False,
+    vocab=vocab,debug=True,
 )
 train_dataset = processor.process_train(train_data,enhanced_train_dict)
 dev_dataset = processor.process_train(dev_data,enhanced_dev_dict)
