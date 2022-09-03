@@ -2,10 +2,11 @@ import torch.nn as nn
 import torch.optim as optim
 from cogktr import *
 from cogktr.utils.general_utils import init_cogktr
+from cogktr.models.qagnn_model import QAGNNModel
 
 device, output_path = init_cogktr(
     device_id=6,
-    output_path="/data/mentianyi/code/CogKTR/datapath/question_answering/CommonsenseQA_for_QAGNN/experimental_result",
+    output_path="/data/hongbang/CogKTR/datapath/question_answering/CommonsenseQA_for_QAGNN/experimental_result",
     folder_tag="simple_test",
 )
 
@@ -15,13 +16,13 @@ train_data, dev_data, test_data = reader.read_all()
 vocab = reader.read_vocab()
 addition = reader.read_addition()
 
-processor = CommonsenseqaQagnnProcessor(plm="roberta-large", max_token_len=100, vocab=vocab, addition=addition)
+processor = CommonsenseqaQagnnProcessor(plm="roberta-large", max_token_len=100, vocab=vocab, addition=addition,debug=True)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 test_dataset = processor.process_test(test_data)
 
 plm = PlmAutoModel(pretrained_model_name="roberta-large")
-model = QAGNNModel(plm=plm, vocab=vocab, addition=addition)
+model = QAGNNModel(plm=plm, vocab=vocab, pretrained_concept_emb=addition["cp_emb"])
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
