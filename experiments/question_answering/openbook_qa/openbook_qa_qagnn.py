@@ -11,9 +11,9 @@ import torch
 from cogktr.models.qagnn_model import QAGNNModel
 
 device, output_path = init_cogktr(
-    device_id=7,
+    device_id=9,
     output_path="/data/hongbang/CogKTR/datapath/question_answering/OpenBookQA/experimental_result/",
-    folder_tag="useless",
+    folder_tag="qagnn",
 )
 
 reader = OpenBookQAReader(
@@ -49,6 +49,7 @@ model = QAGNNModel(plm=plm, vocab=vocab, pretrained_concept_emb=cpnet_emb)
 metric = BaseClassificationMetric(mode="multi")
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.00001)
+early_stopping = EarlyStopping(mode="max",patience=5,threshold=0.001,threshold_mode="abs",metric_name="Acc")
 
 trainer = Trainer(model,
                   train_dataset,
@@ -68,6 +69,7 @@ trainer = Trainer(model,
                   scheduler_steps=None,
                   validate_steps=1000,
                   save_steps=None,
+                  early_stopping=early_stopping,
                   output_path=output_path,
                   grad_norm=1,
                   use_tqdm=True,

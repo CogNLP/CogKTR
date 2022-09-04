@@ -72,6 +72,7 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 |---|---|---|---|---|---|---|---|---|
 | roberta-large | 0.644 | 0.644 | 0.644 | 0.6443   | 0.6442 | 0.6426 | 0.644 | openbook_qa_roberta_large.py |
 | SAFE | 0.664 | 0.664 | 0.664 | 0.6647 | 0.6657 | 0.6636 | 0.664 | openbook_qa_safe.py |
+| QAGNN | 0.676 | 0.676 | 0.676 | 0.6767 | 0.6774 | 0.6749 | 0.676 | openbook_qa_qagnn.py |
 
 [comment]: <> "| QAGNN | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |"
 
