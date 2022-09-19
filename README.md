@@ -3,7 +3,7 @@
 <div align="center"><img src="./docs/source/figures/KTR-02-clip.png" width="350px" ></div>
 
 
-<div align="center"r><b>A Knowledge Enhanced Text Representation Toolkit for Natural Language Understanding</b></div>
+<div align="center"r><b>A Knowledge-Enhanced Text Representation Toolkit for Natural Language Understanding</b></div>
 
 
 ------------------
