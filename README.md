@@ -32,14 +32,11 @@
 
 This easy-to-use python package has the following features:
 
-+ **Unified** 
-CogKTR is designed and built on our Unified Knowledge-Enhanced Paradigm, which consists of four stages: *knowledge acquisition*, *knowledge representation*, *knowledge injection*, and *knowledge application*.
++ **Unified**. CogKTR is designed and built on our Unified Knowledge-Enhanced Paradigm, which consists of four stages: *knowledge acquisition*, *knowledge representation*, *knowledge injection*, and *knowledge application*.
 
-+ **Knowledgeable** 
-CogKTR integrates multiple knowledge sources, including [Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page), [Wikipedia](https://www.wikipedia.org/), [ConceptNet](https://conceptnet.io/), [WordNet](https://wordnet.princeton.edu/)and [CogNet](http://cognet.top/index.html), and implements a series of knowledge-enhanced methods.
++ **Knowledgeable**. CogKTR integrates multiple knowledge sources, including [Wikidata](https://www.wikidata.org/wiki/Wikidata:Main_Page), [Wikipedia](https://www.wikipedia.org/), [ConceptNet](https://conceptnet.io/), [WordNet](https://wordnet.princeton.edu/) and [CogNet](http://cognet.top/index.html), and implements a series of knowledge-enhanced methods.
 
-+ **Modular** 
-CogKTR modularizes our proposed paradigm and consists of `Enhancer`, `Model`, `Core` and `Data` modules, each of which is highly extensible so that researchers can implement new components easily.
++ **Modular**. CogKTR modularizes our proposed paradigm and consists of `Enhancer`, `Model`, `Core` and `Data` modules, each of which is highly extensible so that researchers can implement new components easily.
 
 ## Install
 
