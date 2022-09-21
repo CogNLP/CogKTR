@@ -8,7 +8,6 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model                 | P↑      | R↑      | F1↑(key) | Acc↑    | code                          |
 |-----------------------|---------|---------|----------|---------|-------------------------------|
-| bert-base-cased(paper) | \       | \       | \        | 0.922   | sst2_bert_base_cased.py       |
 | KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841  | 0.92660 | sst2_ktemb_bert_base_cased.py |
 | KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792  | 0.92660 | sst2_kgemb_bert_base_cased.py |
 | KT-Att+bert-base-cased | 0.91323 | 0.94819 | 0.93038  | 0.92775 | sst2_ktatt_bert_base_cased.py |
