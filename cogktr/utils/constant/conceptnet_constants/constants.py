@@ -73,7 +73,7 @@ PATTERN_BACKLIST = {"-PRON-", "actually", "likely", "possibly", "want", "make", 
              "could_be"}
 
 import nltk
-nltk.download('stopwords', quiet=True)
+# nltk.download('stopwords', quiet=True)
 NLTK_STOPWORDS = nltk.corpus.stopwords.words('english')
 
 NODE_TYPE_DICT = {'Q': 0, 'A': 1}
