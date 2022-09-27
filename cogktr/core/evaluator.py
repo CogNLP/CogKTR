@@ -5,7 +5,7 @@ import os
 import logging
 from cogktr.utils.io_utils import load_model
 from cogktr.utils.log_utils import logger
-
+from cogktr.utils.general_utils import move_dict_value_to_device
 
 class Evaluator:
     def __init__(
@@ -72,6 +72,7 @@ class Evaluator:
             progress = enumerate(self.dev_dataloader, 1)
         with torch.no_grad():
             for step, batch in progress:
+                move_dict_value_to_device(batch, device=self.device)
                 self.model.evaluate(batch, self.metrics)
         evaluate_result = self.metrics.get_metric()
         logger.info("Evaluate result = %s", str(evaluate_result))
