@@ -54,6 +54,7 @@ class Squad2Reader(BaseReader):
                     #         "For training, each question should have exactly 1 answer.")
 
                     is_impossible = qa.get("is_impossible", False)
+                    answers = []
                     if not is_impossible:
                         answer = qa["answers"][0]
                         answer_text = answer["text"]
@@ -62,6 +63,7 @@ class Squad2Reader(BaseReader):
                         end_position = char_to_word_offset[
                             min(start_position_character + len(answer_text) - 1, len(char_to_word_offset) - 1)
                         ]
+                        answers = qa["answers"]
                         # actual_text = " ".join(doc_tokens[start_position:(end_position + 1)])
                         # assert actual_text == answer_text
                     else:
@@ -73,6 +75,7 @@ class Squad2Reader(BaseReader):
                     datable("question_text",question_text)
                     datable("context_text",context_text)
                     datable("answer_text",answer_text)
+                    datable("answers",answers)
                     datable("start_position",start_position)
                     datable("end_position",end_position)
                     datable("doc_tokens",doc_tokens)
@@ -97,7 +100,7 @@ def _is_whitespace(c):
     return False
 
 if __name__ == "__main__":
-    reader = Squad2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
+    reader = Squad2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
     train_data, dev_data, test_data = reader.read_all()
     vocab = reader.read_vocab()
     print("end")

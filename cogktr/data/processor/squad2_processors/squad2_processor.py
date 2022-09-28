@@ -40,13 +40,14 @@ class Squad2Processor(BaseProcessor):
         data = self.debug_process(data)
         for qas_id, is_impossible, \
             question_text, context_text, \
-            answer_text, start_position, end_position, \
+            answer_text,answers, start_position, end_position, \
             doc_tokens, title \
                 in tqdm(zip(data["qas_id"], data["is_impossible"],
                             data["question_text"], data["context_text"],
-                            data["answer_text"], data["start_position"],
-                            data["end_position"], data["doc_tokens"],
-                            data["title"], ), total=len(data["qas_id"])):
+                            data["answer_text"], data["answers"],
+                            data["start_position"],data["end_position"],
+                            data["doc_tokens"],data["title"], ),
+                        total=len(data["qas_id"])):
             example = {
                 "qas_id": qas_id,
                 "is_impossible": is_impossible,
@@ -57,6 +58,7 @@ class Squad2Processor(BaseProcessor):
                 "end_position": end_position,
                 "doc_tokens": doc_tokens,
                 "title": title,
+                "answers":answers,
             }
             example = Namespace(**example)
             results = new_process_bert(example,

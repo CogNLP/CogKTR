@@ -6,11 +6,11 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.core.metric.base_reading_comprehension_metric import BaseMRCMetric
 from cogktr.data.processor.squad2_processors.squad2_processor import Squad2Processor
 from cogktr.models.base_reading_comprehension_model import BaseReadingComprehensionModel
-
+lr = 1e-6
 device,output_path = init_cogktr(
-    device_id=9,
+    device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
-    folder_tag="mrc_baseline_d",
+    folder_tag="mrc_baseline_{}".format(lr),
 )
 
 reader = Squad2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
@@ -19,21 +19,33 @@ vocab = reader.read_vocab()
 
 
 
-processor = Squad2Processor(plm="bert-base-cased", max_token_len=512, vocab=vocab,debug=False)
+processor = Squad2Processor(plm="bert-base-uncased", max_token_len=384, vocab=vocab,debug=False)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 
-model = BaseReadingComprehensionModel(plm="bert-base-cased",vocab=vocab)
+model = BaseReadingComprehensionModel(plm="bert-base-uncased",vocab=vocab)
 metric = BaseMRCMetric()
-loss = nn.CrossEntropyLoss(ignore_index=512)
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
-early_stopping = EarlyStopping(mode="max",patience=8,threshold=0.01,threshold_mode="abs",metric_name="F1")
+loss = nn.CrossEntropyLoss(ignore_index=384)
+
+# no_decay = ["bias", "LayerNorm.weight"]
+# optimizer_grouped_parameters = [
+#     {
+#         "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+#         "weight_decay": 0.0,
+#     },
+#     {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
+# ]
+optimizer = optim.AdamW(model.parameters(), lr=0.00001)
+# optimizer = optim.AdamW(optimizer_grouped_parameters, lr=3e-5, eps=1e-8)
+
+
+early_stopping = EarlyStopping(mode="max",patience=100,threshold=0.01,threshold_mode="abs",metric_name="F1")
 
 trainer = Trainer(model,
                   train_dataset,
                   dev_data=dev_dataset,
                   n_epochs=200,
-                  batch_size=16,
+                  batch_size=4,
                   loss=loss,
                   optimizer=optimizer,
                   scheduler=None,
