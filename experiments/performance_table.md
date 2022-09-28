@@ -8,22 +8,25 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 
 | Model                 | P↑      | R↑      | F1↑(key) | Acc↑    | code                          |
 |-----------------------|---------|---------|----------|---------|-------------------------------|
-| bert-base-cased(paper) | \       | \       | \        | 0.922   | sst2_bert_base_cased.py       |
 | KT-Emb+bert-base-cased | 0.92222 | 0.93468 | 0.92841  | 0.92660 | sst2_ktemb_bert_base_cased.py |
 | KG-Emb+bert-base-cased | 0.92792 | 0.92792 | 0.92792  | 0.92660 | sst2_kgemb_bert_base_cased.py |
-| Kbert+bert-base-uncased | 0.93779 | 0.91667 | 0.92711  | 0.92661 | sst2_kbert_bert_base_uncased.py |
+| KT-Att+bert-base-cased | 0.91323 | 0.94819 | 0.93038  | 0.92775 | sst2_ktatt_bert_base_cased.py |
 | Kbert+bert-base-cased | 0.92377 | 0.92793 | 0.92586  | 0.92431 | sst2_kbert_bert_base_cased.py |
 
 
-### 1.2 SST-5 (DEV)
+[comment]: <> (### 1.2 SST-5 &#40;DEV&#41;)
 
-| Model                  | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑(key) | Acc↑    | code                          |
-|------------------------|----------|----------|-----------|----------|----------|----------------|---------|-------------------------------|
-| bert-base-cased        | 0.48319  | 0.48319  | 0.48319   | 0.48459  | 0.46527  | 0.47156        | 0.48319 | sst5_bert_base_cased.py       |
-| KT-Att+bert-base-cased | 0.47321  | 0.47321  | 0.47321   | 0.47372  | 0.45257  | 0.45612        | 0.47321 | sst5_ktatt_bert_base_cased.py |
-| sembert | 0.49137 | 0.49137 | 0.49137 | 0.5108 | 0.47076 | 0.47388 | 0.49137 | sst5_sembert.py |
+[comment]: <> (| Model                  | micro_P↑ | micro_R↑ | micro_F1↑ | macro_P↑ | macro_R↑ | macro_F1↑&#40;key&#41; | Acc↑    | code                          |)
 
-### 1.3 MultiSegChnSentiBERT (TEST)
+[comment]: <> (|------------------------|----------|----------|-----------|----------|----------|----------------|---------|-------------------------------|)
+
+[comment]: <> (| bert-base-cased        | 0.48319  | 0.48319  | 0.48319   | 0.48459  | 0.46527  | 0.47156        | 0.48319 | sst5_bert_base_cased.py       |)
+
+[comment]: <> (| KT-Att+bert-base-cased | 0.47321  | 0.47321  | 0.47321   | 0.47372  | 0.45257  | 0.45612        | 0.47321 | sst5_ktatt_bert_base_cased.py |)
+
+[comment]: <> (| sembert | 0.49137 | 0.49137 | 0.49137 | 0.5108 | 0.47076 | 0.47388 | 0.49137 | sst5_sembert.py |)
+
+### 1.2 MultiSegChnSentiBERT (TEST)
 
 | Model | P↑ | R↑ | F1↑(key) | Acc↑ | code |
 |---|---|---|---|---|---|
