@@ -6,7 +6,8 @@ from cogktr.utils.general_utils import init_cogktr
 from cogktr.core.metric.base_reading_comprehension_metric import BaseMRCMetric
 from cogktr.data.processor.squad2_processors.squad2_processor import Squad2Processor
 from cogktr.models.base_reading_comprehension_model import BaseReadingComprehensionModel
-lr = 1e-6
+
+lr = 5e-6
 device,output_path = init_cogktr(
     device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
@@ -35,7 +36,7 @@ loss = nn.CrossEntropyLoss(ignore_index=384)
 #     },
 #     {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
 # ]
-optimizer = optim.AdamW(model.parameters(), lr=0.00001)
+optimizer = optim.AdamW(model.parameters(), lr=lr)
 # optimizer = optim.AdamW(optimizer_grouped_parameters, lr=3e-5, eps=1e-8)
 
 

@@ -19,6 +19,18 @@ class Squad2Reader(BaseReader):
         self.test_path = os.path.join(raw_data_path, self.test_file)
 
     def _read_train(self, path):
+        return self._read_data(path,is_training=True)
+
+    def _read_dev(self, path):
+        return self._read_data(path,is_training=False)
+
+    def _read_test(self, path):
+        return None
+
+    def read_all(self):
+        return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
+
+    def _read_data(self, path,is_training):
         datable = DataTable()
         raw_data_dict = load_json(path)
         data = raw_data_dict["data"]
@@ -47,29 +59,32 @@ class Squad2Reader(BaseReader):
                 for qa in paragraph["qas"]:
                     qas_id = qa["id"]
                     question_text = qa["question"]
-                    is_impossible = qa.get("is_impossible", False)
 
                     # if (len(qa["answers"]) != 1) and (not is_impossible):
                     #     raise ValueError(
                     #         "For training, each question should have exactly 1 answer.")
 
                     is_impossible = qa.get("is_impossible", False)
+                    answer_text = None
                     answers = []
+                    start_position = None
+                    end_position = None
                     if not is_impossible:
-                        answer = qa["answers"][0]
-                        answer_text = answer["text"]
-                        start_position_character = answer["answer_start"]
-                        start_position = char_to_word_offset[start_position_character]
-                        end_position = char_to_word_offset[
-                            min(start_position_character + len(answer_text) - 1, len(char_to_word_offset) - 1)
-                        ]
-                        answers = qa["answers"]
-                        # actual_text = " ".join(doc_tokens[start_position:(end_position + 1)])
-                        # assert actual_text == answer_text
-                    else:
-                        start_position = -1
-                        end_position = -1
-                        answer_text = ""
+                        if is_training:
+                            # train: answer_text,start_position,end_position
+                            answer = qa["answers"][0]
+                            answer_text = answer["text"]
+                            start_position_character = answer["answer_start"]
+                            start_position = char_to_word_offset[start_position_character]
+                            end_position = char_to_word_offset[
+                                min(start_position_character + len(answer_text) - 1, len(char_to_word_offset) - 1)
+                            ]
+                            # actual_text = " ".join(doc_tokens[start_position:(end_position + 1)])
+                            # assert actual_text == answer_text
+                        else:
+                            # dev: answers
+                            answers = qa["answers"]
+
                     datable("qas_id",qas_id)
                     datable("is_impossible",is_impossible)
                     datable("question_text",question_text)
@@ -80,16 +95,8 @@ class Squad2Reader(BaseReader):
                     datable("end_position",end_position)
                     datable("doc_tokens",doc_tokens)
                     datable("title",title)
+
         return datable
-
-    def _read_dev(self, path):
-        return self._read_train(path)
-
-    def _read_test(self, path):
-        return None
-
-    def read_all(self):
-        return self._read_train(self.train_path), self._read_dev(self.dev_path), self._read_test(self.test_path)
 
     def read_vocab(self):
         return {}

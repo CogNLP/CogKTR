@@ -26,7 +26,7 @@ class BaseMRCMetric(BaseMetric):
 
         for i,example in enumerate(batch["example"]):
             feature1 = {
-                key:value[i].cpu().tolist() for key,value in batch.items() if key != "example" and key != "additional_info"
+                key:value[i].cpu().tolist() for key,value in batch.items() if key != "example" and key != "additional_info" and value is not None
             }
             feature2 = vars(batch["additional_info"][i])
             self.qas_id2info[example.qas_id].append({
@@ -123,12 +123,8 @@ class BaseMRCMetric(BaseMetric):
             if not gold_answers:
                 # For unanswerable questions, only correct answer is empty string
                 gold_answers = ['']
-            simple_start, simple_end = np.argmax(np.array(start_logits)), np.argmax(np.array(end_logits))
-            label_start, label_end = feature.start_position,feature.end_position
             em_score = max(compute_exact(gold_text,pred_text) for gold_text in gold_answers)
             f1_score = max(compute_f1(gold_text,pred_text) for gold_text in gold_answers)
-            # em_score = compute_exact(gold_text,pred_text)
-            # f1_score = compute_f1(gold_text,pred_text)
             qas_id2em_score[qas_id] = em_score
             qas_id2f1_score[qas_id] = f1_score
             result_to_file[qas_id] = pred_text
