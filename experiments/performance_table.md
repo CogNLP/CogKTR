@@ -92,10 +92,14 @@ Note:For the first time to run the program, please set the Enhancer reprocess pa
 | bert-base-cased+defination+hypernyms | 74.72527 | semcor_esr_bert_base_cased.py |
 
 
-[comment]: <> "## 6.Reading Comprehension"
+## 6.Reading Comprehension
 
-[comment]: <> "### 6.1 NULL"
+### 6.1 Squad2.0
 
+| Model | F1↑    | EM↑    | code |
+|---|--------|--------|---|
+| bert-base-uncased | 0.7494 | 0.7058 | squad2_bert_base_uncased.py |
+ 
 
 [comment]: <> "## 7.Masked LM"
 
