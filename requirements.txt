@@ -27,3 +27,4 @@ beautifulsoup4>=4.11.1
 pandas>=1.4.2
 cached-path==1.1.2
 qwikidata>=0.4.1
+hydra-core==1.2.0
