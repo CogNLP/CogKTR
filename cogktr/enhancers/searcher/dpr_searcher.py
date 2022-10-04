@@ -207,7 +207,8 @@ class DprSearcher(BaseSearcher):
         self.question_encoder.eval()
 
         vector_size = self.question_encoder.get_out_size()
-        self.indexer = hydra.utils.instantiate({'_target_': 'cogktr.enhancers.searcher.dpr_searcher.DenseFlatIndexer'})
+        self.indexer = DenseFlatIndexer()
+        # self.indexer = hydra.utils.instantiate({'_target_': 'cogktr.enhancers.searcher.dpr_searcher.DenseFlatIndexer'})
 
         # self.indexer = DenseFlatIndexer()
         self.indexer.init_index(vector_size)
