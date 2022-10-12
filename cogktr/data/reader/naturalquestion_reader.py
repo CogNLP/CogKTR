@@ -4,7 +4,7 @@ from cogktr.data.datable import DataTable
 from cogktr.utils.vocab_utils import Vocabulary
 from cogktr.utils.download_utils import Downloader
 import json
-
+import ast
 
 class NaturalQuestionsReader(BaseReader):
     def __init__(self, raw_data_path, use_cache=True):
@@ -13,12 +13,12 @@ class NaturalQuestionsReader(BaseReader):
         self.use_cache = use_cache
         # downloader = Downloader()
         # downloader.download_commonsenseqa_raw_data(raw_data_path)
-        self.train_file = 'nq-train.json'
-        self.dev_file = 'nq-dev.json'
-        self.test_file = None
+        self.train_file = 'nq-train.csv'
+        self.dev_file = 'nq-dev.csv'
+        self.test_file = 'nq-test.csv'
         self.train_path = os.path.join(raw_data_path, self.train_file)
         self.dev_path = os.path.join(raw_data_path, self.dev_file)
-        self.test_path = None
+        self.test_path = os.path.join(raw_data_path, self.test_file)
         self.label_vocab = Vocabulary()
         self.addition = {}
 
@@ -28,22 +28,23 @@ class NaturalQuestionsReader(BaseReader):
     def _read_dev(self, path):
         return self._read_data(path)
 
+    def _read_test(self, path):
+        return self._read_data(path)
+
 
     def _read_data(self, path):
         datable = DataTable()
         with open(path, "r", encoding="utf-8") as file:
-            lines = json.load(file)
-        print("Debug Usage")
-        for single_data in lines:
-            datable("question",single_data["question"])
-            datable("answers", single_data["answers"])
-            datable("positive_ctxs", single_data["positive_ctxs"])
-            datable("negative_ctxs", single_data["negative_ctxs"])
-            datable("hard_negative_ctxs", single_data["hard_negative_ctxs"])
+            lines = file.readlines()
+        for line in lines:
+            question,answers_text = line.strip('\n').split('\t')
+            answers = ast.literal_eval(answers_text)
+            datable("question",question)
+            datable("answers",answers)
         return datable
 
     def read_all(self):
-        return self._read_train(self.train_path), self._read_dev(self.dev_path) ,None
+        return self._read_train(self.train_path), self._read_dev(self.dev_path) ,self._read_test(self.test_path)
 
     def read_vocab(self):
         self.label_vocab.create()
