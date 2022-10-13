@@ -295,11 +295,11 @@ def _check_is_max_context(doc_spans, cur_span_index, position):
 if __name__ == "__main__":
     from cogktr.data.reader.squad2_reader import Squad2Reader
 
-    reader = Squad2Reader(raw_data_path="/data/mentianyi/code/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
+    reader = Squad2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
     train_data, dev_data, _ = reader.read_all()
     vocab = reader.read_vocab()
 
     processor = Squad2Processor(plm="bert-base-cased", max_token_len=256, vocab=vocab)
-    train_dataset = processor.process_train(train_data)
+    # train_dataset = processor.process_train(train_data)
     dev_dataset = processor.process_dev(dev_data)
     print("end")

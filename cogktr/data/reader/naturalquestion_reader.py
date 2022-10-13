@@ -7,10 +7,11 @@ import json
 import ast
 
 class NaturalQuestionsReader(BaseReader):
-    def __init__(self, raw_data_path, use_cache=True):
+    def __init__(self, raw_data_path, use_cache=True,debug=False):
         super(NaturalQuestionsReader, self).__init__()
         self.raw_data_path = raw_data_path
         self.use_cache = use_cache
+        self.debug = debug
         # downloader = Downloader()
         # downloader.download_commonsenseqa_raw_data(raw_data_path)
         self.train_file = 'nq-train.csv'
@@ -36,6 +37,8 @@ class NaturalQuestionsReader(BaseReader):
         datable = DataTable()
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
+        if self.debug:
+            lines = lines[:10]
         for line in lines:
             question,answers_text = line.strip('\n').split('\t')
             answers = ast.literal_eval(answers_text)
@@ -53,6 +56,6 @@ class NaturalQuestionsReader(BaseReader):
 
 if __name__ == "__main__":
     reader = NaturalQuestionsReader(
-        raw_data_path="/data/hongbang/CogKTR/datapath/question_answering/NaturalQuestions/raw_data")
+        raw_data_path="/data/hongbang/CogKTR/datapath/question_answering/NaturalQuestions/raw_data",debug=True)
     train_data, dev_data, test_data = reader.read_all()
     print("end")
