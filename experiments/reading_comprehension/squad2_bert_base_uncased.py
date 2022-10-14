@@ -11,7 +11,7 @@ lr = 5e-6
 device,output_path = init_cogktr(
     device_id=7,
     output_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/experimental_result/",
-    folder_tag="mrc_baseline_{}".format(lr),
+    folder_tag="demo_debug_usage".format(lr),
 )
 
 reader = Squad2Reader(raw_data_path="/data/hongbang/CogKTR/datapath/reading_comprehension/SQuAD2.0/raw_data")
@@ -20,7 +20,7 @@ vocab = reader.read_vocab()
 
 
 
-processor = Squad2Processor(plm="bert-base-uncased", max_token_len=384, vocab=vocab,debug=False)
+processor = Squad2Processor(plm="bert-base-uncased", max_token_len=384, vocab=vocab,debug=True)
 train_dataset = processor.process_train(train_data)
 dev_dataset = processor.process_dev(dev_data)
 
