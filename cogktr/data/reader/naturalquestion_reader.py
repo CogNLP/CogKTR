@@ -38,7 +38,7 @@ class NaturalQuestionsReader(BaseReader):
         with open(path, "r", encoding="utf-8") as file:
             lines = file.readlines()
         if self.debug:
-            lines = lines[:100]
+            lines = lines[:1000]
         for line in lines:
             question,answers_text = line.strip('\n').split('\t')
             answers = ast.literal_eval(answers_text)
