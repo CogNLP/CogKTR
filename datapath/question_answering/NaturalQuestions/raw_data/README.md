@@ -18,7 +18,8 @@ datapath
 ```
 
 And use the following code to convert the original reading comprehension
-model's state dict storage file so that it can be reused in our code.
+model's state dict storage file (which can be downloaded from [here](https://dl.fbaipublicfiles.com/dpr/checkpoint/reader/nq-single/hf_bert_base.cp))
+so that it can be reused in our code.
 
 
 ```python
